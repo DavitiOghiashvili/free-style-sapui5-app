@@ -8,12 +8,20 @@
     "sapui5"
   ],
   "main": "webapp/index.html",
-  "dependencies": {},
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@sap/ux-ui5-tooling": "1",
     "@ui5/cli": "^3.0.0",
-    "@sap/ux-ui5-tooling": "1"
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "globals": "^16.1.0",
+    "prettier": "^3.5.3"
   },
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
     "start": "fiori run --open \"test/flp.html#app-preview\"",
     "start-local": "fiori run --config ./ui5-local.yaml --open \"test/flp.html#app-preview\"",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
@@ -24,5 +32,15 @@
     "start-variants-management": "fiori run --open \"preview.html#app-preview\"",
     "unit-test": "fiori run --open 'test/unit/unitTests.qunit.html'"
   },
-  "sapuxLayer": "CUSTOMER_BASE"
+  "sapuxLayer": "CUSTOMER_BASE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavitiOghiashvili/free-style-sapui5-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DavitiOghiashvili/free-style-sapui5-app/issues"
+  },
+  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme"
 }
