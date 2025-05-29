@@ -9,26 +9,16 @@ sap.ui.define([
 
     return {
         /**
-         * Format product counts for display.
-         * @param {number} countAll - Total product count
-         * @param {number} ok - Count of products with OK status
-         * @param {number} storage - Count of products in storage
-         * @param {number} outOfStock - Count of out-of-stock products
-         * @returns {string} Formatted product count string
-         * @public
+         * Format the product count title
+         * @param {number} iCount - The product count
+         * @returns {string} Formatted title
          */
-        formatProductCounts(countAll, ok, storage, outOfStock) {
-            const parts = [];
-
-            if (ok > 0) parts.push(`${oResourceBundle.getText("OK")}: ${ok}`)
-            if (storage > 0) parts.push(`${oResourceBundle.getText("Storage")}: ${storage}`);
-            if (outOfStock > 0) parts.push(`${oResourceBundle.getText("outOfStock")}: ${outOfStock}`);
-
-            if (parts.length === 0) {
-                return `${oResourceBundle.getText("products")}: ${countAll}`;
+        formatProductCountTitle(iCount) {
+            if (iCount === undefined || iCount === null) {
+                return '0';
             }
-
-            return parts.join(", ");
+            const sKey = iCount > 0 ? "product" : "products";
+            return oResourceBundle.getText(sKey, [iCount]);
         },
 
         /**

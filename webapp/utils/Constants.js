@@ -10,9 +10,17 @@ sap.ui.define([], () => {
             OUT_OF_STOCK: "OUT_OF_STOCK",
         },
 
-        CURRENCIES: {
+        PRICE_CURRENCIES: {
             USD: 'USD',
             EUR: 'EUR',
+        },
+
+        RATING_LENGTH: {
+            1: '1',
+            2: '2',
+            3: '3',
+            4: '4',
+            5: '5',
         },
     };
 });

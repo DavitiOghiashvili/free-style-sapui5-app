@@ -3,7 +3,6 @@ sap.ui.define([
   "sap/ui/model/json/JSONModel",
   "sap/ui/model/Filter",
   "sap/ui/model/FilterOperator",
-  "sap/ui/comp/smartvariants/PersonalizableInfo",
   "sap/m/MessageBox",
   "../utils/Formatter",
   "../utils/Constants"
@@ -12,7 +11,6 @@ sap.ui.define([
   JSONModel,
   Filter,
   FilterOperator,
-  PersonalizableInfo,
   MessageBox,
   Formatter,
   Constants
@@ -20,6 +18,8 @@ sap.ui.define([
   "use strict";
 
   return Controller.extend("freestylesapui5app.controller.ListReport", {
+    formatter: Formatter,
+
     onInit() {
       const oResourceBundle = this.getOwnerComponent()
         .getModel("i18n")
@@ -27,62 +27,57 @@ sap.ui.define([
 
       this.getView().setModel(
         new JSONModel({
-          countAll: 0,
-          ok: 0,
-          storage: 0,
-          outOfStock: 0
-        }),
-        "productCount"
-      );
-
-      this.getView().setModel(
-        new JSONModel({
           currencies: [
-            { key: Constants.CURRENCIES.USD, text: oResourceBundle.getText("USD") },
-            { key: Constants.CURRENCIES.EUR, text: oResourceBundle.getText("EUR") }
-          ]
-        }),
-        "currencyModel"
-      );
-
-      this.getView().setModel(
-        new JSONModel({
+            { key: Constants.PRICE_CURRENCIES.USD, text: oResourceBundle.getText("USD") },
+            { key: Constants.PRICE_CURRENCIES.EUR, text: oResourceBundle.getText("EUR") }
+          ],
           statuses: [
             { key: Constants.PRODUCT_STATUS.OK, text: oResourceBundle.getText("OK") },
             { key: Constants.PRODUCT_STATUS.STORAGE, text: oResourceBundle.getText("Storage") },
             { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: oResourceBundle.getText("outOfStock") }
-          ]
+          ],
+          ratings: [
+            { key: Constants.RATING_LENGTH[1], text: '1' },
+            { key: Constants.RATING_LENGTH[2], text: '2' },
+            { key: Constants.RATING_LENGTH[3], text: '3' },
+            { key: Constants.RATING_LENGTH[4], text: '4' },
+            { key: Constants.RATING_LENGTH[5], text: '5' },
+          ],
+          productsCount: 0,
         }),
-        "statusModel"
+        "uiModel"
       );
 
       // Fetch initial product count
-      const oModel = this.getOwnerComponent().getModel();
-      const oCountModel = this.getView().getModel("productCount");
-      oModel.read("/Products/$count", {
-        success: (count) => oCountModel.setProperty("/countAll", count),
-        error: (oError) => MessageBox.error(oResourceBundle.getText("productCountError"), { details: oError })
-      });
+      this._updateFilteredCount([]);
 
       // Initialize view references
-      this.oSmartVariantManagement = this.getView().byId("idSmartVariantManagement");
       this.oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
       this.oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
       this.oFilterBar = this.getView().byId("idFilterBar");
 
-      // Bind variant management methods
-      this.oFilterBar.registerFetchData(this.fetchData.bind(this));
-      this.oFilterBar.registerApplyData(this.applyData.bind(this));
       this.oFilterBar.registerGetFiltersWithValues(this.getFiltersWithValues.bind(this));
+    },
 
-      // Configure variant management
-      const oPersInfo = new PersonalizableInfo({
-        type: "filterBar",
-        keyName: "ProductsFilterBar",
-        control: this.oFilterBar
+    /**
+     * Helper method to fetch filtered count from OData service
+     * @param {Array} aFilters - Array of filters to apply
+     * @private
+     */
+    _updateFilteredCount(aFilters) {
+      const oModel = this.getOwnerComponent().getModel();
+      const oUiModel = this.getView().getModel("uiModel");
+      const oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+
+      oModel.read("/Products/$count", {
+        filters: aFilters,
+        success: (count) => {
+          oUiModel.setProperty("/productsCount", count);
+        },
+        error: (oError) => {
+          MessageBox.error(oResourceBundle.getText("productCountError"), { details: oError });
+        }
       });
-      this.oSmartVariantManagement.addPersonalizableControl(oPersInfo);
-      this.oSmartVariantManagement.initialise(() => { }, this.oFilterBar);
     },
 
     /**
@@ -135,36 +130,7 @@ sap.ui.define([
       }
 
       oBinding.filter(aFilters);
-    },
-
-    /**
-     * Fetch filter data for variant management.
-     * @returns {Array} Array of filter data objects
-     * @public
-     */
-    fetchData() {
-      const aData = this.oFilterBar.getAllFilterItems().reduce((aResult, oFilterItem) => {
-        aResult.push({
-          groupName: oFilterItem.getGroupName(),
-          fieldName: oFilterItem.getName(),
-          fieldData: oFilterItem.getControl().getSelectedKeys()
-        });
-        return aResult;
-      }, []);
-
-      return aData;
-    },
-
-    /**
-     * Apply filter data from variant management.
-     * @param {Array} aData - Array of filter data objects
-     * @public
-     */
-    applyData(aData) {
-      aData.forEach((oDataObject) => {
-        const oControl = this.oFilterBar.determineControlByName(oDataObject.fieldName, oDataObject.groupName);
-        oControl.setSelectedKeys(oDataObject.fieldData);
-      }, this);
+      this._updateFilteredCount(aFilters);
     },
 
     /**
@@ -186,12 +152,10 @@ sap.ui.define([
 
     /**
      * Handle MultiComboBox selection changes and trigger variant modification.
-     * @param oEvent - Selection change event
      * @public
      */
-    onMultiComboBoxSelectionChange(oEvent) {
-      this.oSmartVariantManagement.currentVariantSetModified(true);
-      this.oFilterBar.fireFilterChange(oEvent);
+    onMultiComboBoxSelectionChange() {
+      this._updateLabelsAndTable();
     },
 
     /**
@@ -200,19 +164,12 @@ sap.ui.define([
      */
     onFilterBarSearch() {
       const oTable = this.getView().byId("idProductsTable");
-      const oModel = this.getOwnerComponent().getModel();
-      const oCountModel = this.getView().getModel("productCount");
-      let aTableFilters = [];
-      let selectedStatusKeys = [];
+      const aTableFilters = [];
 
       this.oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
         const oControl = oFilterGroupItem.getControl();
         const aSelectedKeys = oControl.getSelectedKeys();
         const sFieldName = oFilterGroupItem.getName();
-
-        if (sFieldName === "Status") {
-          selectedStatusKeys = aSelectedKeys;
-        }
 
         if (aSelectedKeys.length > 0) {
           const aFilters = aSelectedKeys.map((sSelectedKey) => {
@@ -232,44 +189,7 @@ sap.ui.define([
 
       oTable.getBinding("items").filter(aTableFilters);
       oTable.setShowOverlay(false);
-
-      oCountModel.setData({
-        countAll: oCountModel.getProperty("/countAll"),
-        ok: 0,
-        storage: 0,
-        outOfStock: 0
-      });
-
-      selectedStatusKeys.forEach((statusKey) => {
-        oModel.read("/Products/$count", {
-          urlParameters: {
-            "$filter": `Status eq '${statusKey}'`
-          },
-          success: (count) => {
-            if (statusKey === Constants.PRODUCT_STATUS.OK) {
-              oCountModel.setProperty("/ok", count);
-            } else if (statusKey === Constants.PRODUCT_STATUS.STORAGE) {
-              oCountModel.setProperty("/storage", count);
-            } else if (statusKey === Constants.PRODUCT_STATUS.OUT_OF_STOCK) {
-              oCountModel.setProperty("/outOfStock", count);
-            }
-          },
-          error: (oError) => MessageBox.error(oResourceBundle.getText("productCountError"), { details: oError })
-        });
-      });
-    },
-
-    /**
-     * Format product counts for display.
-     * @param {number} countAll - Total product count
-     * @param {number} ok - Count of products with OK status
-     * @param {number} storage - Count of products in storage
-     * @param {number} outOfStock - Count of out-of-stock products
-     * @returns {string} Formatted product count string
-     * @public
-     */
-    formatProductCounts(countAll, ok, storage, outOfStock) {
-      return Formatter.formatProductCounts(countAll, ok, storage, outOfStock);
+      this._updateFilteredCount(aTableFilters);
     },
 
     /**
