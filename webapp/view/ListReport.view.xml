@@ -3,7 +3,6 @@
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
     xmlns:f="sap.f"
-    xmlns:svm="sap.ui.comp.smartvariants"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:plugins="sap.m.plugins"
     core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
@@ -11,8 +10,7 @@
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
-                    <svm:SmartVariantManagement id="idSmartVariantManagement"
-                        showExecuteOnSelection="true" />
+                    <Title text="{i18n>appTitle}" />
                 </f:heading>
                 <f:expandedContent>
                     <Label id="idNoFiltersActiveExpandedLabel"
@@ -37,45 +35,37 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Price_currency"
                             label="{i18n>priceCurrencyLabel}"
-                            groupName="Group1">
+                            groupName="Default">
                             <fb:control>
                                 <MultiComboBox name="Price_currency"
                                     selectionChange="onMultiComboBoxSelectionChange"
-                                    items="{currencyModel>/currencies}">
-                                    <core:Item key="{currencyModel>key}"
-                                        text="{currencyModel>text}" />
+                                    items="{uiModel>/currencies}">
+                                    <core:Item key="{uiModel>key}"
+                                        text="{uiModel>text}" />
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
                         <fb:FilterGroupItem name="Rating"
                             label="{i18n>ratingLabel}"
-                            groupName="Group1">
+                            groupName="Default">
                             <fb:control>
-                                <MultiComboBox id="idRatingMultiComboBox"
-                                    name="Rating"
-                                    selectionChange="onMultiComboBoxSelectionChange">
-                                    <core:Item key="1"
-                                        text="1" />
-                                    <core:Item key="2"
-                                        text="2" />
-                                    <core:Item key="3"
-                                        text="3" />
-                                    <core:Item key="4"
-                                        text="4" />
-                                    <core:Item key="5"
-                                        text="5" />
+                                <MultiComboBox name="Rating"
+                                    selectionChange="onMultiComboBoxSelectionChange"
+                                    items="{uiModel>/ratings}">
+                                    <core:Item key="{uiModel>key}"
+                                        text="{uiModel>text}" />
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
                         <fb:FilterGroupItem name="Status"
                             label="{i18n>statusLabel}"
-                            groupName="Group1">
+                            groupName="Default">
                             <fb:control>
                                 <MultiComboBox name="Status"
                                     selectionChange="onMultiComboBoxSelectionChange"
-                                    items="{statusModel>/statuses}">
-                                    <core:Item key="{statusModel>key}"
-                                        text="{statusModel>text}" />
+                                    items="{uiModel>/statuses}">
+                                    <core:Item key="{uiModel>key}"
+                                        text="{uiModel>text}" />
                                 </MultiComboBox>
                             </fb:control>
                         </fb:FilterGroupItem>
@@ -91,15 +81,11 @@
                 items="{/Products}">
                 <headerToolbar>
                     <OverflowToolbar>
-                        <Title id="idProductsTitle"
-                            text="{
+                        <Title text="{ 
                                 parts: [
-                                'productCount>/countAll',
-                                'productCount>/ok',
-                                'productCount>/storage',
-                                'productCount>/outOfStock'
-                                ],
-                                formatter: '.formatProductCounts'
+                                'uiModel>/productsCount'
+                                ], 
+                                formatter: '.formatter.formatProductCountTitle' 
                             }" />
                         <ToolbarSpacer />
                         <Button text="{i18n>createBtn}" />
@@ -139,6 +125,7 @@
                         <Text text="{i18n>statusColumn}" />
                     </Column>
                 </columns>
+<<<<<<< HEAD
                 <items>
                     <ColumnListItem type="Navigation"
                         press="onColumnListItemPress">
@@ -160,6 +147,24 @@
                         </cells>
                     </ColumnListItem>
                 </items>
+=======
+                <ColumnListItem type="Navigation">
+                    <Text text="{Name}"
+                        wrapping="false" />
+                    <Text text="{Price_amount}" />
+                    <Text text="{Price_currency}" />
+                    <Text text="{Specs}"
+                        wrapping="false" />
+                    <Text text="{SupplierInfo}"
+                        wrapping="false" />
+                    <Text text="{MadeIn}" />
+                    <Text text="{ProductionCompanyName}" />
+                    <RatingIndicator value="{Rating}"
+                        displayOnly="true"
+                        iconSize="1rem" />
+                    <Text text="{Status}" />
+                </ColumnListItem>
+>>>>>>> 4f72312886c5d9b46fba99b5d56334425c0e6248
             </Table>
         </f:content>
     </f:DynamicPage>
