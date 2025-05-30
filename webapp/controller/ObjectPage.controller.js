@@ -1,9 +1,12 @@
 sap.ui.define([
-  "sap/ui/core/mvc/Controller"
-], function (Controller) {
+  "sap/ui/core/mvc/Controller",
+  "freestylesapui5app/utils/Formatter"
+], function (Controller,
+  Formatter) {
   "use strict";
-
   return Controller.extend("freestylesapui5app.controller.ObjectPage", {
+    formatter: Formatter,
+
     onInit() {
       this.getOwnerComponent()
         .getRouter()

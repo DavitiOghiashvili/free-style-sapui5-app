@@ -14,7 +14,7 @@
 
                 <snappedHeading>
                     <m:HBox>
-                        <m:Avatar src="./someImage"
+                        <m:Avatar src="{Photo}"
                             class="sapUiMediumMarginEnd"
                             displayShape="Square" />
                         <m:VBox>
@@ -22,10 +22,6 @@
                         </m:VBox>
                     </m:HBox>
                 </snappedHeading>
-
-                <snappedTitleOnMobile>
-                    <m:Title text="{Name}" />
-                </snappedTitleOnMobile>
 
                 <actions>
                     <m:Button text="{i18n>editBtn}"
@@ -38,7 +34,7 @@
         <headerContent>
             <m:FlexBox wrap="Wrap"
                 fitContainer="true">
-                <m:Avatar src="./someImage"
+                <m:Avatar src="{Photo}"
                     class="sapUiMediumMarginEnd"
                     displayShape="Square"
                     displaySize="L" />
@@ -69,7 +65,8 @@
                 <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
                     <m:Title text="{i18n>status}"
                         class="sapUiTinyMarginBottom" />
-                    <m:ObjectStatus text="{Status}"
+                    <m:ObjectStatus text="{ path: 'Status', formatter: '.formatter.productStatusText' }"
+                        state="{ path: 'Status', formatter: '.formatter.productStatusState' }"
                         class="sapMObjectStatusLarge" />
                 </m:VBox>
 
@@ -88,39 +85,37 @@
             <ObjectPageSection title="{i18n>generalInformationTitle}">
                 <subSections>
                     <ObjectPageSubSection title="{i18n>generalInformationTitle}">
-                        <blocks>
-                            <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
-                                layout="ColumnLayout"
-                                columnsM="2"
-                                columnsL="3"
-                                columnsXL="4">
-                                <core:Title text="{i18n>productDetails}" />
+                        <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
+                            layout="ColumnLayout"
+                            columnsM="2"
+                            columnsL="3"
+                            columnsXL="4">
+                            <core:Title text="{i18n>productDetails}" />
 
-                                <m:Label text="{i18n>Name}" />
-                                <m:Text text="{Name}" />
+                            <m:Label text="{i18n>Name}" />
+                            <m:Text text="{Name}" />
 
-                                <m:Label text="{i18n>productId}" />
-                                <m:Text text="{ID}" />
+                            <m:Label text="{i18n>productId}" />
+                            <m:Text text="{ID}" />
 
-                                <m:Label text="{i18n>productCreatedAt}" />
-                                <m:Text text="{createdAt}" />
+                            <m:Label text="{i18n>productCreatedAt}" />
+                            <m:Text text="{createdAt}" />
 
-                                <m:Label text="{i18n>productCreatedBy}" />
-                                <m:Text text="{createdBy}" />
+                            <m:Label text="{i18n>productCreatedBy}" />
+                            <m:Text text="{createdBy}" />
 
-                                <m:Label text="{i18n>productModifiedAt}" />
-                                <m:Text text="{modifiedAt}" />
+                            <m:Label text="{i18n>productModifiedAt}" />
+                            <m:Text text="{modifiedAt}" />
 
-                                <m:Label text="{i18n>productModifiedBy}" />
-                                <m:Text text="{modifiedBy}" />
+                            <m:Label text="{i18n>productModifiedBy}" />
+                            <m:Text text="{modifiedBy}" />
 
-                                <m:Label text="{i18n>specs}" />
-                                <m:Text text="{Specs}" />
+                            <m:Label text="{i18n>specs}" />
+                            <m:Text text="{Specs}" />
 
-                                <m:Label text="{i18n>supplierInfo}" />
-                                <m:Text text="{SupplierInfo}" />
-                            </forms:SimpleForm>
-                        </blocks>
+                            <m:Label text="{i18n>supplierInfo}" />
+                            <m:Text text="{SupplierInfo}" />
+                        </forms:SimpleForm>
                     </ObjectPageSubSection>
                 </subSections>
             </ObjectPageSection>
@@ -150,18 +145,14 @@
                                     <m:Text text="{i18n>commentRating}" />
                                 </m:Column>
                             </m:columns>
-                            <m:items>
-                                <m:ColumnListItem>
-                                    <m:cells>
-                                        <m:Text text="{Author}" />
-                                        <m:Text text="{Message}"
-                                            wrapping="false" />
-                                        <m:Text text="{Posted}"
-                                            wrapping="false" />
-                                        <m:Text text="{Rating}" />
-                                    </m:cells>
-                                </m:ColumnListItem>
-                            </m:items>
+                            <m:ColumnListItem>
+                                <m:Text text="{Author}" />
+                                <m:Text text="{Message}"
+                                    wrapping="false" />
+                                <m:Text text="{Posted}"
+                                    wrapping="false" />
+                                <m:Text text="{Rating}" />
+                            </m:ColumnListItem>
                         </m:Table>
                     </ObjectPageSubSection>
                 </subSections>

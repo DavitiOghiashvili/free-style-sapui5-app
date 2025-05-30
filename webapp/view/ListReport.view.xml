@@ -4,8 +4,7 @@
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:plugins="sap.m.plugins"
-    core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+    xmlns:plugins="sap.m.plugins">
     <f:DynamicPage>
         <f:title>
             <f:DynamicPageTitle>
@@ -25,14 +24,22 @@
 
         <f:header>
             <f:DynamicPageHeader>
-                <SearchField search="onSearchFieldSearch"
-                    placeholder="{parts: ['i18n>searchPlaceholder'], formatter: 'formatMessage'}"
-                    width="17.5rem" />
                 <fb:FilterBar id="idFilterBar"
                     search="onFilterBarSearch"
                     filterChange="onFilterBarFilterChange"
-                    afterVariantLoad="onFilterBarAfterVariantLoad">
+                    afterVariantLoad="onFilterBarAfterVariantLoad"
+                    basicSearch="true">
                     <fb:filterGroupItems>
+                        <fb:FilterGroupItem name="Search Field"
+                            label="{i18n>searchLabel}"
+                            groupName="Default"
+                            visibleInFilterBar="true">
+                            <fb:control>
+                                <SearchField search="onFilterBarSearch"
+                                    id="idSearchField"
+                                    placeholder="{i18n>searchPlaceholder}" />
+                            </fb:control>
+                        </fb:FilterGroupItem>
                         <fb:FilterGroupItem name="Price_currency"
                             label="{i18n>priceCurrencyLabel}"
                             groupName="Default">
@@ -125,30 +132,9 @@
                         <Text text="{i18n>statusColumn}" />
                     </Column>
                 </columns>
-<<<<<<< HEAD
-                <items>
-                    <ColumnListItem type="Navigation"
-                        press="onColumnListItemPress">
-                        <cells>
-                            <Text text="{Name}"
-                                wrapping="false" />
-                            <Text text="{Price_amount}" />
-                            <Text text="{Price_currency}" />
-                            <Text text="{Specs}"
-                                wrapping="false" />
-                            <Text text="{SupplierInfo}"
-                                wrapping="false" />
-                            <Text text="{MadeIn}" />
-                            <Text text="{ProductionCompanyName}" />
-                            <RatingIndicator value="{Rating}"
-                                displayOnly="true"
-                                iconSize="16px" />
-                            <Text text="{Status}" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-=======
-                <ColumnListItem type="Navigation">
+
+                <ColumnListItem type="Navigation"
+                    press="onColumnListItemPress">
                     <Text text="{Name}"
                         wrapping="false" />
                     <Text text="{Price_amount}" />
@@ -162,9 +148,9 @@
                     <RatingIndicator value="{Rating}"
                         displayOnly="true"
                         iconSize="1rem" />
-                    <Text text="{Status}" />
+                    <ObjectStatus text="{ path: 'Status', formatter: '.formatter.productStatusText' }"
+                        state="{ path: 'Status', formatter: '.formatter.productStatusState' }" />
                 </ColumnListItem>
->>>>>>> 4f72312886c5d9b46fba99b5d56334425c0e6248
             </Table>
         </f:content>
     </f:DynamicPage>

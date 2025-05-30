@@ -54,9 +54,10 @@ sap.ui.define([
       // Initialize view references
       this.oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
       this.oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
+      this.oSearchField = this.getView().byId("idSearchField");
       this.oFilterBar = this.getView().byId("idFilterBar");
 
-      this.oFilterBar.registerGetFiltersWithValues(this.getFiltersWithValues.bind(this));
+      this.oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
     },
 
     /**
@@ -81,64 +82,11 @@ sap.ui.define([
     },
 
     /**
-     * Handle search input to filter table items.
-     * @param oEvent - Search field event
-     * @public
-     */
-    onSearchFieldSearch(oEvent) {
-      const sQuery = oEvent.getParameter("query").trim();
-      const oTable = this.byId("idProductsTable");
-      const oBinding = oTable.getBinding("items");
-      const aFilters = [];
-
-      if (sQuery) {
-        const textFields = ["Name", "Specs", "SupplierInfo", "MadeIn", "ProductionCompanyName"];
-        const textFilters = textFields.map(path =>
-          new Filter({ path, operator: FilterOperator.Contains, caseSensitive: false, value1: sQuery })
-        );
-
-        if (!isNaN(sQuery)) {
-          const nQuery = Number(sQuery);
-          const maxLength = Constants.MAX_PRICE_QUERY_LENGTH;
-          const numDigitsInQuery = sQuery.length;
-          const multiplier = Math.pow(10, maxLength - numDigitsInQuery);
-
-          const value1 = nQuery * multiplier;
-          const value2 = (nQuery + 1) * multiplier - 1;
-
-          textFilters.push(
-            new Filter({
-              path: "Price_amount",
-              operator: FilterOperator.BT,
-              value1: value1,
-              value2: value2
-            })
-          );
-        }
-
-        if (!isNaN(sQuery)) {
-          textFilters.push(
-            new Filter({
-              path: "Rating",
-              operator: FilterOperator.EQ,
-              value1: Number(sQuery)
-            })
-          );
-        }
-
-        aFilters.push(new Filter({ filters: textFilters, and: false }));
-      }
-
-      oBinding.filter(aFilters);
-      this._updateFilteredCount(aFilters);
-    },
-
-    /**
      * Retrieve filter group items with values.
      * @returns {Array} Array of filter group items with selected values
-     * @public
+     * @private
      */
-    getFiltersWithValues() {
+    _getFiltersWithValues() {
       const aFiltersWithValue = this.oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
         const oControl = oFilterGroupItem.getControl();
         if (oControl.getSelectedKeys().length > 0) {
@@ -164,32 +112,83 @@ sap.ui.define([
      */
     onFilterBarSearch() {
       const oTable = this.getView().byId("idProductsTable");
-      const aTableFilters = [];
+      const oBinding = oTable.getBinding("items");
+      const aFilters = [];
+
+      const sQuery = this.oSearchField.getValue().trim();
+      const textFields = Constants.SEARCH_FILTERS.byText
+
+      if (sQuery) {
+        const aTextFieldFilters = textFields.map((field) => {
+          return new Filter({
+            path: field,
+            operator: FilterOperator.Contains,
+            caseSensitive: false,
+            value1: sQuery
+          });
+        });
+
+        if (!isNaN(sQuery)) {
+          const nQuery = Number(sQuery);
+          const maxLength = Constants.MAX_PRICE_QUERY_LENGTH;
+          const numDigitsInQuery = sQuery.length;
+          const multiplier = Math.pow(10, maxLength - numDigitsInQuery);
+
+          const value1 = nQuery * multiplier;
+          const value2 = (nQuery + 1) * multiplier - 1;
+
+          aFilters.push(
+            new Filter({
+              path: "Price_amount",
+              operator: FilterOperator.BT,
+              value1: value1,
+              value2: value2
+            })
+          );
+        }
+
+        if (!isNaN(sQuery)) {
+          aFilters.push(
+            new Filter({
+              path: "Rating",
+              operator: FilterOperator.EQ,
+              value1: Number(sQuery)
+            })
+          );
+        }
+
+        aFilters.push(new Filter({
+          filters: aTextFieldFilters,
+          and: false
+        }));
+      }
 
       this.oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
-        const oControl = oFilterGroupItem.getControl();
-        const aSelectedKeys = oControl.getSelectedKeys();
         const sFieldName = oFilterGroupItem.getName();
+        if (sFieldName === "Search Field") return;
 
-        if (aSelectedKeys.length > 0) {
-          const aFilters = aSelectedKeys.map((sSelectedKey) => {
-            return new Filter({
-              path: sFieldName,
-              operator: sFieldName === "Rating" ? FilterOperator.EQ : FilterOperator.Contains,
-              value1: sSelectedKey
+        const oControl = oFilterGroupItem.getControl();
+        if (typeof oControl.getSelectedKeys === "function") {
+          const aSelectedKeys = oControl.getSelectedKeys();
+          if (aSelectedKeys.length > 0) {
+            const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
+              return new Filter({
+                path: sFieldName,
+                operator: sFieldName === "Rating" ? FilterOperator.EQ : FilterOperator.Contains,
+                value1: sSelectedKey
+              });
             });
-          });
 
-          aTableFilters.push(new Filter({
-            filters: aFilters,
-            and: false
-          }));
+            aFilters.push(new Filter({
+              filters: aFieldFilters,
+              and: false
+            }));
+          }
         }
       });
 
-      oTable.getBinding("items").filter(aTableFilters);
-      oTable.setShowOverlay(false);
-      this._updateFilteredCount(aTableFilters);
+      oBinding.filter(aFilters);
+      this._updateFilteredCount(aFilters);
     },
 
     /**
