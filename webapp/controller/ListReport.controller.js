@@ -99,7 +99,7 @@ sap.ui.define([
       if (sQuery) {
         const textFields = ["Name", "Specs", "SupplierInfo", "MadeIn", "ProductionCompanyName"];
         const textFilters = textFields.map(path =>
-          new Filter({ path, operator: FilterOperator.Contains, value1: sQuery })
+          new Filter({ path, operator: FilterOperator.Contains, caseSensitive: false, value1: sQuery })
         );
 
         if (!isNaN(sQuery)) {
@@ -295,6 +295,20 @@ sap.ui.define([
     _updateLabelsAndTable() {
       this.oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this.oFilterBar));
       this.oSnappedLabel.setText(Formatter.getFormattedSummaryText(this.oFilterBar));
+    },
+
+    /**
+     * Navigate to item on press.
+     * @param oEvent item press event.
+     * @public
+     */
+    onColumnListItemPress(oEvent) {
+      const oContext = oEvent.getSource().getBindingContext();
+      const sProductId = oContext.getProperty("ID");
+
+      this.getOwnerComponent().getRouter().navTo("ObjectPage", {
+        Product_ID: sProductId,
+      });
     }
   });
 });

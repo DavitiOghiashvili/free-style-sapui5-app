@@ -140,7 +140,8 @@
                     </Column>
                 </columns>
                 <items>
-                    <ColumnListItem type="Navigation">
+                    <ColumnListItem type="Navigation"
+                        press="onColumnListItemPress">
                         <cells>
                             <Text text="{Name}"
                                 wrapping="false" />

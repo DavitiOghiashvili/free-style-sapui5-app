@@ -1,13 +1,28 @@
 sap.ui.define([
-    "sap/ui/model/resource/ResourceModel"
-], (ResourceModel) => {
+    "sap/ui/model/resource/ResourceModel",
+    "sap/ui/core/library"
+], (ResourceModel, coreLibrary) => {
     "use strict";
-
     const oResourceBundle = new ResourceModel({
         bundleName: "freestylesapui5app.i18n.i18n"
     }).getResourceBundle();
 
+    const { ValueState } = coreLibrary.ValueState
+
     return {
+        productStatusState(fValue) {
+
+            if (fValue === 'OK') {
+                return ValueState.Success;
+            } else if (fValue === 'STORAGE') {
+                return ValueState.Warning;
+            } else if (fValue === 'OUT_OF_STOCK') {
+                return ValueState.Error;
+            } else {
+                return ValueState.None;
+            }
+        },
+
         /**
          * Format product counts for display.
          * @param {number} countAll - Total product count
