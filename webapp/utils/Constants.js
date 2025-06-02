@@ -22,5 +22,9 @@ sap.ui.define([], () => {
             4: '4',
             5: '5',
         },
+
+        SEARCH_FILTERS: {
+            byText: ["Name", "Specs", "SupplierInfo", "MadeIn", "ProductionCompanyName"]
+        }
     };
 });
