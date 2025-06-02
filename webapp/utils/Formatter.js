@@ -10,13 +10,13 @@ sap.ui.define([
         bundleName: "freestylesapui5app.i18n.i18n"
     }).getResourceBundle();
 
-    const ValueState = coreLibrary.ValueState
+    const { ValueState } = coreLibrary
 
     return {
         /**
          * Format the status
          * @param {string} statusValue - The product status
-         * @returns {enum} ValueState - Formatted status state
+         * @returns {sap.ui.core.library.ValueState} ValueState - Formatted status state
          */
         productStatusState(statusValue) {
             switch (statusValue) {
@@ -36,17 +36,8 @@ sap.ui.define([
          * @param {string} statusValue - The product status
          * @returns {string} Formatted title - The corresponding text for the product status
          */
-        productStatusText(statusValue) {
-            switch (statusValue) {
-                case Constants.PRODUCT_STATUS.OK:
-                    return oResourceBundle.getText("OK")
-                case Constants.PRODUCT_STATUS.STORAGE:
-                    return oResourceBundle.getText("Storage")
-                case Constants.PRODUCT_STATUS.OUT_OF_STOCK:
-                    return oResourceBundle.getText("outOfStock")
-                default:
-                    return ValueState.None;
-            }
+        productStatusText(sStatusValue) {
+            return oResourceBundle.getText(sStatusValue);
         },
 
         /**

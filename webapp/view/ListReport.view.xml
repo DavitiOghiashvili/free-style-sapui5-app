@@ -37,6 +37,7 @@
                             <fb:control>
                                 <SearchField search="onFilterBarSearch"
                                     id="idSearchField"
+                                    value="{uiModel>/searchQuery}"
                                     placeholder="{i18n>searchPlaceholder}" />
                             </fb:control>
                         </fb:FilterGroupItem>
@@ -69,7 +70,7 @@
                             groupName="Default">
                             <fb:control>
                                 <MultiComboBox name="Status"
-                                    selectionChange="onMultiComboBoxSelectionChange"
+                                    selectedKeys="{uiModel>/selectedStatuses}"
                                     items="{uiModel>/statuses}">
                                     <core:Item key="{uiModel>key}"
                                         text="{uiModel>text}" />

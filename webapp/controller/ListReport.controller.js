@@ -33,8 +33,8 @@ sap.ui.define([
           ],
           statuses: [
             { key: Constants.PRODUCT_STATUS.OK, text: oResourceBundle.getText("OK") },
-            { key: Constants.PRODUCT_STATUS.STORAGE, text: oResourceBundle.getText("Storage") },
-            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: oResourceBundle.getText("outOfStock") }
+            { key: Constants.PRODUCT_STATUS.STORAGE, text: oResourceBundle.getText("STORAGE") },
+            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: oResourceBundle.getText("OUT_OF_STOCK") }
           ],
           ratings: [
             { key: Constants.RATING_LENGTH[1], text: '1' },
@@ -44,6 +44,7 @@ sap.ui.define([
             { key: Constants.RATING_LENGTH[5], text: '5' },
           ],
           productsCount: 0,
+          searchQuery: '',
         }),
         "uiModel"
       );
@@ -54,7 +55,6 @@ sap.ui.define([
       // Initialize view references
       this.oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
       this.oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
-      this.oSearchField = this.getView().byId("idSearchField");
       this.oFilterBar = this.getView().byId("idFilterBar");
 
       this.oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
@@ -115,7 +115,7 @@ sap.ui.define([
       const oBinding = oTable.getBinding("items");
       const aFilters = [];
 
-      const sQuery = this.oSearchField.getValue().trim();
+      const sQuery = this.getView().getModel("uiModel").getProperty("/searchQuery")
       const textFields = Constants.SEARCH_FILTERS.byText
 
       if (sQuery) {
@@ -165,26 +165,26 @@ sap.ui.define([
 
       this.oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
         const sFieldName = oFilterGroupItem.getName();
-        if (sFieldName === "Search Field") return;
+        if (sFieldName === 'Search Field') return;
 
         const oControl = oFilterGroupItem.getControl();
-        if (typeof oControl.getSelectedKeys === "function") {
-          const aSelectedKeys = oControl.getSelectedKeys();
-          if (aSelectedKeys.length > 0) {
-            const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
-              return new Filter({
-                path: sFieldName,
-                operator: sFieldName === "Rating" ? FilterOperator.EQ : FilterOperator.Contains,
-                value1: sSelectedKey
-              });
-            });
+        const aSelectedKeys = oControl.getSelectedKeys();
 
-            aFilters.push(new Filter({
-              filters: aFieldFilters,
-              and: false
-            }));
-          }
+        if (aSelectedKeys.length > 0) {
+          const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
+            return new Filter({
+              path: sFieldName,
+              operator: sFieldName === "Rating" ? FilterOperator.EQ : FilterOperator.Contains,
+              value1: sSelectedKey
+            });
+          });
+
+          aFilters.push(new Filter({
+            filters: aFieldFilters,
+            and: false
+          }));
         }
+
       });
 
       oBinding.filter(aFilters);
