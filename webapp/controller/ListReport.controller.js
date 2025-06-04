@@ -5,7 +5,9 @@ sap.ui.define([
   "sap/ui/model/FilterOperator",
   "sap/m/MessageBox",
   "../utils/Formatter",
-  "../utils/Constants"
+  "../utils/Constants",
+  "sap/ui/core/BusyIndicator",
+  "sap/m/MessageToast",
 ], (
   Controller,
   JSONModel,
@@ -13,7 +15,9 @@ sap.ui.define([
   FilterOperator,
   MessageBox,
   Formatter,
-  Constants
+  Constants,
+  BusyIndicator,
+  MessageToast
 ) => {
   "use strict";
 
@@ -21,20 +25,20 @@ sap.ui.define([
     formatter: Formatter,
 
     onInit() {
-      const oResourceBundle = this.getOwnerComponent()
+      this._oResourceBundle = this.getOwnerComponent()
         .getModel("i18n")
         .getResourceBundle();
 
       this.getView().setModel(
         new JSONModel({
           currencies: [
-            { key: Constants.PRICE_CURRENCIES.USD, text: oResourceBundle.getText("USD") },
-            { key: Constants.PRICE_CURRENCIES.EUR, text: oResourceBundle.getText("EUR") }
+            { key: Constants.PRICE_CURRENCIES.USD, text: this._oResourceBundle.getText("USD") },
+            { key: Constants.PRICE_CURRENCIES.EUR, text: this._oResourceBundle.getText("EUR") }
           ],
           statuses: [
-            { key: Constants.PRODUCT_STATUS.OK, text: oResourceBundle.getText("OK") },
-            { key: Constants.PRODUCT_STATUS.STORAGE, text: oResourceBundle.getText("STORAGE") },
-            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: oResourceBundle.getText("OUT_OF_STOCK") }
+            { key: Constants.PRODUCT_STATUS.OK, text: this._oResourceBundle.getText("OK") },
+            { key: Constants.PRODUCT_STATUS.STORAGE, text: this._oResourceBundle.getText("STORAGE") },
+            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: this._oResourceBundle.getText("OUT_OF_STOCK") }
           ],
           ratings: [
             { key: Constants.RATING_LENGTH[1], text: '1' },
@@ -56,6 +60,7 @@ sap.ui.define([
       this.oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
       this.oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
       this.oFilterBar = this.getView().byId("idFilterBar");
+      this.oTable = this.getView().byId("idProductsTable");
 
       this.oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
     },
@@ -68,7 +73,6 @@ sap.ui.define([
     _updateFilteredCount(aFilters) {
       const oModel = this.getOwnerComponent().getModel();
       const oUiModel = this.getView().getModel("uiModel");
-      const oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
       oModel.read("/Products/$count", {
         filters: aFilters,
@@ -76,7 +80,7 @@ sap.ui.define([
           oUiModel.setProperty("/productsCount", count);
         },
         error: (oError) => {
-          MessageBox.error(oResourceBundle.getText("productCountError"), { details: oError });
+          MessageBox.error(this._oResourceBundle.getText("productCountError"), { details: oError });
         }
       });
     },
@@ -111,8 +115,7 @@ sap.ui.define([
      * @public
      */
     onFilterBarSearch() {
-      const oTable = this.getView().byId("idProductsTable");
-      const oBinding = oTable.getBinding("items");
+      const oBinding = this.oTable.getBinding("items");
       const aFilters = [];
 
       const sQuery = this.getView().getModel("uiModel").getProperty("/searchQuery")
@@ -214,6 +217,66 @@ sap.ui.define([
     _updateLabelsAndTable() {
       this.oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this.oFilterBar));
       this.oSnappedLabel.setText(Formatter.getFormattedSummaryText(this.oFilterBar));
+    },
+
+    /**
+   * Handle products table selection change and enable delete button.
+   * @param oEvent item press event.
+   * @public
+   */
+    onProductsTableSelectionChange(oEvent) {
+      const oTable = oEvent.getSource();
+      const aSelectedContexts = oTable.getSelectedContexts();
+
+      const oDeleteButton = this.byId("idProductDeleteButton");
+      oDeleteButton.setEnabled(aSelectedContexts.length > 0);
+    },
+
+    /**
+     * Product delete button handler.
+     * @public
+     */
+    onDeleteButtonPress() {
+      const oModel = this.getOwnerComponent().getModel();
+      const aSelectedContexts = this.oTable.getSelectedContexts();
+      const oBinding = this.oTable.getBinding("items");
+
+      const handleDeleteSuccess = () => {
+        BusyIndicator.hide();
+        MessageToast.show(this._oResourceBundle.getText("productDeleteSuccess"));
+        this._updateFilteredCount([])
+        if (!oBinding.length) {
+          oBinding.filter()
+        }
+      };
+
+      const handleDeleteError = (oError) => {
+        BusyIndicator.hide();
+        MessageBox.error(this._oResourceBundle.getText("productDeleteError"), {
+          details: oError,
+        });
+      };
+
+      const deleteSelectedContexts = () => {
+        BusyIndicator.show();
+        aSelectedContexts.forEach((oContext) => {
+          const sPath = oContext.getPath();
+          oModel.remove(sPath, {
+            success: handleDeleteSuccess,
+            error: handleDeleteError,
+          });
+        });
+      };
+
+      const handleConfirmClose = (sAction) => {
+        if (sAction === MessageBox.Action.OK) {
+          deleteSelectedContexts();
+        }
+      };
+
+      MessageBox.confirm(this._oResourceBundle.getText("confirmDeleteProduct"), {
+        onClose: handleConfirmClose,
+      });
     },
 
     /**

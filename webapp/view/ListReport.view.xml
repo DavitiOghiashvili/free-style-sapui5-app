@@ -86,6 +86,7 @@
             <Table id="idProductsTable"
                 autoPopinMode="true"
                 mode="MultiSelect"
+                selectionChange="onProductsTableSelectionChange"
                 items="{/Products}">
                 <headerToolbar>
                     <OverflowToolbar>
@@ -98,6 +99,8 @@
                         <ToolbarSpacer />
                         <Button text="{i18n>createBtn}" />
                         <Button text="{i18n>deleteBtn}"
+                            id="idProductDeleteButton"
+                            press="onDeleteButtonPress"
                             enabled="false" />
                     </OverflowToolbar>
                 </headerToolbar>
