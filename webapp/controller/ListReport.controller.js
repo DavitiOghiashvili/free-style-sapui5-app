@@ -8,6 +8,7 @@ sap.ui.define([
   "../utils/Constants",
   "sap/ui/core/BusyIndicator",
   "sap/m/MessageToast",
+  "sap/ui/core/library",
 ], (
   Controller,
   JSONModel,
@@ -17,10 +18,11 @@ sap.ui.define([
   Formatter,
   Constants,
   BusyIndicator,
-  MessageToast
+  MessageToast,
+  coreLibrary,
 ) => {
   "use strict";
-
+  const ValueState = coreLibrary.ValueState;
   return Controller.extend("freestylesapui5app.controller.ListReport", {
     formatter: Formatter,
 
@@ -291,6 +293,178 @@ sap.ui.define([
       this.getOwnerComponent().getRouter().navTo("ObjectPage", {
         Product_ID: sProductId,
       });
-    }
+    },
+
+    /**
+       * "Create" button event handler in the Store Details footer.
+       *  @public
+       */
+    onCreateProductDialogPress() {
+      const oView = this.getView();
+      const oMainModel = oView.getModel();
+
+      const oEntryCtx = oMainModel.createEntry("/Products", {
+        properties: {
+          Product_ID: Math.random(),
+          Name: "",
+          Price_amount: "",
+          Specs: "",
+          Rating: "",
+          SupplierInfo: "",
+          MadeIn: "",
+          ProductionCompanyName: "",
+          Status: Constants.PRODUCT_STATUS.OK,
+        },
+      });
+
+      if (!this.oCreateDialog) {
+        this.loadFragment({
+          name: "freestylesapui5app.view.fragments.CreateProduct",
+        }).then((oDialog) => {
+          this.oCreateDialog = oDialog;
+          this.oCreateDialog.setModel(oMainModel);
+          this.oCreateDialog.setBindingContext(oEntryCtx);
+          this.oCreateDialog.open();
+        });
+      } else {
+        this.oCreateDialog.setModel(oMainModel);
+        this.oCreateDialog.setBindingContext(oEntryCtx);
+        this.oCreateDialog.open();
+      }
+    },
+
+    /**
+     * "Cancel" button press event handler (in the dialog).
+     *  @public
+     */
+    onCancelProductDialogPress() {
+      const oMainModel = this.getView().getModel();
+      const oContext = this.oCreateDialog.getBindingContext();
+
+      oMainModel.deleteCreatedEntry(oContext);
+      this.oCreateDialog.close();
+    },
+
+    /**
+       * Handles product creation
+       * @public
+       */
+    onCreateProductPress() {
+      const oMainModel = this.getView().getModel();
+      const oCtx = this.oCreateDialog.getBindingContext();
+      console.log(oCtx, 'octxiii');
+
+      const mData = oCtx.getObject();
+
+
+      const oProductNameInput = oView.byId("createProductNameInput");
+      const oPriceAmountInput = oView.byId("createProductPriceInput");
+      const oSpecsInput = oView.byId("createProductSpecsInput");
+      const oRatingInput = oView.byId("createProductRatingInput");
+      const oSupplierInfoInput = oView.byId("createProductSupplierInfoInput");
+      const oMadeInInput = oView.byId("createProductMadeInInput");
+      const oProdCompanyInput = oView.byId(
+        "createProductProductionCompanyNameInput"
+      );
+      console.log(mData, 'mdataiii');
+
+      if (
+        !mData.Name ||
+        !mData.Price_amount ||
+        !mData.Specs ||
+        !mData.SupplierInfo ||
+        !mData.MadeIn ||
+        !mData.ProductionCompanyName
+      ) {
+        MessageBox.error(this._oResourceBundle.getText("mandatoryFieldsMessage"));
+        return;
+      }
+
+      if (!/^[A-Za-z0-9\s]+$/.test(mData.Name)) {
+        oProductNameInput.setValueState(ValueState.Error);
+        oProductNameInput.setValueStateText(
+          this._oResourceBundle.getText("invalidProductName")
+        );
+        return;
+      }
+      if (mData.Name.length > 50) {
+        oProductNameInput.setValueState(ValueState.Error);
+        oProductNameInput.setValueStateText(
+          this._oResourceBundle.getText("nameTooLongMessage")
+        );
+        return;
+      }
+      oProductNameInput.setValueState(ValueState.None);
+
+      if (mData.Price_amount < 0) {
+        oPriceAmountInput.setValueState(ValueState.Error);
+        oPriceAmountInput.setValueStateText(
+          this._oResourceBundle.getText("invalidProductPrice")
+        );
+        return;
+      }
+      oPriceAmountInput.setValueState(ValueState.None);
+
+      if (mData.Specs.length > 2000) {
+        oSpecsInput.setValueState(ValueState.Error);
+        oSpecsInput.setValueStateText(
+          this._oResourceBundle.getText("specsTooLongMessage")
+        );
+        return;
+      }
+      oSpecsInput.setValueState(ValueState.None);
+
+      if (mData.Rating < 0 || mData.Rating > 5) {
+        oRatingInput.setValueState(ValueState.Error);
+        oRatingInput.setValueStateText(
+          this._oResourceBundle.getText("invalidRatingMessage")
+        );
+        return;
+      }
+      oRatingInput.setValueState(ValueState.None);
+
+      if (mData.SupplierInfo.length > 2000) {
+        oSupplierInfoInput.setValueState(ValueState.Error);
+        oSupplierInfoInput.setValueStateText(
+          this._oResourceBundle.getText("supplierInfoTooLongMessage")
+        );
+        return;
+      }
+      oSupplierInfoInput.setValueState(ValueState.None);
+
+      if (mData.MadeIn.length > 35) {
+        oMadeInInput.setValueState(ValueState.Error);
+        oMadeInInput.setValueStateText(
+          this._oResourceBundle.getText("madeInTooLongMessage")
+        );
+        return;
+      }
+      oMadeInInput.setValueState(ValueState.None);
+
+      if (mData.ProductionCompanyName.length > 35) {
+        oProdCompanyInput.setValueState(ValueState.Error);
+        oProdCompanyInput.setValueStateText(
+          this._oResourceBundle.getText("prodCompanyTooLongMessage")
+        );
+        return;
+      }
+      oProdCompanyInput.setValueState(ValueState.None);
+
+      BusyIndicator.show();
+
+      oMainModel.submitChanges({
+        success: () => {
+          BusyIndicator.hide();
+          MessageToast.show(this._oResourceBundle.getText("productCreateSuccess"));
+          this.oCreateDialog.close();
+        },
+        error: (oError) => {
+          BusyIndicator.hide();
+          MessageBox.error(this._oResourceBundle.getText("productCreateError"), {
+            details: oError,
+          });
+        },
+      });
+    },
   });
 });

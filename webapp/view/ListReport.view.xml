@@ -97,7 +97,8 @@
                                 formatter: '.formatter.formatProductCountTitle' 
                             }" />
                         <ToolbarSpacer />
-                        <Button text="{i18n>createBtn}" />
+                        <Button text="{i18n>createBtn}"
+                            press="onCreateProductDialogPress" />
                         <Button text="{i18n>deleteBtn}"
                             id="idProductDeleteButton"
                             press="onDeleteButtonPress"
