@@ -84,15 +84,14 @@
         "type": "View",
         "viewType": "XML",
         "path": "freestylesapui5app.view",
-        "async": true,
-        "viewPath": "freestylesapui5app.view"
+        "async": true
       },
       "routes": [
         {
-          "name": "RouteListReport",
-          "pattern": ":?query:",
+          "name": "ListReport",
+          "pattern": "",
           "target": [
-            "TargetListReport"
+            "ListReport"
           ]
         },
         {
@@ -111,17 +110,20 @@
         }
       ],
       "targets": {
-        "TargetListReport": {
+        "ListReport": {
           "id": "ListReport",
-          "name": "ListReport"
+          "name": "ListReport",
+          "level": 1
         },
         "ObjectPage": {
           "id": "ObjectPage",
-          "name": "ObjectPage"
+          "name": "ObjectPage",
+          "level": 2
         },
         "ObjectChartPage": {
           "id": "ObjectChartPage",
-          "name": "ObjectChartPage"
+          "name": "ObjectChartPage",
+          "level": 3
         }
       }
     },

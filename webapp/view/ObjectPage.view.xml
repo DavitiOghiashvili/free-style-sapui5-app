@@ -26,7 +26,8 @@
                 <actions>
                     <m:Button text="{i18n>editBtn}"
                         type="Emphasized" />
-                    <m:Button text="{i18n>deleteBtn}" />
+                    <m:Button text="{i18n>deleteBtn}"
+                        press="onDeleteButtonPress" />
                 </actions>
             </ObjectPageDynamicHeaderTitle>
         </headerTitle>
