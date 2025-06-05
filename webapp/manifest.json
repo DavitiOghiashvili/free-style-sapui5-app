@@ -56,7 +56,10 @@
     },
     "models": {
       "": {
-        "dataSource": "mainService"
+        "dataSource": "mainService",
+        "settings": {
+          "defaultBindingMode": "TwoWay"
+        }
       },
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",

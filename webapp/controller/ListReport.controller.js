@@ -250,6 +250,8 @@ sap.ui.define([
         if (!oBinding.length) {
           oBinding.filter()
         }
+        const oDeleteButton = this.byId("idProductDeleteButton");
+        oDeleteButton.setEnabled(!aSelectedContexts.length > 0);
       };
 
       const handleDeleteError = (oError) => {
@@ -303,33 +305,41 @@ sap.ui.define([
       const oView = this.getView();
       const oMainModel = oView.getModel();
 
+      const generateGuid = () => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+          const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      };
+
       const oEntryCtx = oMainModel.createEntry("/Products", {
         properties: {
-          Product_ID: Math.random(),
+          ID: generateGuid(),
           Name: "",
           Price_amount: "",
           Specs: "",
-          Rating: "",
+          Rating: "0",
           SupplierInfo: "",
           MadeIn: "",
           ProductionCompanyName: "",
           Status: Constants.PRODUCT_STATUS.OK,
+          Store_ID: "d554e720-870a-4088-9bcb-dce8aecaa047",
         },
       });
 
-      if (!this.oCreateDialog) {
+      if (!this.oDialog) {
         this.loadFragment({
           name: "freestylesapui5app.view.fragments.CreateProduct",
         }).then((oDialog) => {
-          this.oCreateDialog = oDialog;
-          this.oCreateDialog.setModel(oMainModel);
-          this.oCreateDialog.setBindingContext(oEntryCtx);
-          this.oCreateDialog.open();
+          this.oDialog = oDialog;
+          this.oDialog.setModel(oMainModel);
+          this.oDialog.setBindingContext(oEntryCtx);
+          this.oDialog.open();
         });
       } else {
-        this.oCreateDialog.setModel(oMainModel);
-        this.oCreateDialog.setBindingContext(oEntryCtx);
-        this.oCreateDialog.open();
+        this.oDialog.setModel(oMainModel);
+        this.oDialog.setBindingContext(oEntryCtx);
+        this.oDialog.open();
       }
     },
 
@@ -338,11 +348,34 @@ sap.ui.define([
      *  @public
      */
     onCancelProductDialogPress() {
+      const oContext = this.oDialog.getBindingContext();
+      const mData = oContext.getObject();
       const oMainModel = this.getView().getModel();
-      const oContext = this.oCreateDialog.getBindingContext();
 
-      oMainModel.deleteCreatedEntry(oContext);
-      this.oCreateDialog.close();
+      const resetAndRefresh = () => {
+        oMainModel.deleteCreatedEntry(oContext);
+        oMainModel.resetChanges();
+        this.oDialog.close();
+      };
+
+      if (
+        mData.Name ||
+        mData.Price_amount ||
+        mData.Specs ||
+        mData.SupplierInfo ||
+        mData.MadeIn ||
+        mData.ProductionCompanyName
+      ) {
+        MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+          onClose: (oAction) => {
+            if (oAction === MessageBox.Action.OK) {
+              resetAndRefresh();
+            }
+          }
+        });
+      } else {
+        resetAndRefresh();
+      }
     },
 
     /**
@@ -350,12 +383,10 @@ sap.ui.define([
        * @public
        */
     onCreateProductPress() {
-      const oMainModel = this.getView().getModel();
-      const oCtx = this.oCreateDialog.getBindingContext();
-      console.log(oCtx, 'octxiii');
-
-      const mData = oCtx.getObject();
-
+      const oView = this.getView();
+      const oMainModel = oView.getModel();
+      const oContext = this.oDialog.getBindingContext();
+      const mData = oContext.getObject();
 
       const oProductNameInput = oView.byId("createProductNameInput");
       const oPriceAmountInput = oView.byId("createProductPriceInput");
@@ -366,7 +397,6 @@ sap.ui.define([
       const oProdCompanyInput = oView.byId(
         "createProductProductionCompanyNameInput"
       );
-      console.log(mData, 'mdataiii');
 
       if (
         !mData.Name ||
@@ -387,7 +417,7 @@ sap.ui.define([
         );
         return;
       }
-      if (mData.Name.length > 50) {
+      if (mData.Name.length > Constants.MAX_NAME_LENGTH) {
         oProductNameInput.setValueState(ValueState.Error);
         oProductNameInput.setValueStateText(
           this._oResourceBundle.getText("nameTooLongMessage")
@@ -405,7 +435,7 @@ sap.ui.define([
       }
       oPriceAmountInput.setValueState(ValueState.None);
 
-      if (mData.Specs.length > 2000) {
+      if (mData.Specs.length > Constants.MAX_TEXT_LENGTH) {
         oSpecsInput.setValueState(ValueState.Error);
         oSpecsInput.setValueStateText(
           this._oResourceBundle.getText("specsTooLongMessage")
@@ -423,7 +453,7 @@ sap.ui.define([
       }
       oRatingInput.setValueState(ValueState.None);
 
-      if (mData.SupplierInfo.length > 2000) {
+      if (mData.SupplierInfo.length > Constants.MAX_TEXT_LENGTH) {
         oSupplierInfoInput.setValueState(ValueState.Error);
         oSupplierInfoInput.setValueStateText(
           this._oResourceBundle.getText("supplierInfoTooLongMessage")
@@ -432,7 +462,7 @@ sap.ui.define([
       }
       oSupplierInfoInput.setValueState(ValueState.None);
 
-      if (mData.MadeIn.length > 35) {
+      if (mData.MadeIn.length > Constants.MAX_MADE_IN_LENGTH) {
         oMadeInInput.setValueState(ValueState.Error);
         oMadeInInput.setValueStateText(
           this._oResourceBundle.getText("madeInTooLongMessage")
@@ -441,7 +471,7 @@ sap.ui.define([
       }
       oMadeInInput.setValueState(ValueState.None);
 
-      if (mData.ProductionCompanyName.length > 35) {
+      if (mData.ProductionCompanyName.length > Constants.MAX_COMPANY_LENGTH) {
         oProdCompanyInput.setValueState(ValueState.Error);
         oProdCompanyInput.setValueStateText(
           this._oResourceBundle.getText("prodCompanyTooLongMessage")
@@ -456,7 +486,8 @@ sap.ui.define([
         success: () => {
           BusyIndicator.hide();
           MessageToast.show(this._oResourceBundle.getText("productCreateSuccess"));
-          this.oCreateDialog.close();
+          this.oDialog.close();
+          this._updateFilteredCount([]);
         },
         error: (oError) => {
           BusyIndicator.hide();

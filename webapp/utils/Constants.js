@@ -25,6 +25,11 @@ sap.ui.define([], () => {
 
         SEARCH_FILTERS: {
             byText: ["Name", "Specs", "SupplierInfo", "MadeIn", "ProductionCompanyName"]
-        }
+        },
+
+        MAX_NAME_LENGTH: 45,
+        MAX_MADE_IN_LENGTH: 45,
+        MAX_COMPANY_LENGTH: 100,
+        MAX_TEXT_LENGTH: 2000,
     };
 });
