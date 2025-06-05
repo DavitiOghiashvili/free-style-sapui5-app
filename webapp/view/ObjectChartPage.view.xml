@@ -1,0 +1,44 @@
+<mvc:View controllerName="freestylesapui5app.controller.ObjectChartPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:suite="sap.suite.ui.commons"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data">
+    <suite:ChartContainer id="idChartContainer"
+        showFullScreen="true"
+        autoAdjustHeight="true"
+        showSelectionDetails="true"
+        title="{i18n>productDataTitle}">
+        <suite:ChartContainerContent>
+            <suite:content>
+                <viz:VizFrame id="idVizFrame"
+                    uiConfig="{applicationSet:'fiori'}">
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset data="{/Products}">
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition name="{i18n>status}"
+                                    value="{Status}" />
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition name="{i18n>count}"
+                                    value="{Count}" />
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem uid="categoryAxis"
+                            type="Dimension"
+                            values="Status" />
+                        <viz.feeds:FeedItem uid="valueAxis"
+                            type="Measure"
+                            values="Count" />
+                    </viz:feeds>
+                    <viz:dependents>
+                        <viz:Popover id="idPopover" />
+                    </viz:dependents>
+                </viz:VizFrame>
+            </suite:content>
+        </suite:ChartContainerContent>
+    </suite:ChartContainer>
+</mvc:View>

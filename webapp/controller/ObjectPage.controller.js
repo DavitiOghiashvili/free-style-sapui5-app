@@ -20,16 +20,26 @@ sap.ui.define([
      * @private
      */
     _onRouteMatched(oEvent) {
-      this._sProductId = oEvent.getParameter("arguments").Product_ID;
+      const sProductId = oEvent.getParameter("arguments").Product_ID;
       const oModel = this.getView().getModel();
 
       const sKey = oModel.createKey("/Products", {
-        ID: this._sProductId,
+        ID: sProductId,
       });
 
       this.getView().bindElement({
         path: sKey,
       });
     },
+
+    /**
+     * Navigate to item on press.
+     * @public
+     */
+    onColumnListItemPress() {
+      this.getOwnerComponent()
+        .getRouter()
+        .navTo("ObjectChartPage")
+    }
   });
 });
