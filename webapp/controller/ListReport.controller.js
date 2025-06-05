@@ -59,12 +59,12 @@ sap.ui.define([
       this._updateFilteredCount([]);
 
       // Initialize view references
-      this.oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
-      this.oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
-      this.oFilterBar = this.getView().byId("idFilterBar");
-      this.oTable = this.getView().byId("idProductsTable");
+      this._oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
+      this._oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
+      this._oFilterBar = this.getView().byId("idFilterBar");
+      this._oTable = this.getView().byId("idProductsTable");
 
-      this.oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
+      this._oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
     },
 
     /**
@@ -93,7 +93,7 @@ sap.ui.define([
      * @private
      */
     _getFiltersWithValues() {
-      const aFiltersWithValue = this.oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
+      const aFiltersWithValue = this._oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
         const oControl = oFilterGroupItem.getControl();
         if (oControl.getSelectedKeys().length > 0) {
           aResult.push(oFilterGroupItem);
@@ -117,7 +117,7 @@ sap.ui.define([
      * @public
      */
     onFilterBarSearch() {
-      const oBinding = this.oTable.getBinding("items");
+      const oBinding = this._oTable.getBinding("items");
       const aFilters = [];
 
       const sQuery = this.getView().getModel("uiModel").getProperty("/searchQuery")
@@ -168,7 +168,7 @@ sap.ui.define([
         }));
       }
 
-      this.oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
+      this._oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
         const sFieldName = oFilterGroupItem.getName();
         if (sFieldName === 'Search Field') return;
 
@@ -217,8 +217,8 @@ sap.ui.define([
      * @private
      */
     _updateLabelsAndTable() {
-      this.oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this.oFilterBar));
-      this.oSnappedLabel.setText(Formatter.getFormattedSummaryText(this.oFilterBar));
+      this._oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this._oFilterBar));
+      this._oSnappedLabel.setText(Formatter.getFormattedSummaryText(this._oFilterBar));
     },
 
     /**
@@ -240,8 +240,8 @@ sap.ui.define([
      */
     onDeleteButtonPress() {
       const oModel = this.getOwnerComponent().getModel();
-      const aSelectedContexts = this.oTable.getSelectedContexts();
-      const oBinding = this.oTable.getBinding("items");
+      const aSelectedContexts = this._oTable.getSelectedContexts();
+      const oBinding = this._oTable.getBinding("items");
 
       const handleDeleteSuccess = () => {
         BusyIndicator.hide();
@@ -327,19 +327,19 @@ sap.ui.define([
         },
       });
 
-      if (!this.oDialog) {
+      if (!this._oDialog) {
         this.loadFragment({
           name: "freestylesapui5app.view.fragments.CreateProduct",
         }).then((oDialog) => {
-          this.oDialog = oDialog;
-          this.oDialog.setModel(oMainModel);
-          this.oDialog.setBindingContext(oEntryCtx);
-          this.oDialog.open();
+          this._oDialog = oDialog;
+          this._oDialog.setModel(oMainModel);
+          this._oDialog.setBindingContext(oEntryCtx);
+          this._oDialog.open();
         });
       } else {
-        this.oDialog.setModel(oMainModel);
-        this.oDialog.setBindingContext(oEntryCtx);
-        this.oDialog.open();
+        this._oDialog.setModel(oMainModel);
+        this._oDialog.setBindingContext(oEntryCtx);
+        this._oDialog.open();
       }
     },
 
@@ -348,14 +348,14 @@ sap.ui.define([
      *  @public
      */
     onCancelProductDialogPress() {
-      const oContext = this.oDialog.getBindingContext();
+      const oContext = this._oDialog.getBindingContext();
       const mData = oContext.getObject();
       const oMainModel = this.getView().getModel();
 
       const resetAndRefresh = () => {
         oMainModel.deleteCreatedEntry(oContext);
         oMainModel.resetChanges();
-        this.oDialog.close();
+        this._oDialog.close();
       };
 
       if (
@@ -385,7 +385,7 @@ sap.ui.define([
     onCreateProductPress() {
       const oView = this.getView();
       const oMainModel = oView.getModel();
-      const oContext = this.oDialog.getBindingContext();
+      const oContext = this._oDialog.getBindingContext();
       const mData = oContext.getObject();
 
       const oProductNameInput = oView.byId("createProductNameInput");
@@ -486,7 +486,7 @@ sap.ui.define([
         success: () => {
           BusyIndicator.hide();
           MessageToast.show(this._oResourceBundle.getText("productCreateSuccess"));
-          this.oDialog.close();
+          this._oDialog.close();
           this._updateFilteredCount([]);
         },
         error: (oError) => {

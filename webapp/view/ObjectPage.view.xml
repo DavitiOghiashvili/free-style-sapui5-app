@@ -145,7 +145,8 @@
                                     <m:Text text="{i18n>commentRating}" />
                                 </m:Column>
                             </m:columns>
-                            <m:ColumnListItem type="Navigation" press="onColumnListItemPress">
+                            <m:ColumnListItem type="Navigation"
+                                press="onColumnListItemPress">
                                 <m:Text text="{Author}" />
                                 <m:Text text="{Message}"
                                     wrapping="false" />
