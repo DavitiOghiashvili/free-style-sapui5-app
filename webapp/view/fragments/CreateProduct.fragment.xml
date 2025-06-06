@@ -1,22 +1,31 @@
 <core:FragmentDefinition xmlns="sap.m"
   xmlns:f="sap.ui.layout.form"
+  xmlns:layout="sap.ui.layout"
   xmlns:core="sap.ui.core"
   core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
   <Dialog title="{i18n>createProductFormTitle}">
     <f:SimpleForm>
+
       <Label text="{i18n>labelName}"
         required="true" />
       <Input value="{Name}"
         placeholder="{parts: ['i18n>enterName'], formatter: 'formatMessage'}"
         id="createProductNameInput" />
 
+
       <Label text="{i18n>labelPrice}"
         required="true" />
-      <Input value="{Price_amount}"
-        type="Number"
-        description="USD"
-        placeholder="{parts: ['i18n>enterPrice'], formatter: 'formatMessage'}"
-        id="createProductPriceInput" />
+      <HBox alignItems="Center">
+        <Input value="{Price_amount}"
+          type="Number"
+          placeholder="{parts: ['i18n>enterPrice'], formatter: 'formatMessage'}"
+          id="createProductPriceInput">
+          <layoutData>
+            <FlexItemData growFactor="1" />
+          </layoutData>
+        </Input>
+        <Text text="USD" class="sapUiTinyMargin"/>
+      </HBox>
 
       <Label text="{i18n>labelSpecs}"
         required="true" />
@@ -24,27 +33,23 @@
         placeholder="{parts: ['i18n>enterSpecs'], formatter: 'formatMessage'}"
         id="createProductSpecsInput" />
 
-      <Label text="{i18n>labelRating}"
-        required="true" />
+      <Label text="{i18n>labelRating}" />
       <StepInput value="{Rating}"
         min="0"
         max="5"
         id="createProductRatingInput" />
 
-      <Label text="{i18n>labelSupplierInfo}"
-        required="true" />
+      <Label text="{i18n>labelSupplierInfo}" />
       <Input value="{SupplierInfo}"
         placeholder="{parts: ['i18n>enterSupplier'], formatter: 'formatMessage'}"
         id="createProductSupplierInfoInput" />
 
-      <Label text="{i18n>labelMadeIn}"
-        required="true" />
+      <Label text="{i18n>labelMadeIn}" />
       <Input value="{MadeIn}"
         placeholder="{parts: ['i18n>enterMadeIn'], formatter: 'formatMessage'}"
         id="createProductMadeInInput" />
 
-      <Label text="{i18n>labelProductionCompanyName}"
-        required="true" />
+      <Label text="{i18n>labelProductionCompanyName}" />
       <Input value="{ProductionCompanyName}"
         placeholder="{parts: ['i18n>enterCompany'], formatter: 'formatMessage'}"
         id="createProductProductionCompanyNameInput" />

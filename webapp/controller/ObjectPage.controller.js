@@ -66,7 +66,7 @@ sap.ui.define([
       const oCtx = this.getView().getBindingContext();
       const sKey = oMainModel.createKey("/Products", oCtx.getObject());
 
-      MessageBox.confirm(this._oResourceBundle.getText("confirmDeleteProduct"), {
+      MessageBox.confirm(this._oResourceBundle.getText("confirmDeleteProductSingular"), {
         onClose: (sAction) => {
           if (sAction === MessageBox.Action.OK) {
             BusyIndicator.show();
@@ -74,7 +74,7 @@ sap.ui.define([
               success: () => {
                 BusyIndicator.hide();
                 MessageToast.show(
-                  this._oResourceBundle.getText("productDeleteSuccess"),
+                  this._oResourceBundle.getText("productDeleteSuccessSingular"),
                   {
                     closeOnBrowserNavigation: false,
                   }

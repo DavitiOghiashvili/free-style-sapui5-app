@@ -96,9 +96,6 @@
                             <m:Label text="{i18n>Name}" />
                             <m:Text text="{Name}" />
 
-                            <m:Label text="{i18n>productId}" />
-                            <m:Text text="{ID}" />
-
                             <m:Label text="{i18n>productCreatedAt}" />
                             <m:Text text="{createdAt}" />
 
@@ -127,8 +124,7 @@
                         <m:Table items="{Comment}"
                             autoPopinMode="true"
                             growing="true"
-                            growingThreshold="10"
-                            mode="MultiSelect">
+                            growingThreshold="10">
                             <m:dependents>
                                 <plugins:ColumnResizer />
                             </m:dependents>
@@ -151,8 +147,10 @@
                                 <m:Text text="{Author}" />
                                 <m:Text text="{Message}"
                                     wrapping="false" />
-                                <m:Text text="{Posted}"
-                                    wrapping="false" />
+                                <m:Text text="{path: 
+                                'Posted'
+                                , 
+                                formatter: '.formatter.formatProductCommentDate' }" />
                                 <m:Text text="{Rating}" />
                             </m:ColumnListItem>
                         </m:Table>

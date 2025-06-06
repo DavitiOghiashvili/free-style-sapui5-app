@@ -241,17 +241,18 @@ sap.ui.define([
     onDeleteButtonPress() {
       const oModel = this.getOwnerComponent().getModel();
       const aSelectedContexts = this._oTable.getSelectedContexts();
-      const oBinding = this._oTable.getBinding("items");
+      const iSelectedCount = aSelectedContexts.length;
+      const oBinding = this._oTable.getBinding('items')
 
       const handleDeleteSuccess = () => {
         BusyIndicator.hide();
-        MessageToast.show(this._oResourceBundle.getText("productDeleteSuccess"));
-        this._updateFilteredCount([])
-        if (!oBinding.length) {
-          oBinding.filter()
-        }
+        const sSuccessMsg = iSelectedCount === 1
+          ? this._oResourceBundle.getText("productDeleteSuccessSingular")
+          : this._oResourceBundle.getText("productDeleteSuccessPlural", [iSelectedCount]);
+        MessageToast.show(sSuccessMsg);
+
         const oDeleteButton = this.byId("idProductDeleteButton");
-        oDeleteButton.setEnabled(!aSelectedContexts.length > 0);
+        oDeleteButton.setEnabled(iSelectedCount > 0);
       };
 
       const handleDeleteError = (oError) => {
@@ -269,6 +270,11 @@ sap.ui.define([
             success: handleDeleteSuccess,
             error: handleDeleteError,
           });
+
+          if (!oBinding.length) {
+            oBinding.filter()
+          }
+          this._updateFilteredCount([])
         });
       };
 
@@ -278,7 +284,11 @@ sap.ui.define([
         }
       };
 
-      MessageBox.confirm(this._oResourceBundle.getText("confirmDeleteProduct"), {
+      const sConfirmMsg = iSelectedCount === 1
+        ? this._oResourceBundle.getText("confirmDeleteProductSingular")
+        : this._oResourceBundle.getText("confirmDeleteProductPlural", [iSelectedCount]);
+
+      MessageBox.confirm(sConfirmMsg, {
         onClose: handleConfirmClose,
       });
     },
@@ -379,122 +389,138 @@ sap.ui.define([
     },
 
     /**
-       * Handles product creation
+       * Handles product creation and it's validation
        * @public
        */
     onCreateProductPress() {
       const oView = this.getView();
       const oMainModel = oView.getModel();
+      const oUiModel = oView.getModel('uiModel');
       const oContext = this._oDialog.getBindingContext();
       const mData = oContext.getObject();
+      const rb = this._oResourceBundle;
 
-      const oProductNameInput = oView.byId("createProductNameInput");
-      const oPriceAmountInput = oView.byId("createProductPriceInput");
-      const oSpecsInput = oView.byId("createProductSpecsInput");
-      const oRatingInput = oView.byId("createProductRatingInput");
-      const oSupplierInfoInput = oView.byId("createProductSupplierInfoInput");
-      const oMadeInInput = oView.byId("createProductMadeInInput");
-      const oProdCompanyInput = oView.byId(
-        "createProductProductionCompanyNameInput"
-      );
+      let validationFailed = false;
 
-      if (
-        !mData.Name ||
-        !mData.Price_amount ||
-        !mData.Specs ||
-        !mData.SupplierInfo ||
-        !mData.MadeIn ||
-        !mData.ProductionCompanyName
-      ) {
-        MessageBox.error(this._oResourceBundle.getText("mandatoryFieldsMessage"));
-        return;
-      }
+      const fields = [
+        {
+          id: "createProductNameInput",
+          value: mData.Name,
+          required: true,
+          validate: (val) => /^[A-Za-z0-9\s]+$/.test(val) && val.length <= Constants.MAX_NAME_LENGTH,
+          getErrorText: (val) => {
+            if (!/^[A-Za-z0-9\s]+$/.test(val)) {
+              return rb.getText("invalidProductName");
+            }
+            if (val.length > Constants.MAX_NAME_LENGTH) {
+              return rb.getText("nameTooLongMessage");
+            }
+          },
+        },
+        {
+          id: "createProductPriceInput",
+          value: mData.Price_amount,
+          required: true,
+          validate: (val) => val >= 0,
+          getErrorText: () => rb.getText("invalidProductPrice"),
+        },
+        {
+          id: "createProductSpecsInput",
+          value: mData.Specs,
+          required: true,
+          validate: (val) => val.length <= Constants.MAX_TEXT_LENGTH,
+          getErrorText: () => rb.getText("specsTooLongMessage"),
+        },
+        {
+          id: "createProductRatingInput",
+          value: mData.Rating,
+          required: false,
+          validate: (val) => val === undefined || (val >= 0 && val <= 5),
+          getErrorText: () => rb.getText("invalidRatingMessage"),
+        },
+        {
+          id: "createProductSupplierInfoInput",
+          value: mData.SupplierInfo,
+          required: false,
+          validate: (val) => val.length <= Constants.MAX_TEXT_LENGTH,
+          getErrorText: () => rb.getText("supplierInfoTooLongMessage"),
+        },
+        {
+          id: "createProductMadeInInput",
+          value: mData.MadeIn,
+          required: false,
+          validate: (val) => val.length <= Constants.MAX_MADE_IN_LENGTH,
+          getErrorText: () => rb.getText("madeInTooLongMessage"),
+        },
+        {
+          id: "createProductProductionCompanyNameInput",
+          value: mData.ProductionCompanyName,
+          required: false,
+          validate: (val) => val.length <= Constants.MAX_COMPANY_LENGTH,
+          getErrorText: () => rb.getText("prodCompanyTooLongMessage"),
+        }
+      ];
 
-      if (!/^[A-Za-z0-9\s]+$/.test(mData.Name)) {
-        oProductNameInput.setValueState(ValueState.Error);
-        oProductNameInput.setValueStateText(
-          this._oResourceBundle.getText("invalidProductName")
-        );
-        return;
-      }
-      if (mData.Name.length > Constants.MAX_NAME_LENGTH) {
-        oProductNameInput.setValueState(ValueState.Error);
-        oProductNameInput.setValueStateText(
-          this._oResourceBundle.getText("nameTooLongMessage")
-        );
-        return;
-      }
-      oProductNameInput.setValueState(ValueState.None);
+      fields.forEach((field) => {
+        if (validationFailed) return;
 
-      if (mData.Price_amount < 0) {
-        oPriceAmountInput.setValueState(ValueState.Error);
-        oPriceAmountInput.setValueStateText(
-          this._oResourceBundle.getText("invalidProductPrice")
-        );
-        return;
-      }
-      oPriceAmountInput.setValueState(ValueState.None);
+        const oInput = oView.byId(field.id);
+        const value = field.value;
+        const isEmpty = value === undefined || value === null || value === "";
 
-      if (mData.Specs.length > Constants.MAX_TEXT_LENGTH) {
-        oSpecsInput.setValueState(ValueState.Error);
-        oSpecsInput.setValueStateText(
-          this._oResourceBundle.getText("specsTooLongMessage")
-        );
-        return;
-      }
-      oSpecsInput.setValueState(ValueState.None);
+        if (field.required && isEmpty) {
+          oInput.setValueState(ValueState.Error);
+          oInput.setValueStateText(rb.getText("mandatoryFieldsMessage"));
+          oInput.focus();
+          validationFailed = true;
+          return;
+        }
 
-      if (mData.Rating < 0 || mData.Rating > 5) {
-        oRatingInput.setValueState(ValueState.Error);
-        oRatingInput.setValueStateText(
-          this._oResourceBundle.getText("invalidRatingMessage")
-        );
-        return;
-      }
-      oRatingInput.setValueState(ValueState.None);
+        if (!field.required && isEmpty) {
+          oInput.setValueState(ValueState.None);
+          return;
+        }
 
-      if (mData.SupplierInfo.length > Constants.MAX_TEXT_LENGTH) {
-        oSupplierInfoInput.setValueState(ValueState.Error);
-        oSupplierInfoInput.setValueStateText(
-          this._oResourceBundle.getText("supplierInfoTooLongMessage")
-        );
-        return;
-      }
-      oSupplierInfoInput.setValueState(ValueState.None);
+        if (!field.validate(value)) {
+          oInput.setValueState(ValueState.Error);
+          oInput.setValueStateText(field.getErrorText(value));
+          oInput.focus();
+          validationFailed = true;
+          return;
+        }
 
-      if (mData.MadeIn.length > Constants.MAX_MADE_IN_LENGTH) {
-        oMadeInInput.setValueState(ValueState.Error);
-        oMadeInInput.setValueStateText(
-          this._oResourceBundle.getText("madeInTooLongMessage")
-        );
-        return;
-      }
-      oMadeInInput.setValueState(ValueState.None);
+        oInput.setValueState(ValueState.None);
+      });
 
-      if (mData.ProductionCompanyName.length > Constants.MAX_COMPANY_LENGTH) {
-        oProdCompanyInput.setValueState(ValueState.Error);
-        oProdCompanyInput.setValueStateText(
-          this._oResourceBundle.getText("prodCompanyTooLongMessage")
-        );
-        return;
-      }
-      oProdCompanyInput.setValueState(ValueState.None);
+      if (validationFailed) return;
 
       BusyIndicator.show();
 
       oMainModel.submitChanges({
         success: () => {
           BusyIndicator.hide();
-          MessageToast.show(this._oResourceBundle.getText("productCreateSuccess"));
+          MessageToast.show(rb.getText("productCreateSuccess"));
           this._oDialog.close();
-          this._updateFilteredCount([]);
         },
         error: (oError) => {
           BusyIndicator.hide();
-          MessageBox.error(this._oResourceBundle.getText("productCreateError"), {
+          MessageBox.error(rb.getText("productCreateError"), {
             details: oError,
           });
         },
+      });
+
+      this._oDialog.attachAfterClose(() => {
+        oMainModel.read("/Products/$count", {
+          success: (count) => {
+            oUiModel.setProperty("/productsCount", count);
+          },
+          error: (oError) => {
+            MessageBox.error(rb.getText("productCountError"), {
+              details: oError
+            });
+          }
+        });
       });
     },
   });
