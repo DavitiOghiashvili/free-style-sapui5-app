@@ -97,13 +97,13 @@
                             <m:Text text="{Name}" />
 
                             <m:Label text="{i18n>productCreatedAt}" />
-                            <m:Text text="{createdAt}" />
+                            <m:Text text="{path: 'createdAt', formatter: '.formatter.formatDate'}" />
 
                             <m:Label text="{i18n>productCreatedBy}" />
                             <m:Text text="{createdBy}" />
 
                             <m:Label text="{i18n>productModifiedAt}" />
-                            <m:Text text="{modifiedAt}" />
+                            <m:Text text="{path: 'modifiedAt', formatter: '.formatter.formatDate'}" />
 
                             <m:Label text="{i18n>productModifiedBy}" />
                             <m:Text text="{modifiedBy}" />
@@ -147,10 +147,7 @@
                                 <m:Text text="{Author}" />
                                 <m:Text text="{Message}"
                                     wrapping="false" />
-                                <m:Text text="{path: 
-                                'Posted'
-                                , 
-                                formatter: '.formatter.formatProductCommentDate' }" />
+                                <m:Text text="{path: 'Posted', formatter: '.formatter.formatDate'}" />
                                 <m:Text text="{Rating}" />
                             </m:ColumnListItem>
                         </m:Table>

@@ -102,12 +102,16 @@ sap.ui.define([
 
         /**
          * Format date.
-         * @param {Object} oCommentDate - Comment date object.
+         * @param {Object} dateValue - date object.
          * @returns {string} Formatted date.
          * @public
          */
-        formatProductCommentDate(oCommentDate) {
-            return oCommentDate.toISOString().slice(0, 10)
-        },
+        formatDate: function (dateValue) {
+            if (!dateValue) {
+                return "";
+            }
+
+            return dateValue.toISOString().slice(0, 10)
+        }
     };
 });
