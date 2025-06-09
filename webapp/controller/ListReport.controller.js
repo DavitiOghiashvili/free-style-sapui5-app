@@ -22,8 +22,11 @@ sap.ui.define([
   coreLibrary,
 ) => {
   "use strict";
-  const ValueState = coreLibrary.ValueState;
+
+  const { ValueState } = coreLibrary
+
   return Controller.extend("freestylesapui5app.controller.ListReport", {
+
     formatter: Formatter,
 
     onInit() {
@@ -63,6 +66,7 @@ sap.ui.define([
       this._oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
       this._oFilterBar = this.getView().byId("idFilterBar");
       this._oTable = this.getView().byId("idProductsTable");
+      this._oProductDeleteButton = this.getView().byId("idProductDeleteButton")
 
       this._oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
     },
@@ -222,16 +226,29 @@ sap.ui.define([
     },
 
     /**
-   * Handle products table selection change and enable delete button.
-   * @param oEvent item press event.
-   * @public
-   */
+     * Navigate to item on press.
+     * @param oEvent item press event.
+     * @public
+     */
+    onColumnListItemPress(oEvent) {
+      const oContext = oEvent.getSource().getBindingContext();
+      const sProductId = oContext.getProperty("ID");
+
+      this.getOwnerComponent().getRouter().navTo("ObjectPage", {
+        Product_ID: sProductId,
+      });
+    },
+
+    /**
+     * Handle products table selection change and enable delete button.
+     * @param oEvent item press event.
+     * @public
+     */
     onProductsTableSelectionChange(oEvent) {
       const oTable = oEvent.getSource();
       const aSelectedContexts = oTable.getSelectedContexts();
 
-      const oDeleteButton = this.byId("idProductDeleteButton");
-      oDeleteButton.setEnabled(aSelectedContexts.length > 0);
+      this._oProductDeleteButton.setEnabled(aSelectedContexts.length > 0);
     },
 
     /**
@@ -250,9 +267,7 @@ sap.ui.define([
           ? this._oResourceBundle.getText("productDeleteSuccessSingular")
           : this._oResourceBundle.getText("productDeleteSuccessPlural", [iSelectedCount]);
         MessageToast.show(sSuccessMsg);
-
-        const oDeleteButton = this.byId("idProductDeleteButton");
-        oDeleteButton.setEnabled(iSelectedCount > 0);
+        this._oProductDeleteButton.setEnabled(false)
       };
 
       const handleDeleteError = (oError) => {
@@ -290,20 +305,6 @@ sap.ui.define([
 
       MessageBox.confirm(sConfirmMsg, {
         onClose: handleConfirmClose,
-      });
-    },
-
-    /**
-     * Navigate to item on press.
-     * @param oEvent item press event.
-     * @public
-     */
-    onColumnListItemPress(oEvent) {
-      const oContext = oEvent.getSource().getBindingContext();
-      const sProductId = oContext.getProperty("ID");
-
-      this.getOwnerComponent().getRouter().navTo("ObjectPage", {
-        Product_ID: sProductId,
       });
     },
 
@@ -404,7 +405,7 @@ sap.ui.define([
 
       const fields = [
         {
-          id: "createProductNameInput",
+          id: "idNameInput",
           value: mData.Name,
           required: true,
           validate: (val) => /^[A-Za-z0-9\s]+$/.test(val) && val.length <= Constants.MAX_NAME_LENGTH,
@@ -418,42 +419,42 @@ sap.ui.define([
           },
         },
         {
-          id: "createProductPriceInput",
+          id: "idPriceAmountInput",
           value: mData.Price_amount,
           required: true,
           validate: (val) => val >= 0,
           getErrorText: () => rb.getText("invalidProductPrice"),
         },
         {
-          id: "createProductSpecsInput",
+          id: "idSpecsInput",
           value: mData.Specs,
           required: true,
           validate: (val) => val.length <= Constants.MAX_TEXT_LENGTH,
           getErrorText: () => rb.getText("specsTooLongMessage"),
         },
         {
-          id: "createProductRatingInput",
+          id: "idRatingStepInput",
           value: mData.Rating,
           required: false,
           validate: (val) => val === undefined || (val >= 0 && val <= 5),
           getErrorText: () => rb.getText("invalidRatingMessage"),
         },
         {
-          id: "createProductSupplierInfoInput",
+          id: "idSupplierInfoInput",
           value: mData.SupplierInfo,
           required: false,
           validate: (val) => val.length <= Constants.MAX_TEXT_LENGTH,
           getErrorText: () => rb.getText("supplierInfoTooLongMessage"),
         },
         {
-          id: "createProductMadeInInput",
+          id: "idMadeInInput",
           value: mData.MadeIn,
           required: false,
           validate: (val) => val.length <= Constants.MAX_MADE_IN_LENGTH,
           getErrorText: () => rb.getText("madeInTooLongMessage"),
         },
         {
-          id: "createProductProductionCompanyNameInput",
+          id: "idProductionCompanyNameInput",
           value: mData.ProductionCompanyName,
           required: false,
           validate: (val) => val.length <= Constants.MAX_COMPANY_LENGTH,
@@ -486,7 +487,7 @@ sap.ui.define([
           oInput.setValueStateText(field.getErrorText(value));
           oInput.focus();
           validationFailed = true;
-          return;
+          return;z
         }
 
         oInput.setValueState(ValueState.None);

@@ -31,5 +31,10 @@ sap.ui.define([], () => {
         MAX_MADE_IN_LENGTH: 45,
         MAX_COMPANY_LENGTH: 100,
         MAX_TEXT_LENGTH: 2000,
+
+        FRAGMENTS: {
+            DISPLAY_PRODUCT: "DisplayProduct",
+            EDIT_PRODUCT: "EditProduct"
+        },
     };
 });
