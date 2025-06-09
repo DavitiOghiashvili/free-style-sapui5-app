@@ -2,8 +2,10 @@ sap.ui.define([
     'sap/ui/core/mvc/Controller',
     'sap/ui/model/json/JSONModel',
     'sap/m/MessageBox',
+    'sap/ui/model/Filter',
+    'sap/ui/model/FilterOperator',
     'freestylesapui5app/utils/Formatter'
-], (Controller, JSONModel, MessageBox, Formatter) => {
+], (Controller, JSONModel, MessageBox, Filter, FilterOperator, Formatter) => {
     "use strict";
 
     return Controller.extend("freestylesapui5app.controller.ObjectChartPage", {
@@ -15,23 +17,27 @@ sap.ui.define([
             const oPopOver = this.getView().byId("idPopover");
             oPopOver.connect(oVizFrame.getVizUid());
 
-            oModel.read("/Products", {
-                success: (oData) => {
-                    const statusCounts = oData.results.reduce((total, product) => {
-                        total[product.Status] = (total[product.Status] || 0) + 1;
-                        return total;
-                    }, {});
+            const statuses = ["OK", "STORAGE", "OUT_OF_STOCK"];
+            const chartData = [];
+            let amount = 0;
 
-                    const chartData = Object.keys(statusCounts).map(status => ({
-                        Status: Formatter.productStatusText(status),
-                        Count: statusCounts[status]
-                    }));
-
-                    oVizFrame.setModel(new JSONModel({ Products: chartData }));
-                },
-                error: (error) => {
-                    MessageBox.error(i18n.getText("productCountError"), { details: error });
-                }
+            statuses.forEach(status => {
+                oModel.read("/Products/$count", {
+                    filters: [new Filter("Status", FilterOperator.EQ, status)],
+                    success: (count) => {
+                        chartData.push({
+                            Status: Formatter.productStatusText(status),
+                            Count: count
+                        });
+                        amount++;
+                        if (amount === statuses.length) {
+                            oVizFrame.setModel(new JSONModel({ Products: chartData }));
+                        }
+                    },
+                    error: (error) => {
+                        MessageBox.error(i18n.getText("productCountError"), { details: error });
+                    }
+                });
             });
         }
     });

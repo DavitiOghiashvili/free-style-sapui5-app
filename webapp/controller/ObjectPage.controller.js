@@ -433,5 +433,15 @@ sap.ui.define([
         },
       });
     },
+
+    /**
+     * Navigate to item on press.
+     * @public
+     */
+    onColumnListItemPress() {
+      this.getOwnerComponent()
+        .getRouter()
+        .navTo("ObjectChartPage")
+    }
   });
 });
