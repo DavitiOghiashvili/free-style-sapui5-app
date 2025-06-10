@@ -487,7 +487,7 @@ sap.ui.define([
           oInput.setValueStateText(field.getErrorText(value));
           oInput.focus();
           validationFailed = true;
-          return; z
+          return;
         }
 
         oInput.setValueState(ValueState.None);

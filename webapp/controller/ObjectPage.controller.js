@@ -30,7 +30,7 @@ sap.ui.define([
     formatter: Formatter,
 
     // Constants for repeated UI elements
-    UI_IDS: {
+    _UI_IDS: {
       NEW_COMMENT_ROW: "idHBox",
       SAVE_COMMENT_BUTTON: "idSaveCommentButton",
       ADD_COMMENT_BUTTON: "idAddCommentButton",
@@ -45,7 +45,7 @@ sap.ui.define([
     },
 
     // Validation rules for comment fields
-    COMMENT_VALIDATIONS: [
+    _COMMENT_VALIDATIONS: [
       {
         id: "idAuthorInput",
         required: true,
@@ -193,7 +193,7 @@ sap.ui.define([
         }
       });
 
-      this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).setBindingContext(oEntryCtx);
+      this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).setBindingContext(oEntryCtx);
       this._toggleCommentControls(true);
     },
 
@@ -203,10 +203,10 @@ sap.ui.define([
      * @param {boolean} bShow - Whether to show or hide the comment controls
      */
     _toggleCommentControls(bShow) {
-      this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).setVisible(bShow);
-      this._getFragmentControl(this.UI_IDS.SAVE_COMMENT_BUTTON).setVisible(bShow);
-      this._getFragmentControl(this.UI_IDS.ADD_COMMENT_BUTTON).setVisible(!bShow);
-      this._getFragmentControl(this.UI_IDS.CANCEL_COMMENT_BUTTON).setVisible(bShow);
+      this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).setVisible(bShow);
+      this._getFragmentControl(this._UI_IDS.SAVE_COMMENT_BUTTON).setVisible(bShow);
+      this._getFragmentControl(this._UI_IDS.ADD_COMMENT_BUTTON).setVisible(!bShow);
+      this._getFragmentControl(this._UI_IDS.CANCEL_COMMENT_BUTTON).setVisible(bShow);
     },
 
     /**
@@ -215,7 +215,7 @@ sap.ui.define([
      */
     onCancelNewCommentPress() {
       const oMainModel = this.getView().getModel();
-      const oCommentCtx = this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).getBindingContext();
+      const oCommentCtx = this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).getBindingContext();
 
       if (oMainModel.hasPendingChanges()) {
         this._handleCancelWithPendingChanges(oCommentCtx);
@@ -251,7 +251,7 @@ sap.ui.define([
     onSaveNewCommentPress() {
       const oView = this.getView();
       const oModel = oView.getModel();
-      const oCommentCtx = this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).getBindingContext();
+      const oCommentCtx = this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).getBindingContext();
       const mData = oCommentCtx.getObject();
 
       if (this._validateCommentFields(oView, mData)) {
@@ -269,7 +269,7 @@ sap.ui.define([
     _validateCommentFields(oView, mData) {
       let firstInvalidInput = null;
 
-      this.COMMENT_VALIDATIONS.forEach((field) => {
+      this._COMMENT_VALIDATIONS.forEach((field) => {
         const oInput = oView.byId(field.id);
         const value = mData[field.id.replace("id", "").replace("Input", "")];
         const isEmpty = value === undefined || value === null || value === "";
@@ -322,10 +322,10 @@ sap.ui.define([
      * @private
      */
     _resetCommentControls() {
-      this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).setVisible(false);
-      this._getFragmentControl(this.UI_IDS.SAVE_COMMENT_BUTTON).setVisible(false);
-      this._getFragmentControl(this.UI_IDS.ADD_COMMENT_BUTTON).setVisible(true);
-      this._getFragmentControl(this.UI_IDS.CANCEL_COMMENT_BUTTON).setVisible(false);
+      this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).setVisible(false);
+      this._getFragmentControl(this._UI_IDS.SAVE_COMMENT_BUTTON).setVisible(false);
+      this._getFragmentControl(this._UI_IDS.ADD_COMMENT_BUTTON).setVisible(true);
+      this._getFragmentControl(this._UI_IDS.CANCEL_COMMENT_BUTTON).setVisible(false);
     },
 
     /**
@@ -395,7 +395,7 @@ sap.ui.define([
      * @param {string} sFragmentName - The name of the fragment to display
      */
     _showFormFragment(sFragmentName) {
-      const oPage = this.byId(this.UI_IDS.OBJECT_PAGE);
+      const oPage = this.byId(this._UI_IDS.OBJECT_PAGE);
       const currentFragment = oPage.getContent()[0];
 
       if (currentFragment?.getMetadata().getName().includes(sFragmentName)) {
@@ -496,9 +496,9 @@ sap.ui.define([
     _toggleButtonsAndView(bEdit) {
       const oView = this.getView();
 
-      oView.byId(this.UI_IDS.EDIT_BUTTON).setVisible(!bEdit);
-      oView.byId(this.UI_IDS.SAVE_BUTTON).setVisible(bEdit);
-      oView.byId(this.UI_IDS.CANCEL_BUTTON).setVisible(bEdit);
+      oView.byId(this._UI_IDS.EDIT_BUTTON).setVisible(!bEdit);
+      oView.byId(this._UI_IDS.SAVE_BUTTON).setVisible(bEdit);
+      oView.byId(this._UI_IDS.CANCEL_BUTTON).setVisible(bEdit);
 
       this._showFormFragment(bEdit ? Constants.FRAGMENTS.EDIT_PRODUCT : Constants.FRAGMENTS.DISPLAY_PRODUCT);
 
