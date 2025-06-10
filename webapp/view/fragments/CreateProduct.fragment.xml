@@ -21,7 +21,8 @@
             <FlexItemData growFactor="1" />
           </layoutData>
         </Input>
-        <Text text="USD" class="sapUiTinyMargin"/>
+        <Text text="USD"
+          class="sapUiTinyMargin" />
       </HBox>
 
       <Label text="{i18n>labelSpecs}"
@@ -66,10 +67,10 @@
     <buttons>
       <Button text="{i18n>createBtn}"
         type="Accept"
-        press="onCreateProductPress" />
+        press="onCreateButtonPress" />
       <Button text="{i18n>cancelBtn}"
         type="Reject"
-        press="onCancelProductDialogPress" />
+        press="onCancelButtonPress" />
     </buttons>
   </Dialog>
 </core:FragmentDefinition>

@@ -130,7 +130,7 @@
                                     press="onCancelNewCommentPress" />
                             </m:Toolbar>
                             <m:HBox visible="false"
-                                id="idNewCommentRow">
+                                id="idHBox">
                                 <m:Input placeholder="Author"
                                     id="idAuthorInput"
                                     value="{Author}" />

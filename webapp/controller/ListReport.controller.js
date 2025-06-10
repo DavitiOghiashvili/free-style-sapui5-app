@@ -358,7 +358,7 @@ sap.ui.define([
      * "Cancel" button press event handler (in the dialog).
      *  @public
      */
-    onCancelProductDialogPress() {
+    onCancelButtonPress() {
       const oContext = this._oDialog.getBindingContext();
       const mData = oContext.getObject();
       const oMainModel = this.getView().getModel();
@@ -393,7 +393,7 @@ sap.ui.define([
        * Handles product creation and it's validation
        * @public
        */
-    onCreateProductPress() {
+    onCreateButtonPress() {
       const oView = this.getView();
       const oMainModel = oView.getModel();
       const oUiModel = oView.getModel('uiModel');
@@ -487,7 +487,7 @@ sap.ui.define([
           oInput.setValueStateText(field.getErrorText(value));
           oInput.focus();
           validationFailed = true;
-          return;z
+          return; z
         }
 
         oInput.setValueState(ValueState.None);

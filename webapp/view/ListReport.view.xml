@@ -32,11 +32,9 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Search Field"
                             label="{i18n>searchLabel}"
-                            groupName="Default"
-                            visibleInFilterBar="true">
+                            groupName="Default">
                             <fb:control>
                                 <SearchField search="onFilterBarSearch"
-                                    id="idSearchField"
                                     value="{uiModel>/searchQuery}"
                                     placeholder="{i18n>searchPlaceholder}" />
                             </fb:control>

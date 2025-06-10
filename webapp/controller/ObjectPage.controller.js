@@ -26,21 +26,57 @@ sap.ui.define([
   const { ValueState } = coreLibrary
 
   return Controller.extend("freestylesapui5app.controller.ObjectPage", {
-    _bEditing: false,
+    // Formatter referenced in fragments for date text formatting
     formatter: Formatter,
 
+    // Constants for repeated UI elements
+    UI_IDS: {
+      NEW_COMMENT_ROW: "idHBox",
+      SAVE_COMMENT_BUTTON: "idSaveCommentButton",
+      ADD_COMMENT_BUTTON: "idAddCommentButton",
+      CANCEL_COMMENT_BUTTON: "idCancelCommentButton",
+      EDIT_BUTTON: "idEditButton",
+      SAVE_BUTTON: "idSaveButton",
+      CANCEL_BUTTON: "idCancelButton",
+      AUTHOR_INPUT: "idAuthorInput",
+      MESSAGE_INPUT: "idMessageInput",
+      RATING_INPUT: "idRatingInput",
+      OBJECT_PAGE: "idObjectPage"
+    },
+
+    // Validation rules for comment fields
+    COMMENT_VALIDATIONS: [
+      {
+        id: "idAuthorInput",
+        required: true,
+        validate: (val) => val && val.length <= Constants.MAX_NAME_LENGTH,
+        errorKey: "commentNameRequired"
+      },
+      {
+        id: "idMessageInput",
+        required: true,
+        validate: (val) => !!val,
+        errorKey: "commentMessageRequired"
+      },
+      {
+        id: "idRatingInput",
+        required: true,
+        validate: (val) => val >= 0 && val <= 10,
+        errorKey: "commentRatingRequired"
+      }
+    ],
+
+    /**
+     * Initializes the controller, sets up routing, and prepares the UI model
+     * @public
+     */
     onInit() {
       this._oResourceBundle = this.getOwnerComponent()
         .getModel("i18n")
         .getResourceBundle();
 
-      this._objectPage = this.getView().byId("idObjectPage");
-      this._editButton = this.getView().byId("idEditButton");
-      this._saveButton = this.getView().byId("idSaveButton");
-      this._cancelButton = this.getView().byId("idCancelButton");
-
-      const oRouter = this.getOwnerComponent().getRouter();
-      oRouter
+      this._oRouter = this.getOwnerComponent().getRouter();
+      this._oRouter
         .getRoute("ObjectPage")
         .attachPatternMatched(this._onRouteMatched, this);
 
@@ -60,6 +96,11 @@ sap.ui.define([
       );
     },
 
+    /**
+     * Handles route pattern matching and binds the view to the product context
+     * @private
+     * @param {sap.ui.base.Event} oEvent - The route matched event
+     */
     _onRouteMatched(oEvent) {
       const sProductId = oEvent.getParameter("arguments").Product_ID;
       const oModel = this.getView().getModel();
@@ -72,53 +113,54 @@ sap.ui.define([
         path: sKey,
       });
 
-      this._toggleButtonsAndView(false);
       this._oHashChanger = HashChanger.getInstance();
       this._sCurrentHash = this._oHashChanger.getHash();
+      this._addHashListener();
 
-      this._getFragmentControl("idNewCommentRow").setVisible(false);
-      this._getFragmentControl("idSaveCommentButton").setVisible(false);
-      this._getFragmentControl("idAddCommentButton").setVisible(true);
-      this._getFragmentControl("idCancelCommentButton").setVisible(false);
-
-      this._addHashListener()
+      this._toggleButtonsAndView(false);
+      this._resetCommentControls();
     },
 
+    /**
+     * Adds a listener for hash changes to manage pending model changes
+     * @private
+     */
     _addHashListener() {
       window.addEventListener("hashchange", () => {
-        const oView = this.getView();
-        const oModel = oView.getModel();
-        const oRouter = this.getOwnerComponent().getRouter();
-
+        const oModel = this.getView().getModel();
         if (oModel.hasPendingChanges()) {
-          this._onHashChanged()
+          this._handleHashChange();
         } else {
-          oRouter.initialize()
+          this._oRouter.initialize();
         }
-      }, { once: true })
+      }, { once: true });
     },
 
-    _onHashChanged: function () {
-      const oView = this.getView();
-      const oModel = oView.getModel();
-      const oRouter = this.getOwnerComponent().getRouter();
-
-      MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+    /**
+     * Manages hash changes with confirmation for unsaved changes
+     * @private
+     */
+    _handleHashChange() {
+      MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
         onClose: (oAction) => {
           if (oAction === MessageBox.Action.OK) {
-            oModel.resetChanges();
+            this.getView().getModel().resetChanges();
             this._toggleButtonsAndView(false);
-            oRouter.initialize();
+            this._oRouter.initialize();
           } else {
             this._oHashChanger.setHash(this._sCurrentHash);
-            setTimeout(() => {
-              this._addHashListener()
-            }, 100);
+            setTimeout(() => this._addHashListener(), 100);
           }
         }
-      })
+      });
     },
 
+    /**
+     * Retrieves or caches a fragment control by ID
+     * @private
+     * @param {string} sId - The ID of the fragment control
+     * @returns {sap.ui.core.Control} The fragment control
+     */
     _getFragmentControl(sId) {
       if (!this._fragmentControls) {
         this._fragmentControls = {};
@@ -131,119 +173,118 @@ sap.ui.define([
       return this._fragmentControls[sId];
     },
 
-    onAddCommentPress: function () {
-      const oRouter = this.getOwnerComponent().getRouter();
-      oRouter.stop()
+    /**
+     * Initiates the process to add a new comment
+     * @public
+     */
+    onAddCommentPress() {
+      this._oRouter.stop();
       const oView = this.getView();
       const oMainModel = oView.getModel();
-      const oContext = oView.getBindingContext();
-      const sProductId = oContext.getProperty("ID");
+      const sProductId = oView.getBindingContext().getProperty("ID");
 
       const oEntryCtx = oMainModel.createEntry("/ProductComments", {
         properties: {
-          Author: '',
-          Message: '',
-          Rating: '',
+          Author: "",
+          Message: "",
+          Rating: "",
           Posted: new Date(),
-          Product_ID: sProductId,
-        },
+          Product_ID: sProductId
+        }
       });
 
-      const oNewCommentRow = this._getFragmentControl("idNewCommentRow");
-      oNewCommentRow.setBindingContext(oEntryCtx);
-
-      this._getFragmentControl("idNewCommentRow").setVisible(true);
-      this._getFragmentControl("idSaveCommentButton").setVisible(true);
-      this._getFragmentControl("idAddCommentButton").setVisible(false);
-      this._getFragmentControl("idCancelCommentButton").setVisible(true);
+      this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).setBindingContext(oEntryCtx);
+      this._toggleCommentControls(true);
     },
 
-    onCancelNewCommentPress: function () {
-      const oRouter = this.getOwnerComponent().getRouter();
-      const oView = this.getView();
-      const oMainModel = oView.getModel();
+    /**
+     * Toggles visibility of comment input controls
+     * @private
+     * @param {boolean} bShow - Whether to show or hide the comment controls
+     */
+    _toggleCommentControls(bShow) {
+      this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).setVisible(bShow);
+      this._getFragmentControl(this.UI_IDS.SAVE_COMMENT_BUTTON).setVisible(bShow);
+      this._getFragmentControl(this.UI_IDS.ADD_COMMENT_BUTTON).setVisible(!bShow);
+      this._getFragmentControl(this.UI_IDS.CANCEL_COMMENT_BUTTON).setVisible(bShow);
+    },
 
-      const oNewCommentRow = this._getFragmentControl("idNewCommentRow");
-      const oCommentCtx = oNewCommentRow.getBindingContext()
+    /**
+     * Cancels the creation of a new comment
+     * @public
+     */
+    onCancelNewCommentPress() {
+      const oMainModel = this.getView().getModel();
+      const oCommentCtx = this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).getBindingContext();
 
       if (oMainModel.hasPendingChanges()) {
-        MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
-          onClose: (oAction) => {
-            if (oAction === MessageBox.Action.OK) {
-              this._getFragmentControl("idNewCommentRow").setVisible(false);
-              this._getFragmentControl("idSaveCommentButton").setVisible(false);
-              this._getFragmentControl("idAddCommentButton").setVisible(true);
-              this._getFragmentControl("idCancelCommentButton").setVisible(false);
-              oRouter.initialize();
-              oMainModel.deleteCreatedEntry(oCommentCtx);
-            } else {
-              this._oHashChanger.setHash(this._sCurrentHash);
-              setTimeout(() => {
-                this._addHashListener()
-              }, 100);
-            }
-          }
-        })
+        this._handleCancelWithPendingChanges(oCommentCtx);
       } else {
-        this._getFragmentControl("idNewCommentRow").setVisible(false);
-        this._getFragmentControl("idSaveCommentButton").setVisible(false);
-        this._getFragmentControl("idAddCommentButton").setVisible(true);
-        this._getFragmentControl("idCancelCommentButton").setVisible(false);
+        this._resetCommentControls();
       }
     },
 
-    onSaveNewCommentPress: function () {
+    /**
+     * Handles cancellation when there are pending changes
+     * @private
+     * @param {sap.ui.model.Context} oCommentCtx - The binding context of the comment
+     */
+    _handleCancelWithPendingChanges(oCommentCtx) {
+      MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
+        onClose: (oAction) => {
+          if (oAction === MessageBox.Action.OK) {
+            this.getView().getModel().deleteCreatedEntry(oCommentCtx);
+            this._resetCommentControls();
+            this._oRouter.initialize();
+          } else {
+            this._oHashChanger.setHash(this._sCurrentHash);
+            setTimeout(() => this._addHashListener(), 100);
+          }
+        }
+      });
+    },
+
+    /**
+     * Saves a new comment after validation
+     * @public
+     */
+    onSaveNewCommentPress() {
       const oView = this.getView();
       const oModel = oView.getModel();
-      const rb = this._oResourceBundle;
-      const oNewCommentRow = this._getFragmentControl("idNewCommentRow");
-      const oCommentCtx = oNewCommentRow.getBindingContext()
-      const mData = oCommentCtx.getObject()
+      const oCommentCtx = this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).getBindingContext();
+      const mData = oCommentCtx.getObject();
 
-      const fields = [
-        {
-          id: "idAuthorInput",
-          value: mData.Author,
-          required: true,
-          validate: (val) => val && val.length <= Constants.MAX_NAME_LENGTH,
-          getErrorText: () => rb.getText("commentNameRequired"),
-        },
-        {
-          id: "idMessageInput",
-          value: mData.Message,
-          required: true,
-          validate: (val) => !!val,
-          getErrorText: () => rb.getText("commentMessageRequired"),
-        },
-        {
-          id: "idRatingInput",
-          value: mData.Rating,
-          required: true,
-          validate: (val) => val >= 0 && val <= 10,
-          getErrorText: () => rb.getText("commentRatingRequired"),
-        },
-      ];
+      if (this._validateCommentFields(oView, mData)) {
+        this._submitCommentChanges(oModel);
+      }
+    },
 
+    /**
+     * Validates comment input fields
+     * @private
+     * @param {sap.ui.core.mvc.View} oView - The current view
+     * @param {object} mData - The comment data object
+     * @returns {boolean} Whether the validation was successful
+     */
+    _validateCommentFields(oView, mData) {
       let firstInvalidInput = null;
 
-      fields.forEach((field) => {
+      this.COMMENT_VALIDATIONS.forEach((field) => {
         const oInput = oView.byId(field.id);
-        const value = field.value;
+        const value = mData[field.id.replace("id", "").replace("Input", "")];
         const isEmpty = value === undefined || value === null || value === "";
 
         if (field.required && isEmpty) {
           oInput.setValueState(ValueState.Error);
-          oInput.setValueStateText(field.getErrorText());
-          if (!firstInvalidInput) firstInvalidInput = oInput;
-
+          oInput.setValueStateText(this._oResourceBundle.getText(field.errorKey));
+          firstInvalidInput = firstInvalidInput || oInput;
           return;
         }
 
         if (!field.validate(value)) {
           oInput.setValueState(ValueState.Error);
-          oInput.setValueStateText(field.getErrorText());
-          if (!firstInvalidInput) firstInvalidInput = oInput;
-
+          oInput.setValueStateText(this._oResourceBundle.getText(field.errorKey));
+          firstInvalidInput = firstInvalidInput || oInput;
           return;
         }
         oInput.setValueState(ValueState.None);
@@ -251,78 +292,128 @@ sap.ui.define([
 
       if (firstInvalidInput) {
         firstInvalidInput.focus();
-        return;
+        return false;
       }
+      return true;
+    },
 
+    /**
+     * Submits comment changes to the model
+     * @private
+     * @param {sap.ui.model.Model} oModel - The main data model
+     */
+    _submitCommentChanges(oModel) {
+      BusyIndicator.show();
       oModel.submitChanges({
         success: () => {
           BusyIndicator.hide();
-          MessageToast.show(rb.getText("commentPostSuccess"));
-          this._getFragmentControl("idNewCommentRow").setVisible(false);
-          this._getFragmentControl("idSaveCommentButton").setVisible(false);
-          this._getFragmentControl("idAddCommentButton").setVisible(true);
-          this._getFragmentControl("idCancelCommentButton").setVisible(false);
+          MessageToast.show(this._oResourceBundle.getText("commentPostSuccess"));
+          this._resetCommentControls();
         },
         error: (oError) => {
           BusyIndicator.hide();
-          MessageBox.error(rb.getText("commentPostError"), {
-            details: oError,
-          });
-        },
+          MessageBox.error(this._oResourceBundle.getText("commentPostError"), { details: oError });
+        }
       });
     },
 
-    onColumnListItemPress() {
-      this.getOwnerComponent()
-        .getRouter()
-        .navTo("ObjectChartPage");
+    /**
+     * Resets comment input controls to their initial state
+     * @private
+     */
+    _resetCommentControls() {
+      this._getFragmentControl(this.UI_IDS.NEW_COMMENT_ROW).setVisible(false);
+      this._getFragmentControl(this.UI_IDS.SAVE_COMMENT_BUTTON).setVisible(false);
+      this._getFragmentControl(this.UI_IDS.ADD_COMMENT_BUTTON).setVisible(true);
+      this._getFragmentControl(this.UI_IDS.CANCEL_COMMENT_BUTTON).setVisible(false);
     },
 
+    /**
+     * Navigates to the chart page on list item press
+     * @public
+     */
+    onColumnListItemPress() {
+      this._oRouter.navTo("ObjectChartPage");
+    },
+
+    /**
+     * Initiates product deletion with confirmation
+     * @public
+     */
     onDeleteButtonPress() {
       const oMainModel = this.getView().getModel();
       const oCtx = this.getView().getBindingContext();
       const sKey = oMainModel.createKey("/Products", oCtx.getObject());
 
-      MessageBox.confirm(this._oResourceBundle.getText("confirmDeleteProductSingular"), {
+      this._confirmAndDelete(sKey, "confirmDeleteProductSingular", "productDeleteSuccessSingular", "productDeleteError");
+    },
+
+    /**
+     * Initiates comment deletion with confirmation
+     * @public
+     * @param {sap.ui.base.Event} oEvent - The event triggered by the delete action
+     */
+    onDeleteCommentPress(oEvent) {
+      const oListItem = oEvent.getParameter("listItem");
+      const oCtx = oListItem.getBindingContext();
+      const sKey = oCtx.getModel().createKey("/ProductComments", { ID: oCtx.getObject().ID });
+
+      this._confirmAndDelete(sKey, "confirmDeleteComment", "commentDeleteSuccess", "commentDeleteError");
+    },
+
+    /**
+     * Confirms and executes deletion of a product or comment
+     * @private
+     * @param {string} sKey - The key of the entity to delete
+     * @param {string} sConfirmKey - The i18n key for the confirmation message
+     * @param {string} sSuccessKey - The i18n key for the success message
+     * @param {string} sErrorKey - The i18n key for the error message
+     */
+    _confirmAndDelete(sKey, sConfirmKey, sSuccessKey, sErrorKey) {
+      MessageBox.confirm(this._oResourceBundle.getText(sConfirmKey), {
         onClose: (sAction) => {
           if (sAction === MessageBox.Action.OK) {
             BusyIndicator.show();
-            oMainModel.remove(sKey, {
+            this.getView().getModel().remove(sKey, {
               success: () => {
                 BusyIndicator.hide();
-                MessageToast.show(
-                  this._oResourceBundle.getText("productDeleteSuccessSingular"),
-                  {
-                    closeOnBrowserNavigation: false,
-                  }
-                );
-                this.getOwnerComponent().getRouter().navTo("ListReport");
+                MessageToast.show(this._oResourceBundle.getText(sSuccessKey));
               },
               error: (oError) => {
                 BusyIndicator.hide();
-                MessageBox.error(this._oResourceBundle.getText("productDeleteError"), {
-                  details: oError,
-                });
-              },
+                MessageBox.error(this._oResourceBundle.getText(sErrorKey), { details: oError });
+              }
             });
           }
-        },
+        }
       });
     },
 
+    /**
+     * Displays the specified form fragment
+     * @private
+     * @param {string} sFragmentName - The name of the fragment to display
+     */
     _showFormFragment(sFragmentName) {
-      const currentFragment = this._objectPage.getContent()[0];
+      const oPage = this.byId(this.UI_IDS.OBJECT_PAGE);
+      const currentFragment = oPage.getContent()[0];
 
-      if (currentFragment && currentFragment.getMetadata().getName().includes(sFragmentName)) {
+      if (currentFragment?.getMetadata().getName().includes(sFragmentName)) {
         return;
       }
 
       this._getFormFragment(sFragmentName).then((oFragment) => {
-        this._objectPage.removeAllContent();
-        this._objectPage.insertContent(oFragment, 0);
+        oPage.removeAllContent();
+        oPage.insertContent(oFragment, 0);
       });
     },
 
+    /**
+     * Loads and caches a form fragment
+     * @private
+     * @param {string} sFragmentName - The name of the fragment to load
+     * @returns {Promise<sap.ui.core.Control>} The loaded fragment
+     */
     _getFormFragment(sFragmentName) {
       const oView = this.getView();
       const sFragmentPath = "freestylesapui5app.view.fragments." + sFragmentName;
@@ -338,29 +429,40 @@ sap.ui.define([
       return this._formFragments[sFragmentName];
     },
 
+    /**
+     * Enters edit mode for the product
+     * @public
+     */
     onEditButtonPress() {
       this._toggleButtonsAndView(true);
     },
 
+    /**
+     * Cancels product editing with confirmation for unsaved changes
+     * @public
+     */
     onCancelButtonPress() {
       const oModel = this.getView().getModel();
-      const oRouter = this.getOwnerComponent().getRouter();
 
       if (oModel.hasPendingChanges()) {
-        MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+        MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
           onClose: (oAction) => {
             if (oAction === MessageBox.Action.OK) {
-              this.getView().getModel().resetChanges();
+              oModel.resetChanges();
               this._toggleButtonsAndView(false);
             }
           }
         });
       } else {
         this._toggleButtonsAndView(false);
-        oRouter.initialize()
+        this._oRouter.initialize();
       }
     },
 
+    /**
+     * Saves product changes to the model
+     * @public
+     */
     onSaveButtonPress() {
       const oModel = this.getView().getModel();
 
@@ -386,62 +488,23 @@ sap.ui.define([
       }
     },
 
+    /**
+     * Toggles edit mode and updates UI controls
+     * @private
+     * @param {boolean} bEdit - Whether to enable edit mode
+     */
     _toggleButtonsAndView(bEdit) {
-      const oRouter = this.getOwnerComponent().getRouter();
+      const oView = this.getView();
 
-      this._bEditing = bEdit;
-
-      this._editButton.setVisible(!bEdit);
-      this._saveButton.setVisible(bEdit);
-      this._cancelButton.setVisible(bEdit);
+      oView.byId(this.UI_IDS.EDIT_BUTTON).setVisible(!bEdit);
+      oView.byId(this.UI_IDS.SAVE_BUTTON).setVisible(bEdit);
+      oView.byId(this.UI_IDS.CANCEL_BUTTON).setVisible(bEdit);
 
       this._showFormFragment(bEdit ? Constants.FRAGMENTS.EDIT_PRODUCT : Constants.FRAGMENTS.DISPLAY_PRODUCT);
 
-      if (this._bEditing) {
-        oRouter.stop()
+      if (bEdit) {
+        this._oRouter.stop();
       }
-    },
-
-    onDeleteCommentPress(oEvent) {
-      const oListItem = oEvent.getParameter("listItem");
-      const oCtx = oListItem.getBindingContext();
-      const oModel = oCtx.getModel();
-      const oComment = oCtx.getObject();
-      const sKey = oModel.createKey("/ProductComments", {
-        ID: oComment.ID
-      });
-
-      MessageBox.confirm(this._oResourceBundle.getText("confirmDeleteComment"), {
-        onClose: (sAction) => {
-          if (sAction === MessageBox.Action.OK) {
-            BusyIndicator.show();
-            oModel.remove(sKey, {
-              success: () => {
-                BusyIndicator.hide();
-                MessageToast.show(
-                  this._oResourceBundle.getText("commentDeleteSuccess"),
-                );
-              },
-              error: (oError) => {
-                BusyIndicator.hide();
-                MessageBox.error(this._oResourceBundle.getText("commentDeleteError"), {
-                  details: oError,
-                });
-              },
-            });
-          }
-        },
-      });
-    },
-
-    /**
-     * Navigate to item on press.
-     * @public
-     */
-    onColumnListItemPress() {
-      this.getOwnerComponent()
-        .getRouter()
-        .navTo("ObjectChartPage")
     }
   });
 });
