@@ -7,6 +7,7 @@ sap.ui.define([
   "sap/ui/core/Fragment",
   "sap/ui/model/json/JSONModel",
   "freestylesapui5app/utils/Constants",
+  "sap/ui/core/routing/History",
   "sap/ui/core/routing/HashChanger",
   "sap/ui/core/library",
 ], function (
@@ -18,6 +19,7 @@ sap.ui.define([
   Fragment,
   JSONModel,
   Constants,
+  History,
   HashChanger,
   coreLibrary
 ) {
@@ -79,6 +81,8 @@ sap.ui.define([
       this._oRouter
         .getRoute("ObjectPage")
         .attachPatternMatched(this._onRouteMatched, this);
+      this._oRouter
+        .attachBeforeRouteMatched(this._onBeforeRouteMatched, this);
 
       this._formFragments = {};
       this._showFormFragment(Constants.FRAGMENTS.DISPLAY_PRODUCT);
@@ -94,6 +98,46 @@ sap.ui.define([
         }),
         "uiModel"
       );
+    },
+
+    /**
+ * Intercepts navigation to check for unsaved changes before route change
+ * @private
+ * @param {sap.ui.base.Event} oEvent - The beforeRouteMatched event
+ * @returns {void}
+ */
+    /**
+    * Intercepts navigation to check for unsaved changes before route change
+    * @private
+    * @param {sap.ui.base.Event} oEvent - The beforeRouteMatched event
+    * @returns {void}
+    */
+    _onBeforeRouteMatched(oEvent) {
+      const oModel = this.getView().getModel();
+      const bCommentInputHasChanges = this._hasCommentInputChanges();
+      const bHasChanges = oModel.hasPendingChanges() || bCommentInputHasChanges;
+
+      if (bHasChanges) {
+        const sTargetRoute = oEvent.getParameter("name");
+        const oArguments = oEvent.getParameter("arguments");
+
+        MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
+          title: this._oResourceBundle.getText("confirmNavigationTitle"),
+          actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+          emphasizedAction: MessageBox.Action.OK,
+          onClose: (sAction) => {
+            if (sAction === MessageBox.Action.OK) {
+              oModel.resetChanges();
+              this._resetCommentControls();
+              this._toggleButtonsAndView(false);
+              this._oRouter.navTo(sTargetRoute, oArguments, {}, true);
+            } else {
+              const oCurrentArgs = oEvent.getParameter("arguments");
+              this._oRouter.navTo("ObjectPage", oCurrentArgs, {}, true);
+            }
+          }
+        });
+      }
     },
 
     /**
@@ -113,9 +157,8 @@ sap.ui.define([
         path: sKey,
       });
 
-      this._oHashChanger = HashChanger.getInstance();
-      this._sCurrentHash = this._oHashChanger.getHash();
-      this._addHashListener();
+      this._oHashChanger = HashChanger.getInstance()
+      this._sCurrentHash = this._oHashChanger.getHash()
 
       this._toggleButtonsAndView(false);
       this._resetCommentControls();
@@ -128,12 +171,28 @@ sap.ui.define([
     _addHashListener() {
       window.addEventListener("hashchange", () => {
         const oModel = this.getView().getModel();
-        if (oModel.hasPendingChanges()) {
+        const bCommentInputHasChanges = this._hasCommentInputChanges();
+        if (oModel.hasPendingChanges() || bCommentInputHasChanges) {
           this._handleHashChange();
         } else {
           this._oRouter.initialize();
         }
       }, { once: true });
+    },
+
+    /**
+ * Checks if the new comment input fields have non-empty values
+ * @private
+ * @param None
+ * @returns {boolean} Whether any comment input field has a value
+ */
+    _hasCommentInputChanges() {
+      const oCommentCtx = this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW)?.getBindingContext();
+      if (!oCommentCtx) {
+        return false;
+      }
+      const mData = oCommentCtx.getObject();
+      return !!(mData.Author || mData.Message || mData.Rating);
     },
 
     /**
@@ -145,6 +204,7 @@ sap.ui.define([
         onClose: (oAction) => {
           if (oAction === MessageBox.Action.OK) {
             this.getView().getModel().resetChanges();
+            this._resetCommentControls();
             this._toggleButtonsAndView(false);
             this._oRouter.initialize();
           } else {
@@ -178,7 +238,6 @@ sap.ui.define([
      * @public
      */
     onAddCommentPress() {
-      this._oRouter.stop();
       const oView = this.getView();
       const oMainModel = oView.getModel();
       const sProductId = oView.getBindingContext().getProperty("ID");
@@ -216,10 +275,12 @@ sap.ui.define([
     onCancelNewCommentPress() {
       const oMainModel = this.getView().getModel();
       const oCommentCtx = this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).getBindingContext();
+      const bCommentInputHasChanges = this._hasCommentInputChanges();
 
-      if (oMainModel.hasPendingChanges()) {
+      if (oMainModel.hasPendingChanges() || bCommentInputHasChanges) {
         this._handleCancelWithPendingChanges(oCommentCtx);
       } else {
+        this.getView().getModel().resetChanges();
         this._resetCommentControls();
       }
     },
@@ -227,13 +288,12 @@ sap.ui.define([
     /**
      * Handles cancellation when there are pending changes
      * @private
-     * @param {sap.ui.model.Context} oCommentCtx - The binding context of the comment
      */
-    _handleCancelWithPendingChanges(oCommentCtx) {
+    _handleCancelWithPendingChanges() {
       MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
         onClose: (oAction) => {
           if (oAction === MessageBox.Action.OK) {
-            this.getView().getModel().deleteCreatedEntry(oCommentCtx);
+            this.getView().getModel().resetChanges();
             this._resetCommentControls();
             this._oRouter.initialize();
           } else {
@@ -435,6 +495,8 @@ sap.ui.define([
      */
     onEditButtonPress() {
       this._toggleButtonsAndView(true);
+      console.log("edit clicked and toggle staarted");
+
     },
 
     /**
@@ -446,6 +508,9 @@ sap.ui.define([
 
       if (oModel.hasPendingChanges()) {
         MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
+          title: this._oResourceBundle.getText("confirmNavigationTitle"),
+          actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+          emphasizedAction: MessageBox.Action.OK,
           onClose: (oAction) => {
             if (oAction === MessageBox.Action.OK) {
               oModel.resetChanges();
@@ -455,7 +520,6 @@ sap.ui.define([
         });
       } else {
         this._toggleButtonsAndView(false);
-        this._oRouter.initialize();
       }
     },
 
@@ -502,9 +566,18 @@ sap.ui.define([
 
       this._showFormFragment(bEdit ? Constants.FRAGMENTS.EDIT_PRODUCT : Constants.FRAGMENTS.DISPLAY_PRODUCT);
 
-      if (bEdit) {
-        this._oRouter.stop();
-      }
+      // if (bEdit) {
+      //   this._oRouter.stop();
+      // }
+      console.log(
+        "hello from toggle", bEdit, "bedit and router stop"
+      );
+      window.addEventListener("beforeunload", (event) => {console.log("added window");
+       })
+
+    },
+    onbeforeunload(){ console.log("fired");
     }
+    
   });
 });

@@ -26,8 +26,8 @@ sap.ui.define([
   const { ValueState } = coreLibrary
 
   return Controller.extend("freestylesapui5app.controller.ListReport", {
-
     formatter: Formatter,
+    _selectedStoreId: null,
 
     onInit() {
       this._oResourceBundle = this.getOwnerComponent()
@@ -309,23 +309,16 @@ sap.ui.define([
     },
 
     /**
-       * "Create" button event handler in the Store Details footer.
+       * "Create" product button event handler.
        *  @public
        */
     onCreateProductDialogPress() {
       const oView = this.getView();
       const oMainModel = oView.getModel();
 
-      const generateGuid = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-          const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      };
-
       const oEntryCtx = oMainModel.createEntry("/Products", {
         properties: {
-          ID: generateGuid(),
+          ID: "",
           Name: "",
           Price_amount: "",
           Specs: "",
@@ -334,7 +327,7 @@ sap.ui.define([
           MadeIn: "",
           ProductionCompanyName: "",
           Status: Constants.PRODUCT_STATUS.OK,
-          Store_ID: "d554e720-870a-4088-9bcb-dce8aecaa047",
+          Store_ID: "",
         },
       });
 
@@ -355,6 +348,73 @@ sap.ui.define([
     },
 
     /**
+       * "Select store" button event handler in product dialog.
+       *  @public
+       */
+    onSelectStoreButtonPress() {
+      const oView = this.getView();
+
+      if (!this._pDialog) {
+        this._pDialog = this.loadFragment({
+          id: oView.getId(),
+          name: "freestylesapui5app.view.fragments.SelectStore",
+          controller: this
+        }).then(function (oDialog) {
+          oDialog.setModel(oView.getModel());
+          return oDialog;
+        });
+      }
+
+      this._pDialog.then(function (oDialog) {
+        oDialog.open();
+      });
+    },
+
+    /**
+       * Search logic for stores inside create product dialog.
+       *  @public
+       */
+    onStoresSelectDialogSearch(oEvent) {
+      const sValue = oEvent.getParameter("value");
+      const oFilter = new Filter({
+        path: "Name",
+        operator: FilterOperator.Contains,
+        caseSensitive: false,
+        value1: sValue
+      });
+      const oBinding = oEvent.getParameter("itemsBinding");
+      oBinding.filter([oFilter]);
+    },
+
+    /**
+       * "Select store" dialog closing event handler in product dialog.
+       *  @public
+       */
+    onStoresDialogClose: function (oEvent) {
+      const aContexts = oEvent.getParameter("selectedContexts");
+      if (aContexts && aContexts.length) {
+        this._selectedStoreId = aContexts[0].getObject().ID;
+        MessageToast.show(this._oResourceBundle.getText("chosenStore") + aContexts[0].getObject().Name);
+      }
+
+      oEvent.getSource().getBinding("items").filter([]);
+
+      const oContext = this._oDialog.getBindingContext();
+      const sPath = oContext.getPath();
+
+      const oModel = this.getView().getModel();
+
+      oModel.setProperty(sPath + "/Store_ID", this._selectedStoreId, {
+        success: function () {
+          console.log("Store_ID updated successfully in the model.");
+        },
+        error: function (oError) {
+          console.error("Error updating Store_ID:", oError);
+        }
+      });
+    },
+
+    /**
      * "Cancel" button press event handler (in the dialog).
      *  @public
      */
@@ -364,7 +424,6 @@ sap.ui.define([
       const oMainModel = this.getView().getModel();
 
       const resetAndRefresh = () => {
-        oMainModel.deleteCreatedEntry(oContext);
         oMainModel.resetChanges();
         this._oDialog.close();
       };
@@ -396,7 +455,6 @@ sap.ui.define([
     onCreateButtonPress() {
       const oView = this.getView();
       const oMainModel = oView.getModel();
-      const oUiModel = oView.getModel('uiModel');
       const oContext = this._oDialog.getBindingContext();
       const mData = oContext.getObject();
       const rb = this._oResourceBundle;
@@ -458,7 +516,6 @@ sap.ui.define([
           value: mData.ProductionCompanyName,
           required: false,
           validate: (val) => val.length <= Constants.MAX_COMPANY_LENGTH,
-          getErrorText: () => rb.getText("prodCompanyTooLongMessage"),
         }
       ];
 
@@ -493,6 +550,11 @@ sap.ui.define([
         oInput.setValueState(ValueState.None);
       });
 
+      if (!validationFailed && !this._selectedStoreId) {
+        MessageBox.error(this._oResourceBundle.getText("storeSelectError"));
+        return
+      }
+
       if (validationFailed) return;
 
       BusyIndicator.show();
@@ -511,18 +573,7 @@ sap.ui.define([
         },
       });
 
-      this._oDialog.attachAfterClose(() => {
-        oMainModel.read("/Products/$count", {
-          success: (count) => {
-            oUiModel.setProperty("/productsCount", count);
-          },
-          error: (oError) => {
-            MessageBox.error(rb.getText("productCountError"), {
-              details: oError
-            });
-          }
-        });
-      });
+      this._updateFilteredCount([]);
     },
   });
 });

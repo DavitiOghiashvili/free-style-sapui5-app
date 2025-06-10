@@ -4,6 +4,9 @@
   core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
   <Dialog title="{i18n>createProductFormTitle}">
     <f:SimpleForm>
+      <Button text="{i18n>selectStore}"
+        press="onSelectStoreButtonPress" />
+
       <Label text="{i18n>labelName}"
         required="true" />
       <Input value="{Name}"
