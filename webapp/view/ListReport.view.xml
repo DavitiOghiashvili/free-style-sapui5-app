@@ -32,11 +32,9 @@
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Search Field"
                             label="{i18n>searchLabel}"
-                            groupName="Default"
-                            visibleInFilterBar="true">
+                            groupName="Default">
                             <fb:control>
                                 <SearchField search="onFilterBarSearch"
-                                    id="idSearchField"
                                     value="{uiModel>/searchQuery}"
                                     placeholder="{i18n>searchPlaceholder}" />
                             </fb:control>
@@ -86,6 +84,7 @@
             <Table id="idProductsTable"
                 autoPopinMode="true"
                 mode="MultiSelect"
+                selectionChange="onProductsTableSelectionChange"
                 items="{/Products}">
                 <headerToolbar>
                     <OverflowToolbar>
@@ -96,8 +95,11 @@
                                 formatter: '.formatter.formatProductCountTitle' 
                             }" />
                         <ToolbarSpacer />
-                        <Button text="{i18n>createBtn}" />
+                        <Button text="{i18n>createBtn}"
+                            press="onCreateProductDialogPress" />
                         <Button text="{i18n>deleteBtn}"
+                            id="idProductDeleteButton"
+                            press="onDeleteButtonPress"
                             enabled="false" />
                     </OverflowToolbar>
                 </headerToolbar>

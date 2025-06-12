@@ -9,6 +9,10 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("freestylesapui5app.controller.ObjectChartPage", {
+        /**
+         * Initializes the controller, fetches product counts by status, and sets up the chart
+         * @public
+         */
         onInit() {
             const i18n = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const oModel = this.getOwnerComponent().getModel();

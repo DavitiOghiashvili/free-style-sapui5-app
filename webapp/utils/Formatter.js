@@ -6,6 +6,7 @@ sap.ui.define([
     coreLibrary,
     Constants) => {
     "use strict";
+
     const oResourceBundle = new ResourceModel({
         bundleName: "freestylesapui5app.i18n.i18n"
     }).getResourceBundle();
@@ -98,6 +99,20 @@ sap.ui.define([
             }
 
             return sText;
-        }
+        },
+
+        /**
+         * Format date.
+         * @param {Object} dateValue - date object.
+         * @returns {string} Formatted date.
+         * @public
+         */
+        formatDate: function (dateValue) {
+            if (!dateValue) {
+                return "";
+            }
+
+            return dateValue.toISOString().slice(0, 10)
+        },
     };
 });

@@ -1,0 +1,79 @@
+<core:FragmentDefinition xmlns="sap.m"
+  xmlns:f="sap.ui.layout.form"
+  xmlns:core="sap.ui.core"
+  core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
+  <Dialog title="{i18n>createProductFormTitle}">
+    <f:SimpleForm>
+      <Button text="{i18n>selectStore}"
+        press="onSelectStoreButtonPress" />
+
+      <Label text="{i18n>labelName}"
+        required="true" />
+      <Input value="{Name}"
+        placeholder="{parts: ['i18n>enterName'], formatter: 'formatMessage'}"
+        id="idNameInput" />
+
+      <Label text="{i18n>labelPrice}"
+        required="true" />
+      <HBox alignItems="Center">
+        <Input value="{Price_amount}"
+          type="Number"
+          placeholder="{parts: ['i18n>enterPrice'], formatter: 'formatMessage'}"
+          id="idPriceAmountInput">
+          <layoutData>
+            <FlexItemData growFactor="1" />
+          </layoutData>
+        </Input>
+        <Text text="USD"
+          class="sapUiTinyMargin" />
+      </HBox>
+
+      <Label text="{i18n>labelSpecs}"
+        required="true" />
+      <Input value="{Specs}"
+        placeholder="{parts: ['i18n>enterSpecs'], formatter: 'formatMessage'}"
+        id="idSpecsInput" />
+
+      <Label text="{i18n>labelRating}" />
+      <StepInput value="{Rating}"
+        min="0"
+        max="5"
+        id="idRatingStepInput" />
+
+      <Label text="{i18n>labelSupplierInfo}" />
+      <Input value="{SupplierInfo}"
+        placeholder="{parts: ['i18n>enterSupplier'], formatter: 'formatMessage'}"
+        id="idSupplierInfoInput" />
+
+      <Label text="{i18n>labelMadeIn}" />
+      <Input value="{MadeIn}"
+        placeholder="{parts: ['i18n>enterMadeIn'], formatter: 'formatMessage'}"
+        id="idMadeInInput" />
+
+      <Label text="{i18n>labelProductionCompanyName}" />
+      <Input value="{ProductionCompanyName}"
+        placeholder="{parts: ['i18n>enterCompany'], formatter: 'formatMessage'}"
+        id="idProductionCompanyNameInput" />
+
+      <Label text="{i18n>labelStatus}"
+        required="true" />
+      <Select selectedKey="{Status}">
+        <core:Item key="OK"
+          text="{i18n>OK}" />
+        <core:Item key="STORAGE"
+          text="{i18n>STORAGE}" />
+        <core:Item key="OUT_OF_STOCK"
+          text="{i18n>OUT_OF_STOCK}" />
+      </Select>
+    </f:SimpleForm>
+
+    <buttons>
+      <Button text="{i18n>createBtn}"
+        type="Accept"
+        press="onCreateButtonPress" />
+      <Button text="{i18n>cancelBtn}"
+        type="Reject"
+        press="onCancelButtonPress" />
+    </buttons>
+  </Dialog>
+</core:FragmentDefinition>

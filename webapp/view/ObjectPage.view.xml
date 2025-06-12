@@ -1,162 +1,52 @@
 <mvc:View controllerName="freestylesapui5app.controller.ObjectPage"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.uxap"
     xmlns:m="sap.m"
-    xmlns:plugins="sap.m.plugins"
-    xmlns:core="sap.ui.core"
-    xmlns:forms="sap.ui.layout.form">
-    <ObjectPageLayout>
-        <headerTitle>
-            <ObjectPageDynamicHeaderTitle>
-                <expandedHeading>
-                    <m:Title text="{Name}" />
-                </expandedHeading>
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.uxap">
+    <m:Page id="idObjectPage"
+        showFooter="{uiModel>/toggleFooterVisibility}">
+        <m:customHeader>
+            <m:Bar>
+                <m:contentRight>
+                    <m:Button id="idEditButton"
+                        type="Emphasized"
+                        enabled="{uiModel>/toggleEditButton}"
+                        text="{i18n>editBtn}"
+                        press="onEditButtonPress" />
+                    <m:Button text="{i18n>deleteBtn}"
+                        press="onDeleteButtonPress" />
+                </m:contentRight>
+            </m:Bar>
+        </m:customHeader>
 
-                <snappedHeading>
-                    <m:HBox>
-                        <m:Avatar src="{Photo}"
-                            class="sapUiMediumMarginEnd"
-                            displayShape="Square" />
-                        <m:VBox>
-                            <m:Title text="{Name}" />
-                        </m:VBox>
-                    </m:HBox>
-                </snappedHeading>
-
-                <actions>
-                    <m:Button text="{i18n>editBtn}"
-                        type="Emphasized" />
-                    <m:Button text="{i18n>deleteBtn}" />
-                </actions>
-            </ObjectPageDynamicHeaderTitle>
-        </headerTitle>
-
-        <headerContent>
-            <m:FlexBox wrap="Wrap"
-                fitContainer="true">
-                <m:Avatar src="{Photo}"
-                    class="sapUiMediumMarginEnd"
-                    displayShape="Square"
-                    displaySize="L" />
-
-                <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
-                    <m:HBox class="sapUiTinyMarginBottom"
-                        renderType="Bare">
-                        <m:Label text="{i18n>prodCompany}"
-                            class="sapUiTinyMarginEnd" />
-                        <m:Text text="{ProductionCompanyName}" />
-                    </m:HBox>
-
-                    <m:HBox class="sapUiTinyMarginBottom"
-                        renderType="Bare">
-                        <m:Label text="{i18n>madeIn}"
-                            class="sapUiTinyMarginEnd" />
-                        <m:Text text="{MadeIn}" />
-                    </m:HBox>
-
-                    <m:HBox class="sapUiTinyMarginBottom"
-                        renderType="Bare">
-                        <m:Label text="{i18n>rating}"
-                            class="sapUiTinyMarginEnd" />
-                        <m:Text text="{Rating}" />
-                    </m:HBox>
-                </m:VBox>
-
-                <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
-                    <m:Title text="{i18n>status}"
-                        class="sapUiTinyMarginBottom" />
-                    <m:ObjectStatus text="{ path: 'Status', formatter: '.formatter.productStatusText' }"
-                        state="{ path: 'Status', formatter: '.formatter.productStatusState' }"
-                        class="sapMObjectStatusLarge" />
-                </m:VBox>
-
-                <m:VBox class="sapUiLargeMarginEnd">
-                    <m:Title text="{i18n>Price}"
-                        class="sapUiTinyMarginBottom" />
-                    <m:ObjectNumber number="{Price_amount}"
-                        unit="{Price_currency}"
-                        emphasized="false"
-                        class="sapMObjectNumberLarge" />
-                </m:VBox>
-            </m:FlexBox>
-        </headerContent>
-
-        <sections>
-            <ObjectPageSection title="{i18n>generalInformationTitle}">
-                <subSections>
-                    <ObjectPageSubSection title="{i18n>generalInformationTitle}">
-                        <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
-                            layout="ColumnLayout"
-                            columnsM="2"
-                            columnsL="3"
-                            columnsXL="4">
-                            <core:Title text="{i18n>productDetails}" />
-
-                            <m:Label text="{i18n>Name}" />
-                            <m:Text text="{Name}" />
-
-                            <m:Label text="{i18n>productId}" />
-                            <m:Text text="{ID}" />
-
-                            <m:Label text="{i18n>productCreatedAt}" />
-                            <m:Text text="{createdAt}" />
-
-                            <m:Label text="{i18n>productCreatedBy}" />
-                            <m:Text text="{createdBy}" />
-
-                            <m:Label text="{i18n>productModifiedAt}" />
-                            <m:Text text="{modifiedAt}" />
-
-                            <m:Label text="{i18n>productModifiedBy}" />
-                            <m:Text text="{modifiedBy}" />
-
-                            <m:Label text="{i18n>specs}" />
-                            <m:Text text="{Specs}" />
-
-                            <m:Label text="{i18n>supplierInfo}" />
-                            <m:Text text="{SupplierInfo}" />
-                        </forms:SimpleForm>
-                    </ObjectPageSubSection>
-                </subSections>
-            </ObjectPageSection>
-
-            <ObjectPageSection title="{i18n>commentsTitle}">
-                <subSections>
-                    <ObjectPageSubSection title="{i18n>commentsTitle}">
-                        <m:Table items="{Comment}"
-                            autoPopinMode="true"
-                            growing="true"
-                            growingThreshold="10"
-                            mode="MultiSelect">
-                            <m:dependents>
-                                <plugins:ColumnResizer />
-                            </m:dependents>
-                            <m:columns>
-                                <m:Column>
-                                    <m:Text text="{i18n>commentAuthor}" />
-                                </m:Column>
-                                <m:Column>
-                                    <m:Text text="{i18n>commentMessage}" />
-                                </m:Column>
-                                <m:Column>
-                                    <m:Text text="{i18n>commentPosted}" />
-                                </m:Column>
-                                <m:Column>
-                                    <m:Text text="{i18n>commentRating}" />
-                                </m:Column>
-                            </m:columns>
-                            <m:ColumnListItem type="Navigation" press="onColumnListItemPress">
-                                <m:Text text="{Author}" />
-                                <m:Text text="{Message}"
-                                    wrapping="false" />
-                                <m:Text text="{Posted}"
-                                    wrapping="false" />
-                                <m:Text text="{Rating}" />
-                            </m:ColumnListItem>
-                        </m:Table>
-                    </ObjectPageSubSection>
-                </subSections>
-            </ObjectPageSection>
-        </sections>
-    </ObjectPageLayout>
+        <m:footer>
+            <m:OverflowToolbar>
+                <m:Button icon="sap-icon://alert"
+                    text="{= ${message>/}.length }"
+                    visible="{= ${message>/}.length > 0 }"
+                    type="Negative"
+                    press="onMessagePopoverButtonPress" />
+                <m:ToolbarSpacer />
+                <m:Button id="idSaveButton"
+                    text="{i18n>saveBtn}"
+                    type="Accept"
+                    visible="false"
+                    press="onSaveButtonPress" />
+                <m:Button id="idCancelButton"
+                    type="Reject"
+                    text="Cancel"
+                    visible="false"
+                    press="onCancelButtonPress" />
+                <m:Button text="{i18n>saveComment}"
+                    type="Accept"
+                    visible="false"
+                    id="idSaveNewCommentButton"
+                    press="onSaveNewCommentButtonPress" />
+                <m:Button text="{i18n>cancelBtn}"
+                    type="Reject"
+                    visible="false"
+                    id="idCancelNewCommentButton"
+                    press="onCancelNewCommentButtonPress" />
+            </m:OverflowToolbar>
+        </m:footer>
+    </m:Page>
 </mvc:View>

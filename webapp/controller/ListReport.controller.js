@@ -5,7 +5,10 @@ sap.ui.define([
   "sap/ui/model/FilterOperator",
   "sap/m/MessageBox",
   "../utils/Formatter",
-  "../utils/Constants"
+  "../utils/Constants",
+  "sap/ui/core/BusyIndicator",
+  "sap/m/MessageToast",
+  "sap/ui/core/Messaging",
 ], (
   Controller,
   JSONModel,
@@ -13,28 +16,34 @@ sap.ui.define([
   FilterOperator,
   MessageBox,
   Formatter,
-  Constants
+  Constants,
+  BusyIndicator,
+  MessageToast,
+  Messaging
 ) => {
   "use strict";
-
   return Controller.extend("freestylesapui5app.controller.ListReport", {
     formatter: Formatter,
+    _selectedStoreId: null,
 
     onInit() {
-      const oResourceBundle = this.getOwnerComponent()
+      this.getView().setModel(Messaging.getMessageModel(), "message");
+      Messaging.registerObject(this.getView(), true)
+
+      this._oResourceBundle = this.getOwnerComponent()
         .getModel("i18n")
         .getResourceBundle();
 
       this.getView().setModel(
         new JSONModel({
           currencies: [
-            { key: Constants.PRICE_CURRENCIES.USD, text: oResourceBundle.getText("USD") },
-            { key: Constants.PRICE_CURRENCIES.EUR, text: oResourceBundle.getText("EUR") }
+            { key: Constants.PRICE_CURRENCIES.USD, text: this._oResourceBundle.getText("USD") },
+            { key: Constants.PRICE_CURRENCIES.EUR, text: this._oResourceBundle.getText("EUR") }
           ],
           statuses: [
-            { key: Constants.PRODUCT_STATUS.OK, text: oResourceBundle.getText("OK") },
-            { key: Constants.PRODUCT_STATUS.STORAGE, text: oResourceBundle.getText("STORAGE") },
-            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: oResourceBundle.getText("OUT_OF_STOCK") }
+            { key: Constants.PRODUCT_STATUS.OK, text: this._oResourceBundle.getText("OK") },
+            { key: Constants.PRODUCT_STATUS.STORAGE, text: this._oResourceBundle.getText("STORAGE") },
+            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: this._oResourceBundle.getText("OUT_OF_STOCK") }
           ],
           ratings: [
             { key: Constants.RATING_LENGTH[1], text: '1' },
@@ -53,22 +62,23 @@ sap.ui.define([
       this._updateFilteredCount([]);
 
       // Initialize view references
-      this.oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
-      this.oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
-      this.oFilterBar = this.getView().byId("idFilterBar");
+      this._oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
+      this._oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
+      this._oFilterBar = this.getView().byId("idFilterBar");
+      this._oTable = this.getView().byId("idProductsTable");
+      this._oProductDeleteButton = this.getView().byId("idProductDeleteButton")
 
-      this.oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
+      this._oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
     },
 
     /**
-     * Helper method to fetch filtered count from OData service
-     * @param {Array} aFilters - Array of filters to apply
+     * Fetches filtered count of products from OData service
+     * @param {sap.ui.model.Filter[]} aFilters - Array of filters to apply
      * @private
      */
     _updateFilteredCount(aFilters) {
       const oModel = this.getOwnerComponent().getModel();
       const oUiModel = this.getView().getModel("uiModel");
-      const oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
 
       oModel.read("/Products/$count", {
         filters: aFilters,
@@ -76,20 +86,20 @@ sap.ui.define([
           oUiModel.setProperty("/productsCount", count);
         },
         error: (oError) => {
-          MessageBox.error(oResourceBundle.getText("productCountError"), { details: oError });
+          MessageBox.error(this._oResourceBundle.getText("productCountError"), { details: oError });
         }
       });
     },
 
     /**
-     * Retrieve filter group items with values.
-     * @returns {Array} Array of filter group items with selected values
-     * @private
-     */
+   * Retrieve filter group items that have selected values.
+   * @returns {Array<FilterGroupItem>} Array of FilterGroupItem objects whose controls have one or more selected keys
+   * @private
+   */
     _getFiltersWithValues() {
-      const aFiltersWithValue = this.oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
+      const aFiltersWithValue = this._oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
         const oControl = oFilterGroupItem.getControl();
-        if (oControl.getSelectedKeys().length > 0) {
+        if (oControl.getSelectedKeys().length) {
           aResult.push(oFilterGroupItem);
         }
         return aResult;
@@ -111,8 +121,7 @@ sap.ui.define([
      * @public
      */
     onFilterBarSearch() {
-      const oTable = this.getView().byId("idProductsTable");
-      const oBinding = oTable.getBinding("items");
+      const oBinding = this._oTable.getBinding("items");
       const aFilters = [];
 
       const sQuery = this.getView().getModel("uiModel").getProperty("/searchQuery")
@@ -163,14 +172,14 @@ sap.ui.define([
         }));
       }
 
-      this.oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
+      this._oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
         const sFieldName = oFilterGroupItem.getName();
         if (sFieldName === 'Search Field') return;
 
         const oControl = oFilterGroupItem.getControl();
         const aSelectedKeys = oControl.getSelectedKeys();
 
-        if (aSelectedKeys.length > 0) {
+        if (aSelectedKeys.length) {
           const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
             return new Filter({
               path: sFieldName,
@@ -184,7 +193,6 @@ sap.ui.define([
             and: false
           }));
         }
-
       });
 
       oBinding.filter(aFilters);
@@ -212,15 +220,15 @@ sap.ui.define([
      * @private
      */
     _updateLabelsAndTable() {
-      this.oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this.oFilterBar));
-      this.oSnappedLabel.setText(Formatter.getFormattedSummaryText(this.oFilterBar));
+      this._oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this._oFilterBar));
+      this._oSnappedLabel.setText(Formatter.getFormattedSummaryText(this._oFilterBar));
     },
 
     /**
-     * Navigate to item on press.
-     * @param oEvent item press event.
-     * @public
-     */
+   * Navigate to item on press.
+   * @param {sap.ui.base.Event} oEvent The press event from the list item.
+   * @public
+   */
     onColumnListItemPress(oEvent) {
       const oContext = oEvent.getSource().getBindingContext();
       const sProductId = oContext.getProperty("ID");
@@ -228,6 +236,265 @@ sap.ui.define([
       this.getOwnerComponent().getRouter().navTo("ObjectPage", {
         Product_ID: sProductId,
       });
-    }
+    },
+
+    /**
+     * Handle products table selection change and enable delete button.
+     * @param {sap.ui.base.Event} oEvent The press event from the products table.
+     * @public
+     */
+    onProductsTableSelectionChange(oEvent) {
+      const oTable = oEvent.getSource();
+      const aSelectedContexts = oTable.getSelectedContexts();
+
+      this._oProductDeleteButton.setEnabled(aSelectedContexts.length > 0);
+    },
+
+    /**
+     * Product delete button handler.
+     * @public
+     */
+    onDeleteButtonPress() {
+      const oModel = this.getView().getModel();
+      const aSelectedContexts = this._oTable.getSelectedContexts();
+      const iSelectedCount = aSelectedContexts.length;
+      const oBinding = this._oTable.getBinding('items')
+
+      const handleDeleteSuccess = () => {
+        BusyIndicator.hide();
+        const sSuccessMsg = iSelectedCount === 1
+          ? this._oResourceBundle.getText("productDeleteSuccessSingular")
+          : this._oResourceBundle.getText("productDeleteSuccessPlural", [iSelectedCount]);
+        MessageToast.show(sSuccessMsg);
+        this._oProductDeleteButton.setEnabled(false)
+      };
+
+      const handleDeleteError = (oError) => {
+        BusyIndicator.hide();
+        MessageBox.error(this._oResourceBundle.getText("productDeleteError"), {
+          details: oError,
+        });
+      };
+
+      const deleteSelectedContexts = () => {
+        BusyIndicator.show();
+        aSelectedContexts.forEach((oContext) => {
+          const sPath = oContext.getPath();
+          oModel.remove(sPath, {
+            success: handleDeleteSuccess,
+            error: handleDeleteError,
+          });
+
+          if (!oBinding.length) {
+            oBinding.filter()
+          }
+          this._updateFilteredCount([])
+        });
+      };
+
+      const handleConfirmClose = (sAction) => {
+        if (sAction === MessageBox.Action.OK) {
+          deleteSelectedContexts();
+        }
+      };
+
+      const sConfirmMsg = iSelectedCount === 1
+        ? this._oResourceBundle.getText("confirmDeleteProductSingular")
+        : this._oResourceBundle.getText("confirmDeleteProductPlural", [iSelectedCount]);
+
+      MessageBox.confirm(sConfirmMsg, {
+        onClose: handleConfirmClose,
+      });
+    },
+
+    /**
+     * Handles pressing the "Create Product" button.
+     * Initializes product context and opens the dialog.
+     * @public
+     */
+    async onCreateProductDialogPress() {
+      const oView = this.getView();
+      const oMainModel = oView.getModel();
+
+      const oEntryCtx = oMainModel.createEntry("/Products", {
+        properties: {
+          ID: "",
+          Name: "",
+          Price_amount: "",
+          Specs: "",
+          Rating: "0",
+          SupplierInfo: "",
+          MadeIn: "",
+          ProductionCompanyName: "",
+          Status: Constants.PRODUCT_STATUS.OK,
+          Store_ID: "",
+        },
+      });
+
+      const oDialog = await this._loadCreateProductDialog();
+      oDialog.setModel(oMainModel);
+      oDialog.setBindingContext(oEntryCtx);
+      oDialog.open();
+    },
+
+    /**
+     * Loads the create product dialog fragment if not already loaded.
+     * @private
+     * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
+     * @type {sap.m.Dialog}
+     */
+    _oDialog: null,
+    async _loadCreateProductDialog() {
+      this._oDialog ??= await this.loadFragment({
+        name: "freestylesapui5app.view.fragments.CreateProduct",
+      });
+      return this._oDialog;
+    },
+
+    /**
+    * Handles press on the "Select Store" button.
+    * Opens the SelectStore dialog fragment.
+    * @public
+    */
+    async onSelectStoreButtonPress() {
+      const oDialog = await this._loadSelectStoreDialog();
+      oDialog.open();
+    },
+
+    /**
+     * Loads the SelectStore dialog fragment if not already loaded.
+     * @private
+     * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
+     * @type {sap.m.Dialog}
+     */
+    _oSelectStoreDialog: null,
+    async _loadSelectStoreDialog() {
+      if (!this._oSelectStoreDialog) {
+        const oView = this.getView();
+        this._oSelectStoreDialog = await this.loadFragment({
+          id: oView.getId(),
+          name: "freestylesapui5app.view.fragments.SelectStore",
+          controller: this,
+        });
+        this._oSelectStoreDialog.setModel(oView.getModel());
+      }
+
+      return this._oSelectStoreDialog;
+    },
+
+    /**
+     * Handles the search logic for the stores SelectDialog in the create product dialog.
+     * @param {sap.ui.base.Event} oEvent The search event from the SelectDialog.
+     * @public
+     */
+    onStoresSelectDialogSearch(oEvent) {
+      const sValue = oEvent.getParameter("value");
+      const oFilter = new Filter({
+        path: "Name",
+        operator: FilterOperator.Contains,
+        caseSensitive: false,
+        value1: sValue
+      });
+
+      const oBinding = oEvent.getParameter("itemsBinding");
+      oBinding.filter([oFilter]);
+    },
+
+    /**
+     * Handles the close event of the "Select Store" dialog in the product creation dialog.
+     * @param {sap.ui.base.Event} oEvent The close event containing the selected store contexts.
+     * @public
+     */
+    onStoresDialogClose(oEvent) {
+      const aContexts = oEvent.getParameter("selectedContexts");
+      if (aContexts.length) {
+        this._selectedStoreId = aContexts[0].getObject().ID;
+        MessageToast.show(this._oResourceBundle.getText("chosenStore") + aContexts[0].getObject().Name);
+      }
+
+      oEvent.getSource().getBinding("items").filter([]);
+
+      const oContext = this._oDialog.getBindingContext();
+      const sPath = oContext.getPath();
+      const oModel = this.getView().getModel();
+      oModel.setProperty(sPath + "/Store_ID", this._selectedStoreId);
+    },
+
+    /**
+     * "Cancel" button press event handler (in the product creation dialog).
+     *  @public
+     */
+    onCancelButtonPress() {
+      const oContext = this._oDialog.getBindingContext();
+      const mData = oContext.getObject();
+      const oMainModel = this.getView().getModel();
+
+      const resetAndRefresh = () => {
+        oMainModel.resetChanges();
+        this._oDialog.close();
+      };
+
+      if (
+        mData.Name ||
+        mData.Price_amount ||
+        mData.Specs ||
+        mData.SupplierInfo ||
+        mData.MadeIn ||
+        mData.ProductionCompanyName
+      ) {
+        MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+          onClose: (oAction) => {
+            if (oAction === MessageBox.Action.OK) {
+              resetAndRefresh();
+            }
+          }
+        });
+      } else {
+        resetAndRefresh();
+      }
+    },
+
+    /**
+       * Handles product creation and it's validation
+       * @public
+       */
+    onCreateButtonPress() {
+      const oView = this.getView();
+      const oMainModel = oView.getModel();
+      const oContext = this._oDialog.getBindingContext();
+      const mData = oContext.getObject();
+      const rb = this._oResourceBundle;
+      const oTable = this.byId("idProductsTable");
+      const oBinding = oTable.getBinding("items");
+
+      Messaging.removeAllMessages();
+
+      if (!mData.Name || !mData.Price_amount || !mData.Specs) {
+        oMainModel.setRefreshAfterChange(false);
+        oMainModel.submitChanges({});
+      } else if (!this._selectedStoreId) {
+        MessageToast.show(this._oResourceBundle.getText("storeSelectError"));
+      } else {
+        mData.Store_ID = this._selectedStoreId
+        oMainModel.setRefreshAfterChange(true);
+        oMainModel.submitChanges({
+          success: () => {
+            MessageToast.show(rb.getText("productCreateSuccess"));
+            Messaging.removeAllMessages();
+            this._selectedStoreId = null;
+            this._oDialog.close();
+            this._updateFilteredCount([]);
+            if (oBinding) {
+              oBinding.refresh(true);
+            }
+          },
+          error: (oError) => {
+            MessageBox.error(rb.getText("productCreateError"), {
+              details: oError,
+            });
+          },
+        });
+      }
+    },
   });
 });
