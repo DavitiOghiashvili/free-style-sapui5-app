@@ -297,6 +297,7 @@ sap.ui.define([
             MessageToast.show(this._oResourceBundle.getText("commentPostSuccess"));
             Messaging.removeAllMessages();
             this._toggleCommentControls(false);
+            this._oView.getModel("uiModel").setProperty("/toggleEditButton", true);
           },
           error: (oError) => {
             MessageBox.error(rb.getText("commentPostError"), {
@@ -361,7 +362,7 @@ sap.ui.define([
         },
       });
     },
-
+// FIX EDIT BUTTON
     /**
      * Initiates comment deletion with confirmation
      * @public
