@@ -11,6 +11,11 @@ export default defineConfig([
   { files: ['**/*.js'], languageOptions: { sourceType: 'script' } },
   {
     files: ['**/*.{js,mjs,cjs}'],
-    languageOptions: { globals: globals.browser },
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        sap: true,
+      },
+    },
   },
 ]);

@@ -25,16 +25,16 @@
         <f:header>
             <f:DynamicPageHeader>
                 <fb:FilterBar id="idFilterBar"
-                    search="onFilterBarSearch"
-                    filterChange="onFilterBarFilterChange"
-                    afterVariantLoad="onFilterBarAfterVariantLoad"
+                    search=".onFilterBarSearch"
+                    filterChange=".onFilterBarFilterChange"
+                    afterVariantLoad=".onFilterBarAfterVariantLoad"
                     basicSearch="true">
                     <fb:filterGroupItems>
                         <fb:FilterGroupItem name="Search Field"
                             label="{i18n>searchLabel}"
                             groupName="Default">
                             <fb:control>
-                                <SearchField search="onFilterBarSearch"
+                                <SearchField search=".onFilterBarSearch"
                                     value="{uiModel>/searchQuery}"
                                     placeholder="{i18n>searchPlaceholder}" />
                             </fb:control>
@@ -44,7 +44,7 @@
                             groupName="Default">
                             <fb:control>
                                 <MultiComboBox name="Price_currency"
-                                    selectionChange="onMultiComboBoxSelectionChange"
+                                    selectionChange=".onMultiComboBoxSelectionChange"
                                     items="{uiModel>/currencies}">
                                     <core:Item key="{uiModel>key}"
                                         text="{uiModel>text}" />
@@ -56,7 +56,7 @@
                             groupName="Default">
                             <fb:control>
                                 <MultiComboBox name="Rating"
-                                    selectionChange="onMultiComboBoxSelectionChange"
+                                    selectionChange=".onMultiComboBoxSelectionChange"
                                     items="{uiModel>/ratings}">
                                     <core:Item key="{uiModel>key}"
                                         text="{uiModel>text}" />
@@ -84,7 +84,7 @@
             <Table id="idProductsTable"
                 autoPopinMode="true"
                 mode="MultiSelect"
-                selectionChange="onProductsTableSelectionChange"
+                selectionChange=".onProductsTableSelectionChange"
                 items="{/Products}">
                 <headerToolbar>
                     <OverflowToolbar>
@@ -96,10 +96,10 @@
                             }" />
                         <ToolbarSpacer />
                         <Button text="{i18n>createBtn}"
-                            press="onCreateProductDialogPress" />
+                            press=".onCreateProductDialogPress" />
                         <Button text="{i18n>deleteBtn}"
                             id="idProductDeleteButton"
-                            press="onDeleteButtonPress"
+                            press=".onDeleteButtonPress"
                             enabled="false" />
                     </OverflowToolbar>
                 </headerToolbar>
@@ -137,7 +137,7 @@
                 </columns>
 
                 <ColumnListItem type="Navigation"
-                    press="onColumnListItemPress">
+                    press=".onColumnListItemPress">
                     <Text text="{Name}"
                         wrapping="false" />
                     <Text text="{Price_amount}" />

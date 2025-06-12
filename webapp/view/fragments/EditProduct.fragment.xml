@@ -74,7 +74,7 @@
                             growing="true"
                             growingThreshold="10"
                             mode="Delete"
-                            delete="onDeleteCommentPress"
+                            delete=".onDeleteCommentPress"
                             id="idEditCommentTable">
                             <m:dependents>
                                 <plugins:ColumnResizer />
@@ -94,7 +94,7 @@
                                 </m:Column>
                             </m:columns>
                             <m:ColumnListItem type="Navigation"
-                                press="onColumnListItemPress">
+                                press=".onColumnListItemPress">
                                 <m:Input value="{Author}"
                                     required="true" />
                                 <m:Input value="{Message}"
