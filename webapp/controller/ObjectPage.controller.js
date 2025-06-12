@@ -171,28 +171,31 @@ sap.ui.define([
     },
 
     /**
-   * Opens message popover
-   * @private
-   * @param {sap.ui.base.Event} oEvent - Click event on button.
-   */
-    onMessagePopoverButtonPress: function (oEvent) {
-      this._getMessagePopover().then(function (oMessagePopover) {
-        oMessagePopover.toggle(oEvent.getSource());
-      });
+     * Opens the message popover.
+     * @private
+     * @param {sap.ui.base.Event} oEvent - Click event on the button.
+     */
+    async onMessagePopoverButtonPress(oEvent) {
+      const oMessagePopover = await this._getMessagePopover();
+      oMessagePopover.toggle(oEvent.getSource());
     },
 
     /**
-    * Loads popover fragment.
-    * @private
-    */
-    _getMessagePopover() {
-      return this.loadFragment({
+     * Loads the message popover fragment if not already loaded.
+     * @private
+     * @returns {Promise<sap.m.MessagePopover>} The message popover instance.
+     * @type {sap.m.MessagePopover} 
+     */
+    _oMessagePopover: null,
+    async _getMessagePopover() {
+      this._oMessagePopover ??= await this.loadFragment({
         name: "freestylesapui5app.view.fragments.MessagePopover"
       });
+      return this._oMessagePopover;
     },
 
     /**
-     * Retrieves or caches a fragment control by ID
+     * Retrieves fragment control by ID
      * @private
      * @param {string} sId - The ID of the fragment control
      * @returns {sap.ui.core.Control} The fragment control
@@ -255,29 +258,21 @@ sap.ui.define([
       const oMainModel = this.getView().getModel();
 
       if (oMainModel.hasPendingChanges()) {
-        this._handleCancelWithPendingChanges();
+        MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
+          onClose: (oAction) => {
+            if (oAction === MessageBox.Action.OK) {
+              this.getView().getModel().resetChanges();
+              Messaging.removeAllMessages()
+              this._resetCommentControls();
+              this._oView.getModel("uiModel").setProperty("/toggleEditButton", true);
+            }
+          }
+        });
         Messaging.removeAllMessages()
       } else {
         this.getView().getModel().resetChanges();
         this._resetCommentControls();
       }
-    },
-
-    /**
-     * Handles cancellation when there are pending changes
-     * @private
-     */
-    _handleCancelWithPendingChanges() {
-      MessageBox.confirm(this._oResourceBundle.getText("inputDataLoss"), {
-        onClose: (oAction) => {
-          if (oAction === MessageBox.Action.OK) {
-            this.getView().getModel().resetChanges();
-            Messaging.removeAllMessages()
-            this._resetCommentControls();
-            this._oView.getModel("uiModel").setProperty("/toggleEditButton", true);
-          }
-        }
-      });
     },
 
     /**

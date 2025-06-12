@@ -308,10 +308,6 @@ sap.ui.define([
     },
 
     /**
-       * "Create" product button event handler.
-       *  @public
-       */
-    /**
      * Handles pressing the "Create Product" button.
      * Initializes product context and opens the dialog.
      * @public
@@ -420,9 +416,7 @@ sap.ui.define([
 
       const oContext = this._oDialog.getBindingContext();
       const sPath = oContext.getPath();
-
       const oModel = this.getView().getModel();
-
       oModel.setProperty(sPath + "/Store_ID", this._selectedStoreId);
     },
 
