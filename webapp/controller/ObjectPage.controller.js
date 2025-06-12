@@ -362,7 +362,7 @@ sap.ui.define([
         },
       });
     },
-// FIX EDIT BUTTON
+
     /**
      * Initiates comment deletion with confirmation
      * @public
