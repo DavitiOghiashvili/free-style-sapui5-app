@@ -37,7 +37,7 @@ sap.ui.define([
     _UI_IDS: {
       NEW_COMMENT_ROW: "idHBox",
       SAVE_COMMENT_BUTTON: "idSaveNewCommentButton",
-      ADD_COMMENT_BUTTON: "idAddCommentButton",
+      ADD_COMMENT_BUTTON: "idAddNewCommentButton",
       CANCEL_COMMENT_BUTTON: "idCancelNewCommentButton",
       EDIT_BUTTON: "idEditButton",
       SAVE_BUTTON: "idSaveButton",
@@ -251,7 +251,7 @@ sap.ui.define([
      * Cancels the creation of a new comment
      * @public
      */
-    onCancelNewCommentPress() {
+    onCancelNewCommentButtonPress() {
       const oMainModel = this.getView().getModel();
 
       if (oMainModel.hasPendingChanges()) {

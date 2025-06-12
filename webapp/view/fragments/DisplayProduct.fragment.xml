@@ -117,7 +117,7 @@
                                 <m:ToolbarSpacer />
                                 <m:Button text="{i18n>addComment}"
                                     type="Emphasized"
-                                    id="idAddCommentButton"
+                                    id="idAddNewCommentButton"
                                     press="onAddCommentPress" />
                             </m:Toolbar>
                             <m:HBox visible="false"

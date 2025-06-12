@@ -72,8 +72,8 @@ sap.ui.define([
     },
 
     /**
-     * Helper method to fetch filtered count from OData service
-     * @param {Array} aFilters - Array of filters to apply
+     * Fetches filtered count of products from OData service
+     * @param {sap.ui.model.Filter[]} aFilters - Array of filters to apply
      * @private
      */
     _updateFilteredCount(aFilters) {
@@ -92,14 +92,14 @@ sap.ui.define([
     },
 
     /**
-     * Retrieve filter group items with values.
-     * @returns {Array} Array of filter group items with selected values
-     * @private
-     */
+   * Retrieve filter group items that have selected values.
+   * @returns {Array<FilterGroupItem>} Array of FilterGroupItem objects whose controls have one or more selected keys
+   * @private
+   */
     _getFiltersWithValues() {
       const aFiltersWithValue = this._oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
         const oControl = oFilterGroupItem.getControl();
-        if (oControl.getSelectedKeys().length > 0) {
+        if (oControl.getSelectedKeys().length) {
           aResult.push(oFilterGroupItem);
         }
         return aResult;
@@ -179,7 +179,7 @@ sap.ui.define([
         const oControl = oFilterGroupItem.getControl();
         const aSelectedKeys = oControl.getSelectedKeys();
 
-        if (aSelectedKeys.length > 0) {
+        if (aSelectedKeys.length) {
           const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
             return new Filter({
               path: sFieldName,
@@ -225,10 +225,10 @@ sap.ui.define([
     },
 
     /**
-     * Navigate to item on press.
-     * @param oEvent item press event.
-     * @public
-     */
+   * Navigate to item on press.
+   * @param {sap.ui.base.Event} oEvent The press event from the list item.
+   * @public
+   */
     onColumnListItemPress(oEvent) {
       const oContext = oEvent.getSource().getBindingContext();
       const sProductId = oContext.getProperty("ID");
@@ -240,7 +240,7 @@ sap.ui.define([
 
     /**
      * Handle products table selection change and enable delete button.
-     * @param oEvent item press event.
+     * @param {sap.ui.base.Event} oEvent The press event from the products table.
      * @public
      */
     onProductsTableSelectionChange(oEvent) {
@@ -255,7 +255,7 @@ sap.ui.define([
      * @public
      */
     onDeleteButtonPress() {
-      const oModel = this.getOwnerComponent().getModel();
+      const oModel = this.getView().getModel();
       const aSelectedContexts = this._oTable.getSelectedContexts();
       const iSelectedCount = aSelectedContexts.length;
       const oBinding = this._oTable.getBinding('items')
@@ -311,7 +311,12 @@ sap.ui.define([
        * "Create" product button event handler.
        *  @public
        */
-    onCreateProductDialogPress() {
+    /**
+     * Handles pressing the "Create Product" button.
+     * Initializes product context and opens the dialog.
+     * @public
+     */
+    async onCreateProductDialogPress() {
       const oView = this.getView();
       const oMainModel = oView.getModel();
 
@@ -330,49 +335,62 @@ sap.ui.define([
         },
       });
 
-      if (!this._oDialog) {
-        this.loadFragment({
-          name: "freestylesapui5app.view.fragments.CreateProduct",
-        }).then((oDialog) => {
-          this._oDialog = oDialog;
-          this._oDialog.setModel(oMainModel);
-          this._oDialog.setBindingContext(oEntryCtx);
-          this._oDialog.open();
-        });
-      } else {
-        this._oDialog.setModel(oMainModel);
-        this._oDialog.setBindingContext(oEntryCtx);
-        this._oDialog.open();
-      }
+      const oDialog = await this._loadCreateProductDialog();
+      oDialog.setModel(oMainModel);
+      oDialog.setBindingContext(oEntryCtx);
+      oDialog.open();
     },
 
     /**
-       * "Select store" button event handler in product dialog.
-       *  @public
-       */
-    onSelectStoreButtonPress() {
-      const oView = this.getView();
+     * Loads the create product dialog fragment if not already loaded.
+     * @private
+     * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
+     * @type {sap.m.Dialog}
+     */
+    _oDialog: null,
+    async _loadCreateProductDialog() {
+      this._oDialog ??= await this.loadFragment({
+        name: "freestylesapui5app.view.fragments.CreateProduct",
+      });
+      return this._oDialog;
+    },
 
-      if (!this._pDialog) {
-        this._pDialog = this.loadFragment({
+    /**
+    * Handles press on the "Select Store" button.
+    * Opens the SelectStore dialog fragment.
+    * @public
+    */
+    async onSelectStoreButtonPress() {
+      const oDialog = await this._loadSelectStoreDialog();
+      oDialog.open();
+    },
+
+    /**
+     * Loads the SelectStore dialog fragment if not already loaded.
+     * @private
+     * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
+     * @type {sap.m.Dialog}
+     */
+    _oSelectStoreDialog: null,
+    async _loadSelectStoreDialog() {
+      if (!this._oSelectStoreDialog) {
+        const oView = this.getView();
+        this._oSelectStoreDialog = await this.loadFragment({
           id: oView.getId(),
           name: "freestylesapui5app.view.fragments.SelectStore",
-          controller: this
-        }).then(function (oDialog) {
-          oDialog.setModel(oView.getModel());
-          return oDialog;
+          controller: this,
         });
+        this._oSelectStoreDialog.setModel(oView.getModel());
       }
 
-      this._pDialog.then(function (oDialog) {
-        oDialog.open();
-      });
+      return this._oSelectStoreDialog;
     },
 
     /**
-       * Search logic for stores inside create product dialog.
-       *  @public
-       */
+     * Handles the search logic for the stores SelectDialog in the create product dialog.
+     * @param {sap.ui.base.Event} oEvent The search event from the SelectDialog.
+     * @public
+     */
     onStoresSelectDialogSearch(oEvent) {
       const sValue = oEvent.getParameter("value");
       const oFilter = new Filter({
@@ -387,12 +405,13 @@ sap.ui.define([
     },
 
     /**
-       * "Select store" dialog closing event handler in product dialog.
-       *  @public
-       */
+     * Handles the close event of the "Select Store" dialog in the product creation dialog.
+     * @param {sap.ui.base.Event} oEvent The close event containing the selected store contexts.
+     * @public
+     */
     onStoresDialogClose(oEvent) {
       const aContexts = oEvent.getParameter("selectedContexts");
-      if (aContexts?.length) {
+      if (aContexts.length) {
         this._selectedStoreId = aContexts[0].getObject().ID;
         MessageToast.show(this._oResourceBundle.getText("chosenStore") + aContexts[0].getObject().Name);
       }
@@ -408,7 +427,7 @@ sap.ui.define([
     },
 
     /**
-     * "Cancel" button press event handler (in the dialog).
+     * "Cancel" button press event handler (in the product creation dialog).
      *  @public
      */
     onCancelButtonPress() {
@@ -451,6 +470,8 @@ sap.ui.define([
       const oContext = this._oDialog.getBindingContext();
       const mData = oContext.getObject();
       const rb = this._oResourceBundle;
+      const oTable = this.byId("idProductsTable");
+      const oBinding = oTable.getBinding("items");
 
       Messaging.removeAllMessages();
 
@@ -460,13 +481,18 @@ sap.ui.define([
       } else if (!this._selectedStoreId) {
         MessageToast.show(this._oResourceBundle.getText("storeSelectError"));
       } else {
+        mData.Store_ID = this._selectedStoreId
         oMainModel.setRefreshAfterChange(true);
         oMainModel.submitChanges({
           success: () => {
             MessageToast.show(rb.getText("productCreateSuccess"));
             Messaging.removeAllMessages();
-            this._selectedStoreId = null
+            this._selectedStoreId = null;
             this._oDialog.close();
+            this._updateFilteredCount([]);
+            if (oBinding) {
+              oBinding.refresh(true);
+            }
           },
           error: (oError) => {
             MessageBox.error(rb.getText("productCreateError"), {
@@ -475,10 +501,6 @@ sap.ui.define([
           },
         });
       }
-
-      this._oDialog.attachAfterClose(() => {
-        this._updateFilteredCount(null);
-      })
     },
   });
 });
