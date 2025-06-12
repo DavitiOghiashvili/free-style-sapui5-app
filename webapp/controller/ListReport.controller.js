@@ -8,7 +8,7 @@ sap.ui.define([
   "../utils/Constants",
   "sap/ui/core/BusyIndicator",
   "sap/m/MessageToast",
-  "sap/ui/core/library",
+  "sap/ui/core/Messaging",
 ], (
   Controller,
   JSONModel,
@@ -19,17 +19,17 @@ sap.ui.define([
   Constants,
   BusyIndicator,
   MessageToast,
-  coreLibrary,
+  Messaging
 ) => {
   "use strict";
-
-  const { ValueState } = coreLibrary
-
   return Controller.extend("freestylesapui5app.controller.ListReport", {
     formatter: Formatter,
     _selectedStoreId: null,
 
     onInit() {
+      this.getView().setModel(Messaging.getMessageModel(), "message");
+      Messaging.registerObject(this.getView(), true)
+
       this._oResourceBundle = this.getOwnerComponent()
         .getModel("i18n")
         .getResourceBundle();
@@ -193,7 +193,6 @@ sap.ui.define([
             and: false
           }));
         }
-
       });
 
       oBinding.filter(aFilters);
@@ -382,6 +381,7 @@ sap.ui.define([
         caseSensitive: false,
         value1: sValue
       });
+
       const oBinding = oEvent.getParameter("itemsBinding");
       oBinding.filter([oFilter]);
     },
@@ -390,9 +390,9 @@ sap.ui.define([
        * "Select store" dialog closing event handler in product dialog.
        *  @public
        */
-    onStoresDialogClose: function (oEvent) {
+    onStoresDialogClose(oEvent) {
       const aContexts = oEvent.getParameter("selectedContexts");
-      if (aContexts && aContexts.length) {
+      if (aContexts?.length) {
         this._selectedStoreId = aContexts[0].getObject().ID;
         MessageToast.show(this._oResourceBundle.getText("chosenStore") + aContexts[0].getObject().Name);
       }
@@ -404,14 +404,7 @@ sap.ui.define([
 
       const oModel = this.getView().getModel();
 
-      oModel.setProperty(sPath + "/Store_ID", this._selectedStoreId, {
-        success: function () {
-          console.log("Store_ID updated successfully in the model.");
-        },
-        error: function (oError) {
-          console.error("Error updating Store_ID:", oError);
-        }
-      });
+      oModel.setProperty(sPath + "/Store_ID", this._selectedStoreId);
     },
 
     /**
@@ -459,121 +452,33 @@ sap.ui.define([
       const mData = oContext.getObject();
       const rb = this._oResourceBundle;
 
-      let validationFailed = false;
+      Messaging.removeAllMessages();
 
-      const fields = [
-        {
-          id: "idNameInput",
-          value: mData.Name,
-          required: true,
-          validate: (val) => /^[A-Za-z0-9\s]+$/.test(val) && val.length <= Constants.MAX_NAME_LENGTH,
-          getErrorText: (val) => {
-            if (!/^[A-Za-z0-9\s]+$/.test(val)) {
-              return rb.getText("invalidProductName");
-            }
-            if (val.length > Constants.MAX_NAME_LENGTH) {
-              return rb.getText("nameTooLongMessage");
-            }
+      if (!mData.Name || !mData.Price_amount || !mData.Specs) {
+        oMainModel.setRefreshAfterChange(false);
+        oMainModel.submitChanges({});
+      } else if (!this._selectedStoreId) {
+        MessageToast.show(this._oResourceBundle.getText("storeSelectError"));
+      } else {
+        oMainModel.setRefreshAfterChange(true);
+        oMainModel.submitChanges({
+          success: () => {
+            MessageToast.show(rb.getText("productCreateSuccess"));
+            Messaging.removeAllMessages();
+            this._selectedStoreId = null
+            this._oDialog.close();
           },
-        },
-        {
-          id: "idPriceAmountInput",
-          value: mData.Price_amount,
-          required: true,
-          validate: (val) => val >= 0,
-          getErrorText: () => rb.getText("invalidProductPrice"),
-        },
-        {
-          id: "idSpecsInput",
-          value: mData.Specs,
-          required: true,
-          validate: (val) => val.length <= Constants.MAX_TEXT_LENGTH,
-          getErrorText: () => rb.getText("specsTooLongMessage"),
-        },
-        {
-          id: "idRatingStepInput",
-          value: mData.Rating,
-          required: false,
-          validate: (val) => val === undefined || (val >= 0 && val <= 5),
-          getErrorText: () => rb.getText("invalidRatingMessage"),
-        },
-        {
-          id: "idSupplierInfoInput",
-          value: mData.SupplierInfo,
-          required: false,
-          validate: (val) => val.length <= Constants.MAX_TEXT_LENGTH,
-          getErrorText: () => rb.getText("supplierInfoTooLongMessage"),
-        },
-        {
-          id: "idMadeInInput",
-          value: mData.MadeIn,
-          required: false,
-          validate: (val) => val.length <= Constants.MAX_MADE_IN_LENGTH,
-          getErrorText: () => rb.getText("madeInTooLongMessage"),
-        },
-        {
-          id: "idProductionCompanyNameInput",
-          value: mData.ProductionCompanyName,
-          required: false,
-          validate: (val) => val.length <= Constants.MAX_COMPANY_LENGTH,
-        }
-      ];
-
-      fields.forEach((field) => {
-        if (validationFailed) return;
-
-        const oInput = oView.byId(field.id);
-        const value = field.value;
-        const isEmpty = value === undefined || value === null || value === "";
-
-        if (field.required && isEmpty) {
-          oInput.setValueState(ValueState.Error);
-          oInput.setValueStateText(rb.getText("mandatoryFieldsMessage"));
-          oInput.focus();
-          validationFailed = true;
-          return;
-        }
-
-        if (!field.required && isEmpty) {
-          oInput.setValueState(ValueState.None);
-          return;
-        }
-
-        if (!field.validate(value)) {
-          oInput.setValueState(ValueState.Error);
-          oInput.setValueStateText(field.getErrorText(value));
-          oInput.focus();
-          validationFailed = true;
-          return;
-        }
-
-        oInput.setValueState(ValueState.None);
-      });
-
-      if (!validationFailed && !this._selectedStoreId) {
-        MessageBox.error(this._oResourceBundle.getText("storeSelectError"));
-        return
+          error: (oError) => {
+            MessageBox.error(rb.getText("productCreateError"), {
+              details: oError,
+            });
+          },
+        });
       }
 
-      if (validationFailed) return;
-
-      BusyIndicator.show();
-
-      oMainModel.submitChanges({
-        success: () => {
-          BusyIndicator.hide();
-          MessageToast.show(rb.getText("productCreateSuccess"));
-          this._oDialog.close();
-        },
-        error: (oError) => {
-          BusyIndicator.hide();
-          MessageBox.error(rb.getText("productCreateError"), {
-            details: oError,
-          });
-        },
-      });
-
-      this._updateFilteredCount([]);
+      this._oDialog.attachAfterClose(() => {
+        this._updateFilteredCount(null);
+      })
     },
   });
 });

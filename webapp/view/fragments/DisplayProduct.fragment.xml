@@ -63,7 +63,7 @@
                 </m:VBox>
 
                 <m:VBox class="sapUiLargeMarginEnd">
-                    <m:Title text="{i18n>Price}"
+                    <m:Title text="{i18n>price}"
                         class="sapUiTinyMarginBottom" />
                     <m:ObjectNumber number="{Price_amount}"
                         unit="{Price_currency}"
@@ -84,7 +84,7 @@
                             columnsXL="4">
                             <core:Title text="{i18n>productDetails}" />
 
-                            <m:Label text="{i18n>Name}" />
+                            <m:Label text="{i18n>name}" />
                             <m:Text text="{Name}" />
 
                             <m:Label text="{i18n>productCreatedAt}" />
@@ -114,31 +114,23 @@
                     <ObjectPageSubSection title="{i18n>commentsTitle}">
                         <m:VBox>
                             <m:Toolbar>
+                                <m:ToolbarSpacer />
                                 <m:Button text="{i18n>addComment}"
                                     type="Emphasized"
                                     id="idAddCommentButton"
                                     press="onAddCommentPress" />
-                                <m:Button text="{i18n>saveComment}"
-                                    type="Accept"
-                                    visible="false"
-                                    id="idSaveCommentButton"
-                                    press="onSaveNewCommentPress" />
-                                <m:Button text="{i18n>cancelBtn}"
-                                    type="Reject"
-                                    visible="false"
-                                    id="idCancelCommentButton"
-                                    press="onCancelNewCommentPress" />
                             </m:Toolbar>
                             <m:HBox visible="false"
-                                id="idHBox">
-                                <m:Input placeholder="Author"
-                                    id="idAuthorInput"
-                                    value="{Author}" />
-                                <m:Input placeholder="Message"
-                                    id="idMessageInput"
-                                    value="{Message}" />
-                                <m:Input placeholder="Rating"
-                                    id="idRatingInput"
+                                id="idHBox"
+                                justifyContent="Center"
+                                class="sapUiSmallMargin">
+                                <m:Input placeholder="{i18n>commentAuthor}"
+                                    value="{Author}"
+                                    required="true" />
+                                <m:Input placeholder="{i18n>commentMessage}"
+                                    value="{Message}"
+                                    required="true" />
+                                <m:Input placeholder="{i18n>commentRating}"
                                     value="{Rating}" />
                             </m:HBox>
                             <m:Table id="idCommentTable"

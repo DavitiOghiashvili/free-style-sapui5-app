@@ -4,74 +4,6 @@
     xmlns:forms="sap.ui.layout.form"
     xmlns:plugins="sap.m.plugins">
     <ObjectPageLayout>
-        <headerTitle>
-            <ObjectPageDynamicHeaderTitle>
-                <expandedHeading>
-                    <m:Title text="{Name}" />
-                </expandedHeading>
-
-                <snappedHeading>
-                    <m:HBox>
-                        <m:Avatar src="{Photo}"
-                            class="sapUiMediumMarginEnd"
-                            displayShape="Square" />
-                        <m:VBox>
-                            <m:Title text="{Name}" />
-                        </m:VBox>
-                    </m:HBox>
-                </snappedHeading>
-            </ObjectPageDynamicHeaderTitle>
-        </headerTitle>
-
-        <headerContent>
-            <m:FlexBox wrap="Wrap"
-                fitContainer="true">
-                <m:Avatar src="{Photo}"
-                    class="sapUiMediumMarginEnd"
-                    displayShape="Square"
-                    displaySize="L" />
-
-                <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
-                    <m:HBox class="sapUiTinyMarginBottom"
-                        renderType="Bare">
-                        <m:Label text="{i18n>prodCompany}"
-                            class="sapUiTinyMarginEnd" />
-                        <m:Input value="{ProductionCompanyName}" />
-                    </m:HBox>
-
-                    <m:HBox class="sapUiTinyMarginBottom"
-                        renderType="Bare">
-                        <m:Label text="{i18n>madeIn}"
-                            class="sapUiTinyMarginEnd" />
-                        <m:Input value="{MadeIn}" />
-                    </m:HBox>
-
-                    <m:HBox class="sapUiTinyMarginBottom"
-                        renderType="Bare">
-                        <m:Label text="{i18n>rating}"
-                            class="sapUiTinyMarginEnd" />
-                        <m:Input value="{Rating}" />
-                    </m:HBox>
-                </m:VBox>
-
-                <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
-                    <m:Title text="{i18n>status}"
-                        class="sapUiTinyMarginBottom" />
-                    <m:Select selectedKey="{Status}"
-                        items="{uiModel>/statuses}">
-                        <core:Item key="{uiModel>key}"
-                            text="{uiModel>text}" />
-                    </m:Select>
-                </m:VBox>
-
-                <m:VBox class="sapUiLargeMarginEnd">
-                    <m:Title text="{i18n>Price}"
-                        class="sapUiTinyMarginBottom" />
-                    <m:Input value="{Price_amount}" />
-                </m:VBox>
-            </m:FlexBox>
-        </headerContent>
-
         <sections>
             <ObjectPageSection title="{i18n>generalInformationTitle}">
                 <subSections>
@@ -83,9 +15,9 @@
                             columnsXL="4">
                             <core:Title text="{i18n>productDetails}" />
 
-                            <m:Label text="{i18n>Name}" />
-                            <m:Input value="{Name}" />
-
+                            <m:Label text="{i18n>name}" />
+                            <m:Input value="{Name}"
+                                required="true" />
                             <m:Label text="{i18n>productCreatedAt}" />
                             <m:Text text="{path: 'createdAt', formatter: '.formatter.formatDate'}" />
 
@@ -99,10 +31,35 @@
                             <m:Text text="{modifiedBy}" />
 
                             <m:Label text="{i18n>specs}" />
-                            <m:Input value="{Specs}" />
-
+                            <m:Input value="{Specs}"
+                                required="true" />
                             <m:Label text="{i18n>supplierInfo}" />
                             <m:Input value="{SupplierInfo}" />
+
+                            <m:Label text="{i18n>prodCompany}"
+                                class="sapUiTinyMarginEnd" />
+                            <m:Input value="{ProductionCompanyName}" />
+
+                            <m:Label text="{i18n>madeIn}"
+                                class="sapUiTinyMarginEnd" />
+                            <m:Input value="{MadeIn}" />
+
+                            <m:Label text="{i18n>rating}"
+                                class="sapUiTinyMarginEnd" />
+                            <m:Input value="{Rating}" />
+
+                            <m:Label text="{i18n>status}"
+                                class="sapUiTinyMarginBottom" />
+                            <m:Select selectedKey="{Status}"
+                                items="{uiModel>/statuses}">
+                                <core:Item key="{uiModel>key}"
+                                    text="{uiModel>text}" />
+                            </m:Select>
+
+                            <m:Label text="{i18n>price}"
+                                class="sapUiTinyMarginBottom" />
+                            <m:Input value="{Price_amount}"
+                                required="true" />
                         </forms:SimpleForm>
                     </ObjectPageSubSection>
                 </subSections>
@@ -116,7 +73,8 @@
                             growing="true"
                             growingThreshold="10"
                             mode="Delete"
-                            delete="onDeleteCommentPress">
+                            delete="onDeleteCommentPress"
+                            id="idEditCommentTable">
                             <m:dependents>
                                 <plugins:ColumnResizer />
                             </m:dependents>
@@ -136,8 +94,10 @@
                             </m:columns>
                             <m:ColumnListItem type="Navigation"
                                 press="onColumnListItemPress">
-                                <m:Input value="{Author}" />
-                                <m:Input value="{Message}" />
+                                <m:Input value="{Author}"
+                                    required="true" />
+                                <m:Input value="{Message}"
+                                    required="true" />
                                 <m:Text text="{path: 'Posted', formatter: '.formatter.formatDate'}" />
                                 <m:Input value="{Rating}" />
                             </m:ColumnListItem>

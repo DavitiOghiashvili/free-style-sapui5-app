@@ -5,8 +5,7 @@
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
     xmlns:viz.data="sap.viz.ui5.data">
-    <suite:ChartContainer id="idChartContainer"
-        showFullScreen="true"
+    <suite:ChartContainer showFullScreen="true"
         autoAdjustHeight="true"
         showSelectionDetails="true"
         title="{i18n>productDataTitle}">
