@@ -505,12 +505,15 @@ sap.ui.define(
 
         if (
           this.getModel().hasPendingChanges() &&
-          (!mData.Name || !mData.Specs || !mData.Price_amount || bValidationFailed)
+          (!mData.Name ||
+            !mData.Specs ||
+            !mData.Price_amount ||
+            bValidationFailed)
         ) {
           this.getModel().setRefreshAfterChange(false);
           this.getModel().submitChanges({});
         } else if (bValidationFailed) {
-          return
+          return;
         } else if (
           this.getModel().hasPendingChanges() &&
           (mData.Name || mData.Specs || mData.Price_amount)

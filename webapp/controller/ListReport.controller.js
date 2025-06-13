@@ -301,9 +301,9 @@ sap.ui.define(
             iSelectedCount === 1
               ? this.getResourceBundleText('productDeleteSuccessSingular')
               : this.getResourceBundleTextWithParam(
-                'productDeleteSuccessPlural',
-                [iSelectedCount],
-              );
+                  'productDeleteSuccessPlural',
+                  [iSelectedCount],
+                );
           MessageToast.show(sSuccessMsg);
           this._oProductDeleteButton.setEnabled(false);
         };
@@ -341,9 +341,9 @@ sap.ui.define(
           iSelectedCount === 1
             ? this.getResourceBundleText('confirmDeleteProductSingular')
             : this.getResourceBundleTextWithParam(
-              'confirmDeleteProductPlural',
-              [iSelectedCount],
-            );
+                'confirmDeleteProductPlural',
+                [iSelectedCount],
+              );
 
         MessageBox.confirm(sConfirmMsg, {
           onClose: handleConfirmClose,
@@ -442,7 +442,7 @@ sap.ui.define(
           this._selectedStoreId = aContexts[0].getObject().ID;
           MessageToast.show(
             this.getResourceBundleText('chosenStore') +
-            aContexts[0].getObject().Name,
+              aContexts[0].getObject().Name,
           );
         }
 
@@ -505,7 +505,7 @@ sap.ui.define(
           this.getModel().setRefreshAfterChange(false);
           this.getModel().submitChanges({});
           MessageToast.show(this.getResourceBundleText('storeSelectError'));
-          return
+          return;
         } else {
           this.getModel().setRefreshAfterChange(true);
           this.getModel().submitChanges({
