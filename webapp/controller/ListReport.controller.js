@@ -463,6 +463,7 @@ sap.ui.define(
 
         const resetAndRefresh = () => {
           this.getModel().resetChanges();
+          this._selectedStoreId = null;
           this._oDialog.close();
         };
 
@@ -504,9 +505,9 @@ sap.ui.define(
           this.getModel().setRefreshAfterChange(false);
           this.getModel().submitChanges({});
           MessageToast.show(this.getResourceBundleText('storeSelectError'));
+          return
         } else {
           this.getModel().setRefreshAfterChange(true);
-          mData.Store_ID = this._selectedStoreId;
           this.getModel().submitChanges({
             success: () => {
               MessageToast.show(
