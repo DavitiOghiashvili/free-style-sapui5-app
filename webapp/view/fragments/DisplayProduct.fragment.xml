@@ -118,7 +118,7 @@
                                 <m:Button text="{i18n>addComment}"
                                     type="Emphasized"
                                     id="idAddNewCommentButton"
-                                    press="onAddCommentPress" />
+                                    press=".onAddCommentPress" />
                             </m:Toolbar>
                             <m:HBox visible="false"
                                 id="idHBox"
@@ -139,7 +139,7 @@
                                 growing="true"
                                 growingThreshold="10"
                                 mode="Delete"
-                                delete="onDeleteCommentPress">
+                                delete=".onDeleteCommentPress">
                                 <m:dependents>
                                     <plugins:ColumnResizer />
                                 </m:dependents>
@@ -158,7 +158,7 @@
                                     </m:Column>
                                 </m:columns>
                                 <m:ColumnListItem type="Navigation"
-                                    press="onColumnListItemPress">
+                                    press=".onColumnListItemPress">
                                     <m:Text text="{Author}" />
                                     <m:Text text="{Message}"
                                         wrapping="false" />

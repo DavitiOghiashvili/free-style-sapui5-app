@@ -1,12 +1,19 @@
 {
-    "cSpell.words": [
-        "filterbar",
-        "Fiori",
-        "Popin",
-        "Resizer",
-        "uxap",
-        "XTIT",
-        "YDES",
-        "yxxx"
-    ]
+  "cSpell.words": [
+    "filterbar",
+    "Fiori",
+    "noflp",
+    "oninit",
+    "openui",
+    "Popin",
+    "Resizer",
+    "resourceroots",
+    "sapui",
+    "sapux",
+    "uiarea",
+    "uxap",
+    "XTIT",
+    "YDES",
+    "yxxx"
+  ]
 }
