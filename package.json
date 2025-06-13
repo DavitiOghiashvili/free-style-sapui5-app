@@ -24,6 +24,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "lint:ui5": "ui5lint",
+    "lint:ui5:fix": "ui5lint --fix",
     "start": "fiori run --open \"test/flp.html#app-preview\"",
     "start-local": "fiori run --config ./ui5-local.yaml --open \"test/flp.html#app-preview\"",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
