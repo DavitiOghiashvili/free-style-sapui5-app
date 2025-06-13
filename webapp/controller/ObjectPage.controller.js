@@ -149,11 +149,18 @@ sap.ui.define(
       },
 
       /**
-       * Enters edit mode for the product and comments
+       * Retrieves current user name with Function Import form metadata.
        * @public
        */
-      onEditButtonPress() {
-        this._toggleButtonsAndView(true);
+      onGetUserButtonPress() {
+        this.getModel().read('/getCurrentUser', {
+          success(oData) {
+            MessageToast.show(JSON.stringify(oData.getCurrentUser));
+          },
+          error(oError) {
+            console.log(oError);
+          },
+        });
       },
 
       /**
