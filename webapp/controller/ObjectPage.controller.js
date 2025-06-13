@@ -45,6 +45,7 @@ sap.ui.define(
         EDIT_BUTTON: 'idEditButton',
         SAVE_BUTTON: 'idSaveButton',
         CANCEL_BUTTON: 'idCancelButton',
+        DELETE_BUTTON: 'idDeleteButton',
       },
 
       /**
@@ -57,7 +58,6 @@ sap.ui.define(
           this,
         );
 
-        this._oEditCommentTable = this.getView().byId('idEditCommentTable');
         this._objectPage = this.getView().byId('idObjectPage');
         this._formFragments = {};
         this._showFormFragment(Constants.FRAGMENTS.DISPLAY_PRODUCT);
@@ -450,6 +450,7 @@ sap.ui.define(
       onSaveButtonPress() {
         const oBindingContext = this.getView().getBindingContext();
         const mData = oBindingContext.getObject();
+        this._oEditCommentTable = this.getView().byId('idEditCommentTable');
         const aItems = this._oEditCommentTable.getItems();
 
         Messaging.removeAllMessages();
@@ -463,7 +464,6 @@ sap.ui.define(
 
           if (!oAuthorInput.getValue() || oAuthorInput.getValue().length > 45) {
             oAuthorInput.setValueState(ValueState.Error);
-            bValidationFailed = true;
             Messaging.addMessages(
               new Message({
                 message: this.getResourceBundleText('commentNameRequired'),
@@ -472,11 +472,11 @@ sap.ui.define(
                 processor: this.getModel(),
               }),
             );
+            bValidationFailed = true;
           }
 
           if (!oMessageInput.getValue()) {
             oMessageInput.setValueState(ValueState.Error);
-            bValidationFailed = true;
             Messaging.addMessages(
               new Message({
                 message: this.getResourceBundleText('mandatoryFieldsMessage'),
@@ -485,13 +485,12 @@ sap.ui.define(
                 processor: this.getModel(),
               }),
             );
+            bValidationFailed = true;
           }
 
           const iRatingValue = parseFloat(oRatingInput.getValue());
-
           if (isNaN(iRatingValue) || iRatingValue < 0 || iRatingValue > 10) {
             oRatingInput.setValueState(ValueState.Error);
-            bValidationFailed = true;
             Messaging.addMessages(
               new Message({
                 message: this.getResourceBundleText('commentRatingRequired'),
@@ -500,22 +499,18 @@ sap.ui.define(
                 processor: this.getModel(),
               }),
             );
+            bValidationFailed = true;
           }
         });
 
-        if (bValidationFailed) {
-          MessageToast.show(
-            this.getResourceBundleText('mandatoryFieldsMessage'),
-          );
-          return;
-        }
-
         if (
           this.getModel().hasPendingChanges() &&
-          (!mData.Name || !mData.Specs || !mData.Price_amount)
+          (!mData.Name || !mData.Specs || !mData.Price_amount || bValidationFailed)
         ) {
           this.getModel().setRefreshAfterChange(false);
           this.getModel().submitChanges({});
+        } else if (bValidationFailed) {
+          return
         } else if (
           this.getModel().hasPendingChanges() &&
           (mData.Name || mData.Specs || mData.Price_amount)
@@ -556,6 +551,7 @@ sap.ui.define(
         );
 
         this.getView().byId(this._UI_IDS.EDIT_BUTTON).setVisible(!bEdit);
+        this.getView().byId(this._UI_IDS.DELETE_BUTTON).setVisible(bEdit);
         this.getView().byId(this._UI_IDS.SAVE_BUTTON).setVisible(bEdit);
         this.getView().byId(this._UI_IDS.CANCEL_BUTTON).setVisible(bEdit);
       },

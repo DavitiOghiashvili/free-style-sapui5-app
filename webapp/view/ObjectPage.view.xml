@@ -13,6 +13,8 @@
                         text="{i18n>editBtn}"
                         press=".onEditButtonPress" />
                     <m:Button text="{i18n>deleteBtn}"
+                        id="idDeleteButton"
+                        visible="false"
                         press=".onDeleteButtonPress" />
                 </m:contentRight>
             </m:Bar>
