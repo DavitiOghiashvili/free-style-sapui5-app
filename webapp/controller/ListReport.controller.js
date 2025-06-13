@@ -1,6 +1,6 @@
 sap.ui.define(
   [
-    'sap/ui/core/mvc/Controller',
+    'freestylesapui5app/controller/BaseController',
     'sap/ui/model/json/JSONModel',
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
@@ -12,7 +12,7 @@ sap.ui.define(
     'sap/ui/core/Messaging',
   ],
   (
-    Controller,
+    BaseController,
     JSONModel,
     Filter,
     FilterOperator,
@@ -24,44 +24,40 @@ sap.ui.define(
     Messaging,
   ) => {
     'use strict';
-    return Controller.extend('freestylesapui5app.controller.ListReport', {
+    return BaseController.extend('freestylesapui5app.controller.ListReport', {
       _oDialog: null,
       _oSelectStoreDialog: null,
       formatter: Formatter,
       _selectedStoreId: null,
 
       onInit() {
-        this.getView().setModel(Messaging.getMessageModel(), 'message');
+        this.setNamedModel(Messaging.getMessageModel(), 'message');
         Messaging.registerObject(this.getView(), true);
 
-        this._oResourceBundle = this.getOwnerComponent()
-          .getModel('i18n')
-          .getResourceBundle();
-
-        this.getView().setModel(
+        this.setNamedModel(
           new JSONModel({
             currencies: [
               {
                 key: Constants.PRICE_CURRENCIES.USD,
-                text: this._oResourceBundle.getText('USD'),
+                text: this.getResourceBundleText('USD'),
               },
               {
                 key: Constants.PRICE_CURRENCIES.EUR,
-                text: this._oResourceBundle.getText('EUR'),
+                text: this.getResourceBundleText('EUR'),
               },
             ],
             statuses: [
               {
                 key: Constants.PRODUCT_STATUS.OK,
-                text: this._oResourceBundle.getText('OK'),
+                text: this.getResourceBundleText('OK'),
               },
               {
                 key: Constants.PRODUCT_STATUS.STORAGE,
-                text: this._oResourceBundle.getText('STORAGE'),
+                text: this.getResourceBundleText('STORAGE'),
               },
               {
                 key: Constants.PRODUCT_STATUS.OUT_OF_STOCK,
-                text: this._oResourceBundle.getText('OUT_OF_STOCK'),
+                text: this.getResourceBundleText('OUT_OF_STOCK'),
               },
             ],
             ratings: [
@@ -104,19 +100,15 @@ sap.ui.define(
        * @private
        */
       _updateFilteredCount(aFilters) {
-        const oModel = this.getOwnerComponent().getModel();
-        const oUiModel = this.getView().getModel('uiModel');
-
-        oModel.read('/Products/$count', {
+        this.getMainModel().read('/Products/$count', {
           filters: aFilters,
           success: (count) => {
-            oUiModel.setProperty('/productsCount', count);
+            this.getNamedModel('uiModel').setProperty('/productsCount', count);
           },
           error: (oError) => {
-            MessageBox.error(
-              this._oResourceBundle.getText('productCountError'),
-              { details: oError },
-            );
+            MessageBox.error(this.getResourceBundleText('productCountError'), {
+              details: oError,
+            });
           },
         });
       },
@@ -156,9 +148,8 @@ sap.ui.define(
         const oBinding = this._oTable.getBinding('items');
         const aFilters = [];
 
-        const sQuery = this.getView()
-          .getModel('uiModel')
-          .getProperty('/searchQuery');
+        const sQuery =
+          this.getNamedModel('uiModel').getProperty('/searchQuery');
         const textFields = Constants.SEARCH_FILTERS.byText;
 
         if (sQuery) {
@@ -278,7 +269,7 @@ sap.ui.define(
         const oContext = oEvent.getSource().getBindingContext();
         const sProductId = oContext.getProperty('ID');
 
-        this.getOwnerComponent().getRouter().navTo('ObjectPage', {
+        this.navToWithParameters('ObjectPage', {
           Product_ID: sProductId,
         });
       },
@@ -300,7 +291,6 @@ sap.ui.define(
        * @public
        */
       onDeleteButtonPress() {
-        const oModel = this.getView().getModel();
         const aSelectedContexts = this._oTable.getSelectedContexts();
         const iSelectedCount = aSelectedContexts.length;
         const oBinding = this._oTable.getBinding('items');
@@ -309,29 +299,27 @@ sap.ui.define(
           BusyIndicator.hide();
           const sSuccessMsg =
             iSelectedCount === 1
-              ? this._oResourceBundle.getText('productDeleteSuccessSingular')
-              : this._oResourceBundle.getText('productDeleteSuccessPlural', [
-                  iSelectedCount,
-                ]);
+              ? this.getResourceBundleText('productDeleteSuccessSingular')
+              : this.getResourceBundleTextWithParam(
+                'productDeleteSuccessPlural',
+                [iSelectedCount],
+              );
           MessageToast.show(sSuccessMsg);
           this._oProductDeleteButton.setEnabled(false);
         };
 
         const handleDeleteError = (oError) => {
           BusyIndicator.hide();
-          MessageBox.error(
-            this._oResourceBundle.getText('productDeleteError'),
-            {
-              details: oError,
-            },
-          );
+          MessageBox.error(this.getResourceBundleText('productDeleteError'), {
+            details: oError,
+          });
         };
 
         const deleteSelectedContexts = () => {
           BusyIndicator.show();
           aSelectedContexts.forEach((oContext) => {
             const sPath = oContext.getPath();
-            oModel.remove(sPath, {
+            this.getModel().remove(sPath, {
               success: handleDeleteSuccess,
               error: handleDeleteError,
             });
@@ -351,10 +339,11 @@ sap.ui.define(
 
         const sConfirmMsg =
           iSelectedCount === 1
-            ? this._oResourceBundle.getText('confirmDeleteProductSingular')
-            : this._oResourceBundle.getText('confirmDeleteProductPlural', [
-                iSelectedCount,
-              ]);
+            ? this.getResourceBundleText('confirmDeleteProductSingular')
+            : this.getResourceBundleTextWithParam(
+              'confirmDeleteProductPlural',
+              [iSelectedCount],
+            );
 
         MessageBox.confirm(sConfirmMsg, {
           onClose: handleConfirmClose,
@@ -367,10 +356,7 @@ sap.ui.define(
        * @public
        */
       async onCreateProductDialogPress() {
-        const oView = this.getView();
-        const oMainModel = oView.getModel();
-
-        const oEntryCtx = oMainModel.createEntry('/Products', {
+        const oEntryCtx = this.getModel().createEntry('/Products', {
           properties: {
             ID: '',
             Name: '',
@@ -386,7 +372,7 @@ sap.ui.define(
         });
 
         const oDialog = await this._loadCreateProductDialog();
-        oDialog.setModel(oMainModel);
+        oDialog.setModel(this.getModel());
         oDialog.setBindingContext(oEntryCtx);
         oDialog.open();
       },
@@ -455,8 +441,8 @@ sap.ui.define(
         if (aContexts.length) {
           this._selectedStoreId = aContexts[0].getObject().ID;
           MessageToast.show(
-            this._oResourceBundle.getText('chosenStore') +
-              aContexts[0].getObject().Name,
+            this.getResourceBundleText('chosenStore') +
+            aContexts[0].getObject().Name,
           );
         }
 
@@ -464,8 +450,7 @@ sap.ui.define(
 
         const oContext = this._oDialog.getBindingContext();
         const sPath = oContext.getPath();
-        const oModel = this.getView().getModel();
-        oModel.setProperty(sPath + '/Store_ID', this._selectedStoreId);
+        this.getModel().setProperty(sPath + '/Store_ID', this._selectedStoreId);
       },
 
       /**
@@ -475,10 +460,9 @@ sap.ui.define(
       onCancelButtonPress() {
         const oContext = this._oDialog.getBindingContext();
         const mData = oContext.getObject();
-        const oMainModel = this.getView().getModel();
 
         const resetAndRefresh = () => {
-          oMainModel.resetChanges();
+          this.getModel().resetChanges();
           this._oDialog.close();
         };
 
@@ -490,7 +474,7 @@ sap.ui.define(
           mData.MadeIn ||
           mData.ProductionCompanyName
         ) {
-          MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+          MessageBox.confirm(this.getResourceBundleText('inputDataLoss'), {
             onClose: (oAction) => {
               if (oAction === MessageBox.Action.OK) {
                 resetAndRefresh();
@@ -507,39 +491,42 @@ sap.ui.define(
        * @public
        */
       onCreateButtonPress() {
-        const oView = this.getView();
-        const oMainModel = oView.getModel();
         const oContext = this._oDialog.getBindingContext();
         const mData = oContext.getObject();
-        const rb = this._oResourceBundle;
-        const oTable = this.byId('idProductsTable');
-        const oBinding = oTable.getBinding('items');
+        const oBinding = this._oTable.getBinding('items');
 
         Messaging.removeAllMessages();
 
         if (!mData.Name || !mData.Price_amount || !mData.Specs) {
-          oMainModel.setRefreshAfterChange(false);
-          oMainModel.submitChanges({});
+          this.getModel().setRefreshAfterChange(false);
+          this.getModel().submitChanges({});
         } else if (!this._selectedStoreId) {
-          MessageToast.show(this._oResourceBundle.getText('storeSelectError'));
+          this.getModel().setRefreshAfterChange(false);
+          this.getModel().submitChanges({});
+          MessageToast.show(this.getResourceBundleText('storeSelectError'));
         } else {
+          this.getModel().setRefreshAfterChange(true);
           mData.Store_ID = this._selectedStoreId;
-          oMainModel.setRefreshAfterChange(true);
-          oMainModel.submitChanges({
+          this.getModel().submitChanges({
             success: () => {
-              MessageToast.show(rb.getText('productCreateSuccess'));
-              Messaging.removeAllMessages();
-              this._selectedStoreId = null;
+              MessageToast.show(
+                this.getResourceBundleText('productCreateSuccess'),
+              );
               this._oDialog.close();
               this._updateFilteredCount([]);
               if (oBinding) {
                 oBinding.refresh(true);
               }
+              Messaging.removeAllMessages();
+              this._selectedStoreId = null;
             },
             error: (oError) => {
-              MessageBox.error(rb.getText('productCreateError'), {
-                details: oError,
-              });
+              MessageBox.error(
+                this.getResourceBundleText('productCreateError'),
+                {
+                  details: oError,
+                },
+              );
             },
           });
         }

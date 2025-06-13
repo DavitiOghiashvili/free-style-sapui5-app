@@ -1,6 +1,6 @@
 sap.ui.define(
   [
-    'sap/ui/core/mvc/Controller',
+    'freestylesapui5app/controller/BaseController',
     'freestylesapui5app/utils/Formatter',
     'sap/m/MessageBox',
     'sap/m/MessageToast',
@@ -14,7 +14,7 @@ sap.ui.define(
     'sap/ui/core/library',
   ],
   function (
-    Controller,
+    BaseController,
     Formatter,
     MessageBox,
     MessageToast,
@@ -31,9 +31,10 @@ sap.ui.define(
 
     const { ValueState } = coreLibrary;
 
-    return Controller.extend('freestylesapui5app.controller.ObjectPage', {
+    return BaseController.extend('freestylesapui5app.controller.ObjectPage', {
       // Formatter referenced in fragments for date text formatting
       formatter: Formatter,
+      _oMessagePopover: null,
 
       // Constants for repeated UI elements
       _UI_IDS: {
@@ -51,33 +52,30 @@ sap.ui.define(
        * @public
        */
       onInit() {
-        this._oResourceBundle = this.getOwnerComponent()
-          .getModel('i18n')
-          .getResourceBundle();
+        this.getRoute('ObjectPage').attachPatternMatched(
+          this._onRouteMatched,
+          this,
+        );
 
-        this._oRouter = this.getOwnerComponent().getRouter();
-        this._oRouter
-          .getRoute('ObjectPage')
-          .attachPatternMatched(this._onRouteMatched, this);
-
+        this._oEditCommentTable = this.getView().byId('idEditCommentTable');
         this._objectPage = this.getView().byId('idObjectPage');
         this._formFragments = {};
         this._showFormFragment(Constants.FRAGMENTS.DISPLAY_PRODUCT);
 
-        this.getView().setModel(
+        this.setNamedModel(
           new JSONModel({
             statuses: [
               {
                 key: Constants.PRODUCT_STATUS.OK,
-                text: this._oResourceBundle.getText('OK'),
+                text: this.getResourceBundleText('OK'),
               },
               {
                 key: Constants.PRODUCT_STATUS.STORAGE,
-                text: this._oResourceBundle.getText('STORAGE'),
+                text: this.getResourceBundleText('STORAGE'),
               },
               {
                 key: Constants.PRODUCT_STATUS.OUT_OF_STOCK,
-                text: this._oResourceBundle.getText('OUT_OF_STOCK'),
+                text: this.getResourceBundleText('OUT_OF_STOCK'),
               },
             ],
             toggleFooterVisibility: false,
@@ -85,9 +83,9 @@ sap.ui.define(
           }),
           'uiModel',
         );
-        this._oView = this.getView();
-        this._oView.setModel(Messaging.getMessageModel(), 'message');
-        Messaging.registerObject(this._oView, true);
+
+        this.setNamedModel(Messaging.getMessageModel(), 'message');
+        Messaging.registerObject(this.getView(), true);
       },
 
       /**
@@ -97,9 +95,8 @@ sap.ui.define(
        */
       _onRouteMatched(oEvent) {
         const sProductId = oEvent.getParameter('arguments').Product_ID;
-        const oModel = this.getView().getModel();
 
-        const sKey = oModel.createKey('/Products', {
+        const sKey = this.getModel().createKey('/Products', {
           ID: sProductId,
         });
 
@@ -107,7 +104,7 @@ sap.ui.define(
           path: sKey,
         });
 
-        oModel.resetChanges();
+        this.getModel().resetChanges();
         this._toggleButtonsAndView(false);
         this._resetCommentControls();
         Messaging.removeAllMessages();
@@ -137,13 +134,12 @@ sap.ui.define(
        * @param {string} sFragmentName - The name of the fragment to display
        */
       _getFormFragment(sFragmentName) {
-        const oView = this.getView();
         const sFragmentPath =
           'freestylesapui5app.view.fragments.' + sFragmentName;
 
         if (!this._formFragments[sFragmentName]) {
           this._formFragments[sFragmentName] = Fragment.load({
-            id: oView.getId(),
+            id: this.getView().getId(),
             name: sFragmentPath,
             controller: this,
           });
@@ -165,13 +161,11 @@ sap.ui.define(
        * @public
        */
       onCancelButtonPress() {
-        const oModel = this.getView().getModel();
-
-        if (oModel.hasPendingChanges()) {
-          MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+        if (this.getModel().hasPendingChanges()) {
+          MessageBox.confirm(this.getResourceBundleText('inputDataLoss'), {
             onClose: (oAction) => {
               if (oAction === MessageBox.Action.OK) {
-                oModel.resetChanges();
+                this.getModel().resetChanges();
                 this._toggleButtonsAndView(false);
                 Messaging.removeAllMessages();
               }
@@ -198,7 +192,6 @@ sap.ui.define(
        * @returns {Promise<sap.m.MessagePopover>} The message popover instance.
        * @type {sap.m.MessagePopover}
        */
-      _oMessagePopover: null,
       async _getMessagePopover() {
         this._oMessagePopover ??= await this.loadFragment({
           name: 'freestylesapui5app.view.fragments.MessagePopover',
@@ -232,11 +225,9 @@ sap.ui.define(
        * @public
        */
       onAddCommentPress() {
-        const oView = this.getView();
-        const oModel = oView.getModel();
-        const sProductId = oView.getBindingContext().getProperty('ID');
+        const sProductId = this.getView().getBindingContext().getProperty('ID');
 
-        const oEntryCtx = oModel.createEntry('/ProductComments', {
+        const oEntryCtx = this.getModel().createEntry('/ProductComments', {
           properties: {
             Author: '',
             Message: '',
@@ -258,10 +249,11 @@ sap.ui.define(
        * @param {boolean} bShow - Whether to show or hide the comment controls
        */
       _toggleCommentControls(bShow) {
-        this._oView
-          .getModel('uiModel')
-          .setProperty('/toggleFooterVisibility', bShow);
-        this._oView.getModel('uiModel').setProperty('/toggleEditButton', false);
+        this.getNamedModel('uiModel').setProperty(
+          '/toggleFooterVisibility',
+          bShow,
+        );
+        this.getNamedModel('uiModel').setProperty('/toggleEditButton', false);
 
         this._getFragmentControl(this._UI_IDS.NEW_COMMENT_ROW).setVisible(
           bShow,
@@ -282,24 +274,23 @@ sap.ui.define(
        * @public
        */
       onCancelNewCommentButtonPress() {
-        const oMainModel = this.getView().getModel();
-
-        if (oMainModel.hasPendingChanges()) {
-          MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
+        if (this.getModel().hasPendingChanges()) {
+          MessageBox.confirm(this.getResourceBundleText('inputDataLoss'), {
             onClose: (oAction) => {
               if (oAction === MessageBox.Action.OK) {
-                this.getView().getModel().resetChanges();
+                this.getModel().resetChanges();
                 Messaging.removeAllMessages();
                 this._resetCommentControls();
-                this._oView
-                  .getModel('uiModel')
-                  .setProperty('/toggleEditButton', true);
+                this.getNamedModel('uiModel').setProperty(
+                  '/toggleEditButton',
+                  true,
+                );
               }
             },
           });
           Messaging.removeAllMessages();
         } else {
-          this.getView().getModel().resetChanges();
+          this.getModel().resetChanges();
           this._resetCommentControls();
         }
       },
@@ -309,8 +300,6 @@ sap.ui.define(
        * @public
        */
       onSaveNewCommentButtonPress: function () {
-        const oView = this.getView();
-        const oModel = oView.getModel();
         const oCommentCtx = this._getFragmentControl(
           this._UI_IDS.NEW_COMMENT_ROW,
         ).getBindingContext();
@@ -319,28 +308,26 @@ sap.ui.define(
         Messaging.removeAllMessages();
 
         if (!mData.Author || !mData.Message) {
-          oModel.setRefreshAfterChange(false);
-          oModel.submitChanges({});
+          this.getModel().setRefreshAfterChange(false);
+          this.getModel().submitChanges({});
         } else {
-          oModel.setRefreshAfterChange(true);
-          oModel.submitChanges({
+          this.getModel().setRefreshAfterChange(true);
+          this.getModel().submitChanges({
             success: () => {
               MessageToast.show(
-                this._oResourceBundle.getText('commentPostSuccess'),
+                this.getResourceBundleText('commentPostSuccess'),
               );
               Messaging.removeAllMessages();
               this._toggleCommentControls(false);
-              this._oView
-                .getModel('uiModel')
-                .setProperty('/toggleEditButton', true);
+              this.getNamedModel('uiModel').setProperty(
+                '/toggleEditButton',
+                true,
+              );
             },
             error: (oError) => {
-              MessageBox.error(
-                this._oResourceBundle.getText('commentPostError'),
-                {
-                  details: oError,
-                },
-              );
+              MessageBox.error(this.getResourceBundleText('commentPostError'), {
+                details: oError,
+              });
             },
           });
         }
@@ -370,7 +357,7 @@ sap.ui.define(
        * @public
        */
       onColumnListItemPress() {
-        this._oRouter.navTo('ObjectChartPage');
+        this.navTo('ObjectChartPage');
       },
 
       /**
@@ -378,33 +365,32 @@ sap.ui.define(
        * @public
        */
       onDeleteButtonPress() {
-        const oMainModel = this.getView().getModel();
         const oCtx = this.getView().getBindingContext();
-        const sKey = oMainModel.createKey('/Products', oCtx.getObject());
+        const sKey = this.getModel().createKey('/Products', oCtx.getObject());
 
         MessageBox.confirm(
-          this._oResourceBundle.getText('confirmDeleteProductSingular'),
+          this.getResourceBundleText('confirmDeleteProductSingular'),
           {
             onClose: (sAction) => {
               if (sAction === MessageBox.Action.OK) {
                 BusyIndicator.show();
-                oMainModel.remove(sKey, {
+                this.getModel().remove(sKey, {
                   success: () => {
                     BusyIndicator.hide();
                     MessageToast.show(
-                      this._oResourceBundle.getText(
+                      this.getResourceBundleText(
                         'productDeleteSuccessSingular',
                       ),
                       {
                         closeOnBrowserNavigation: false,
                       },
                     );
-                    this.getOwnerComponent().getRouter().navTo('ListReport');
+                    this.navTo('ListReport');
                   },
                   error: (oError) => {
                     BusyIndicator.hide();
                     MessageBox.error(
-                      this._oResourceBundle.getText('productDeleteError'),
+                      this.getResourceBundleText('productDeleteError'),
                       {
                         details: oError,
                       },
@@ -424,40 +410,37 @@ sap.ui.define(
        */
       onDeleteCommentPress(oEvent) {
         const oListItem = oEvent.getParameter('listItem');
-        const oCtx = oListItem.getBindingContext();
-        const oModel = oCtx.getModel();
-        const oComment = oCtx.getObject();
-        const sKey = oModel.createKey('/ProductComments', {
+        const oContext = oListItem.getBindingContext();
+        const oContextModel = oContext.getModel();
+        const oComment = oContext.getObject();
+        const sKey = oContextModel.createKey('/ProductComments', {
           ID: oComment.ID,
         });
 
-        MessageBox.confirm(
-          this._oResourceBundle.getText('confirmDeleteComment'),
-          {
-            onClose: (sAction) => {
-              if (sAction === MessageBox.Action.OK) {
-                BusyIndicator.show();
-                oModel.remove(sKey, {
-                  success: () => {
-                    BusyIndicator.hide();
-                    MessageToast.show(
-                      this._oResourceBundle.getText('commentDeleteSuccess'),
-                    );
-                  },
-                  error: (oError) => {
-                    BusyIndicator.hide();
-                    MessageBox.error(
-                      this._oResourceBundle.getText('commentDeleteError'),
-                      {
-                        details: oError,
-                      },
-                    );
-                  },
-                });
-              }
-            },
+        MessageBox.confirm(this.getResourceBundleText('confirmDeleteComment'), {
+          onClose: (sAction) => {
+            if (sAction === MessageBox.Action.OK) {
+              BusyIndicator.show();
+              oContextModel.remove(sKey, {
+                success: () => {
+                  BusyIndicator.hide();
+                  MessageToast.show(
+                    this.getResourceBundleText('commentDeleteSuccess'),
+                  );
+                },
+                error: (oError) => {
+                  BusyIndicator.hide();
+                  MessageBox.error(
+                    this.getResourceBundleText('commentDeleteError'),
+                    {
+                      details: oError,
+                    },
+                  );
+                },
+              });
+            }
           },
-        );
+        });
       },
 
       /**
@@ -465,12 +448,9 @@ sap.ui.define(
        * @public
        */
       onSaveButtonPress() {
-        const oModel = this.getView().getModel();
         const oBindingContext = this.getView().getBindingContext();
         const mData = oBindingContext.getObject();
-
-        const oTable = this._oView.byId('idEditCommentTable');
-        const aItems = oTable.getItems();
+        const aItems = this._oEditCommentTable.getItems();
 
         Messaging.removeAllMessages();
         let bValidationFailed = false;
@@ -486,10 +466,10 @@ sap.ui.define(
             bValidationFailed = true;
             Messaging.addMessages(
               new Message({
-                message: this._oResourceBundle.getText('commentNameRequired'),
+                message: this.getResourceBundleText('commentNameRequired'),
                 type: MessageType.Error,
                 target: `/Comment/${iIndex}/Author`,
-                processor: oModel,
+                processor: this.getModel(),
               }),
             );
           }
@@ -499,12 +479,10 @@ sap.ui.define(
             bValidationFailed = true;
             Messaging.addMessages(
               new Message({
-                message: this._oResourceBundle.getText(
-                  'mandatoryFieldsMessage',
-                ),
+                message: this.getResourceBundleText('mandatoryFieldsMessage'),
                 type: MessageType.Error,
                 target: `/Comment/${iIndex}/Message`,
-                processor: oModel,
+                processor: this.getModel(),
               }),
             );
           }
@@ -516,10 +494,10 @@ sap.ui.define(
             bValidationFailed = true;
             Messaging.addMessages(
               new Message({
-                message: this._oResourceBundle.getText('commentRatingRequired'),
+                message: this.getResourceBundleText('commentRatingRequired'),
                 type: MessageType.Error,
                 target: `/Comment/${iIndex}/Rating`,
-                processor: oModel,
+                processor: this.getModel(),
               }),
             );
           }
@@ -527,27 +505,27 @@ sap.ui.define(
 
         if (bValidationFailed) {
           MessageToast.show(
-            this._oResourceBundle.getText('mandatoryFieldsMessage'),
+            this.getResourceBundleText('mandatoryFieldsMessage'),
           );
           return;
         }
 
         if (
-          oModel.hasPendingChanges() &&
+          this.getModel().hasPendingChanges() &&
           (!mData.Name || !mData.Specs || !mData.Price_amount)
         ) {
-          oModel.setRefreshAfterChange(false);
-          oModel.submitChanges({});
+          this.getModel().setRefreshAfterChange(false);
+          this.getModel().submitChanges({});
         } else if (
-          oModel.hasPendingChanges() &&
+          this.getModel().hasPendingChanges() &&
           (mData.Name || mData.Specs || mData.Price_amount)
         ) {
-          oModel.setRefreshAfterChange(true);
-          oModel.submitChanges({
+          this.getModel().setRefreshAfterChange(true);
+          this.getModel().submitChanges({
             success: () => {
               BusyIndicator.hide();
               MessageToast.show(
-                this._oResourceBundle.getText('productUpdateSuccess'),
+                this.getResourceBundleText('productUpdateSuccess'),
               );
               Messaging.removeAllMessages();
               this._toggleButtonsAndView(false);
@@ -555,7 +533,7 @@ sap.ui.define(
           });
         } else {
           Messaging.removeAllMessages();
-          MessageToast.show(this._oResourceBundle.getText('noChangesToSave'));
+          MessageToast.show(this.getResourceBundleText('noChangesToSave'));
           this._toggleButtonsAndView(false);
         }
       },
@@ -566,8 +544,10 @@ sap.ui.define(
        * @param {boolean} bEdit - Whether to enable edit mode
        */
       _toggleButtonsAndView(bEdit) {
-        const oView = this.getView();
-        oView.getModel('uiModel').setProperty('/toggleFooterVisibility', bEdit);
+        this.getNamedModel('uiModel').setProperty(
+          '/toggleFooterVisibility',
+          bEdit,
+        );
 
         this._showFormFragment(
           bEdit
@@ -575,9 +555,9 @@ sap.ui.define(
             : Constants.FRAGMENTS.DISPLAY_PRODUCT,
         );
 
-        oView.byId(this._UI_IDS.EDIT_BUTTON).setVisible(!bEdit);
-        oView.byId(this._UI_IDS.SAVE_BUTTON).setVisible(bEdit);
-        oView.byId(this._UI_IDS.CANCEL_BUTTON).setVisible(bEdit);
+        this.getView().byId(this._UI_IDS.EDIT_BUTTON).setVisible(!bEdit);
+        this.getView().byId(this._UI_IDS.SAVE_BUTTON).setVisible(bEdit);
+        this.getView().byId(this._UI_IDS.CANCEL_BUTTON).setVisible(bEdit);
       },
     });
   },
