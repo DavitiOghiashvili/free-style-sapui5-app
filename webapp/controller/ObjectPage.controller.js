@@ -149,6 +149,14 @@ sap.ui.define(
       },
 
       /**
+       * Enters edit mode for the product and comments
+       * @public
+       */
+      onEditButtonPress() {
+        this._toggleButtonsAndView(true);
+      },
+
+      /**
        * Retrieves current user name with Function Import form metadata.
        * @public
        */
