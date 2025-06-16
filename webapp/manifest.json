@@ -46,10 +46,15 @@
     "dependencies": {
       "minUI5Version": "1.136.1",
       "libs": {
+        "sap.f": {},
         "sap.m": {},
-        "sap.ui.core": {}
+        "sap.ui.core": {},
+        "sap.uxap": {}
       }
     },
+    "config": {
+			"fullWidth": true
+		},
     "contentDensities": {
       "compact": true,
       "cozy": true
@@ -77,9 +82,8 @@
     },
     "routing": {
       "config": {
-        "routerClass": "sap.m.routing.Router",
-        "controlAggregation": "pages",
-        "controlId": "app",
+        "routerClass": "sap.f.routing.Router",
+        "controlId": "flexibleColumnLayout",
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
@@ -88,43 +92,50 @@
       },
       "routes": [
         {
+          "pattern": ":layout:",
           "name": "ListReport",
-          "pattern": "",
-          "target": ["ListReport"]
+          "target": [
+            "ListReport",
+            "ObjectPage"
+          ]
         },
         {
           "name": "ObjectPage",
-          "pattern": "ObjectPage/{Product_ID}",
-          "target": ["ObjectPage"]
+          "pattern": "ObjectPage/{Product_ID}/{layout}",
+          "target": [
+            "ListReport",
+            "ObjectPage"
+          ]
         },
         {
           "name": "ObjectChartPage",
-          "pattern": "ObjectChartPage",
-          "target": ["ObjectChartPage"]
+          "pattern": "ObjectPage/{Product_ID}/ObjectChartPage/{layout}",
+          "target": [
+            "ListReport",
+            "ObjectPage",
+            "ObjectChartPage"
+          ]
         }
       ],
       "targets": {
         "ListReport": {
-          "id": "ListReport",
           "name": "ListReport",
-          "level": 1
+          "controlAggregation": "beginColumnPages"
         },
         "ObjectPage": {
-          "id": "ObjectPage",
           "name": "ObjectPage",
-          "level": 2
+          "controlAggregation": "midColumnPages"
         },
         "ObjectChartPage": {
-          "id": "ObjectChartPage",
           "name": "ObjectChartPage",
-          "level": 3
+          "controlAggregation": "endColumnPages"
         }
       }
     },
     "rootView": {
       "viewName": "freestylesapui5app.view.App",
       "type": "XML",
-      "id": "App",
+      "id": "fcl",
       "async": true
     }
   }

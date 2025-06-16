@@ -53,10 +53,9 @@ sap.ui.define(
        * @public
        */
       onInit() {
-        this.getRoute('ObjectPage').attachPatternMatched(
-          this._onRouteMatched,
-          this,
-        );
+        this.getRoute("ListReport").attachPatternMatched(this._onRouteMatched, this);
+        this.getRoute("ObjectPage").attachPatternMatched(this._onRouteMatched, this);
+        this.getRoute("ObjectChartPage").attachPatternMatched(this._onRouteMatched, this);
 
         this._objectPage = this.getView().byId('idObjectPage');
         this._formFragments = {};
@@ -88,6 +87,11 @@ sap.ui.define(
         Messaging.registerObject(this.getView(), true);
       },
 
+      onExit: function () {
+        this.oRouter.getRoute("ListReport").detachPatternMatched(this._onProductMatched, this);
+        this.oRouter.getRoute("ObjectPage").detachPatternMatched(this._onProductMatched, this);
+      },
+
       /**
        * Handles route pattern matching and binds the view to the product context, resets controls and messages
        * @private
@@ -103,6 +107,7 @@ sap.ui.define(
         this.getView().bindElement({
           path: sKey,
         });
+        console.log("objectpage", "sProductId", sProductId, "sKey", sKey);
 
         this.getModel().resetChanges();
         this._toggleButtonsAndView(false);
