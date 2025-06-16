@@ -160,14 +160,18 @@ sap.ui.define(
        * Retrieves current user name with Function Import form metadata.
        * @public
        */
-      onGetUserButtonPress() {
-        this.getModel().read('/getCurrentUser', {
+      onInvokeFunctionFromMetadataButtonPress() {
+        this.getModel().callFunction("/mutate", {
+          method: "POST",
+          urlParameters: {
+            param: "'param'"
+          },
           success(oData) {
-            MessageToast.show(JSON.stringify(oData.getCurrentUser));
+            MessageToast.show(JSON.stringify(oData.mutate));
           },
           error(oError) {
-            console.log(oError);
-          },
+            console.error("Error calling function import:", oError);
+          }
         });
       },
 

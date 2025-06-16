@@ -8,8 +8,8 @@
             <m:Bar>
                 <m:contentRight>
                     <m:Button type="Emphasized"
-                        text="{i18n>getCurrentUser}"
-                        press=".onGetUserButtonPress" />
+                        text="{i18n>invokeFunction}"
+                        press=".onInvokeFunctionFromMetadataButtonPress" />
                     <m:Button id="idEditButton"
                         type="Emphasized"
                         enabled="{uiModel>/toggleEditButton}"
