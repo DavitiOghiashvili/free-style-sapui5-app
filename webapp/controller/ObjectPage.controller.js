@@ -157,6 +157,25 @@ sap.ui.define(
       },
 
       /**
+       * Retrieves current user name with Function Import form metadata.
+       * @public
+       */
+      onInvokeFunctionFromMetadataButtonPress() {
+        this.getModel().callFunction("/mutate", {
+          method: "POST",
+          urlParameters: {
+            param: "'param'"
+          },
+          success(oData) {
+            MessageToast.show(JSON.stringify(oData.mutate));
+          },
+          error(oError) {
+            console.error("Error calling function import:", oError);
+          }
+        });
+      },
+
+      /**
        * Cancels editing with confirmation for unsaved changes
        * @public
        */
