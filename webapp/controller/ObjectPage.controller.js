@@ -106,8 +106,11 @@ sap.ui.define(
 
         this.getModel().resetChanges();
         this._toggleButtonsAndView(false);
-        this._resetCommentControls();
         Messaging.removeAllMessages();
+
+        this.getView().addEventDelegate(() => {
+          this._resetCommentControls();
+        });
       },
 
       /**
