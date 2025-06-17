@@ -13,15 +13,6 @@ sap.ui.define(['sap/ui/core/mvc/Controller'], function (Controller) {
     },
 
     /**
-     * Returns the default model from the owner component.
-     * @returns {sap.ui.model.Model} The default model.
-     * @public
-     */
-    getMainModel() {
-      return this.getOwnerComponent().getModel();
-    },
-
-    /**
      * Returns a model by name from the view.
      * @param {string} [sName] - Optional model name.
      * @returns {sap.ui.model.Model} The requested model.

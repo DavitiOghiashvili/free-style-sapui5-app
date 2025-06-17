@@ -100,17 +100,19 @@ sap.ui.define(
        * @private
        */
       _updateFilteredCount(aFilters) {
-        this.getMainModel().read('/Products/$count', {
-          filters: aFilters,
-          success: (count) => {
-            this.getModel('uiModel').setProperty('/productsCount', count);
-          },
-          error: (oError) => {
-            MessageBox.error(this.i18n('productCountError'), {
-              details: oError,
-            });
-          },
-        });
+        this.getOwnerComponent()
+          .getModel()
+          .read('/Products/$count', {
+            filters: aFilters,
+            success: (count) => {
+              this.getModel('uiModel').setProperty('/productsCount', count);
+            },
+            error: (oError) => {
+              MessageBox.error(this.i18n('productCountError'), {
+                details: oError,
+              });
+            },
+          });
       },
 
       /**

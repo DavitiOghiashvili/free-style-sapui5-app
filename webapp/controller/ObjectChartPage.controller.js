@@ -36,24 +36,26 @@ sap.ui.define(
           let amount = 0;
 
           statuses.forEach((status) => {
-            this.getMainModel().read('/Products/$count', {
-              filters: [new Filter('Status', FilterOperator.EQ, status)],
-              success: (count) => {
-                chartData.push({
-                  Status: Formatter.productStatusText(status),
-                  Count: count,
-                });
-                amount++;
-                if (amount === statuses.length) {
-                  oVizFrame.setModel(new JSONModel({ Products: chartData }));
-                }
-              },
-              error: (error) => {
-                MessageBox.error(this.i18n('productCountError'), {
-                  details: error,
-                });
-              },
-            });
+            this.getOwnerComponent()
+              .getModel()
+              .read('/Products/$count', {
+                filters: [new Filter('Status', FilterOperator.EQ, status)],
+                success: (count) => {
+                  chartData.push({
+                    Status: Formatter.productStatusText(status),
+                    Count: count,
+                  });
+                  amount++;
+                  if (amount === statuses.length) {
+                    oVizFrame.setModel(new JSONModel({ Products: chartData }));
+                  }
+                },
+                error: (error) => {
+                  MessageBox.error(this.i18n('productCountError'), {
+                    details: error,
+                  });
+                },
+              });
           });
         },
       },
