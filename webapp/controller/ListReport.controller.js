@@ -31,33 +31,33 @@ sap.ui.define(
       _selectedStoreId: null,
 
       onInit() {
-        this.setNamedModel(Messaging.getMessageModel(), 'message');
+        this.setModel(Messaging.getMessageModel(), 'message');
         Messaging.registerObject(this.getView(), true);
 
-        this.setNamedModel(
+        this.setModel(
           new JSONModel({
             currencies: [
               {
                 key: Constants.PRICE_CURRENCIES.USD,
-                text: this.getResourceBundleText('USD'),
+                text: this.i18n('USD'),
               },
               {
                 key: Constants.PRICE_CURRENCIES.EUR,
-                text: this.getResourceBundleText('EUR'),
+                text: this.i18n('EUR'),
               },
             ],
             statuses: [
               {
                 key: Constants.PRODUCT_STATUS.OK,
-                text: this.getResourceBundleText('OK'),
+                text: this.i18n('OK'),
               },
               {
                 key: Constants.PRODUCT_STATUS.STORAGE,
-                text: this.getResourceBundleText('STORAGE'),
+                text: this.i18n('STORAGE'),
               },
               {
                 key: Constants.PRODUCT_STATUS.OUT_OF_STOCK,
-                text: this.getResourceBundleText('OUT_OF_STOCK'),
+                text: this.i18n('OUT_OF_STOCK'),
               },
             ],
             ratings: [
@@ -103,10 +103,10 @@ sap.ui.define(
         this.getMainModel().read('/Products/$count', {
           filters: aFilters,
           success: (count) => {
-            this.getNamedModel('uiModel').setProperty('/productsCount', count);
+            this.getModel('uiModel').setProperty('/productsCount', count);
           },
           error: (oError) => {
-            MessageBox.error(this.getResourceBundleText('productCountError'), {
+            MessageBox.error(this.i18n('productCountError'), {
               details: oError,
             });
           },
@@ -148,8 +148,7 @@ sap.ui.define(
         const oBinding = this._oTable.getBinding('items');
         const aFilters = [];
 
-        const sQuery =
-          this.getNamedModel('uiModel').getProperty('/searchQuery');
+        const sQuery = this.getModel('uiModel').getProperty('/searchQuery');
         const textFields = Constants.SEARCH_FILTERS.byText;
 
         if (sQuery) {
@@ -269,7 +268,7 @@ sap.ui.define(
         const oContext = oEvent.getSource().getBindingContext();
         const sProductId = oContext.getProperty('ID');
 
-        this.navToWithParameters('ObjectPage', {
+        this.navTo('ObjectPage', {
           Product_ID: sProductId,
         });
       },
@@ -299,18 +298,15 @@ sap.ui.define(
           BusyIndicator.hide();
           const sSuccessMsg =
             iSelectedCount === 1
-              ? this.getResourceBundleText('productDeleteSuccessSingular')
-              : this.getResourceBundleTextWithParam(
-                  'productDeleteSuccessPlural',
-                  [iSelectedCount],
-                );
+              ? this.i18n('productDeleteSuccessSingular')
+              : this.i18n('productDeleteSuccessPlural', iSelectedCount);
           MessageToast.show(sSuccessMsg);
           this._oProductDeleteButton.setEnabled(false);
         };
 
         const handleDeleteError = (oError) => {
           BusyIndicator.hide();
-          MessageBox.error(this.getResourceBundleText('productDeleteError'), {
+          MessageBox.error(this.i18n('productDeleteError'), {
             details: oError,
           });
         };
@@ -339,11 +335,8 @@ sap.ui.define(
 
         const sConfirmMsg =
           iSelectedCount === 1
-            ? this.getResourceBundleText('confirmDeleteProductSingular')
-            : this.getResourceBundleTextWithParam(
-                'confirmDeleteProductPlural',
-                [iSelectedCount],
-              );
+            ? this.i18n('confirmDeleteProductSingular')
+            : this.i18n('confirmDeleteProductPlural', iSelectedCount);
 
         MessageBox.confirm(sConfirmMsg, {
           onClose: handleConfirmClose,
@@ -441,8 +434,7 @@ sap.ui.define(
         if (aContexts.length) {
           this._selectedStoreId = aContexts[0].getObject().ID;
           MessageToast.show(
-            this.getResourceBundleText('chosenStore') +
-              aContexts[0].getObject().Name,
+            this.i18n('chosenStore') + aContexts[0].getObject().Name,
           );
         }
 
@@ -475,7 +467,7 @@ sap.ui.define(
           mData.MadeIn ||
           mData.ProductionCompanyName
         ) {
-          MessageBox.confirm(this.getResourceBundleText('inputDataLoss'), {
+          MessageBox.confirm(this.i18n('inputDataLoss'), {
             onClose: (oAction) => {
               if (oAction === MessageBox.Action.OK) {
                 resetAndRefresh();
@@ -504,15 +496,13 @@ sap.ui.define(
         } else if (!this._selectedStoreId) {
           this.getModel().setRefreshAfterChange(false);
           this.getModel().submitChanges({});
-          MessageToast.show(this.getResourceBundleText('storeSelectError'));
+          MessageToast.show(this.i18n('storeSelectError'));
           return;
         } else {
           this.getModel().setRefreshAfterChange(true);
           this.getModel().submitChanges({
             success: () => {
-              MessageToast.show(
-                this.getResourceBundleText('productCreateSuccess'),
-              );
+              MessageToast.show(this.i18n('productCreateSuccess'));
               this._oDialog.close();
               this._updateFilteredCount([]);
               if (oBinding) {
@@ -522,12 +512,9 @@ sap.ui.define(
               this._selectedStoreId = null;
             },
             error: (oError) => {
-              MessageBox.error(
-                this.getResourceBundleText('productCreateError'),
-                {
-                  details: oError,
-                },
-              );
+              MessageBox.error(this.i18n('productCreateError'), {
+                details: oError,
+              });
             },
           });
         }

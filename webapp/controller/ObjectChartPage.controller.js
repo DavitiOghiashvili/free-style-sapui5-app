@@ -6,6 +6,7 @@ sap.ui.define(
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
     'freestylesapui5app/utils/Formatter',
+    'freestylesapui5app/utils/Constants',
   ],
   (
     BaseController,
@@ -14,6 +15,7 @@ sap.ui.define(
     Filter,
     FilterOperator,
     Formatter,
+    Constants,
   ) => {
     'use strict';
 
@@ -29,7 +31,7 @@ sap.ui.define(
           const oPopOver = this.getView().byId('idPopover');
           oPopOver.connect(oVizFrame.getVizUid());
 
-          const statuses = ['OK', 'STORAGE', 'OUT_OF_STOCK'];
+          const statuses = Object.values(Constants.PRODUCT_STATUS);
           const chartData = [];
           let amount = 0;
 
@@ -47,12 +49,9 @@ sap.ui.define(
                 }
               },
               error: (error) => {
-                MessageBox.error(
-                  this.getResourceBundleText('productCountError'),
-                  {
-                    details: error,
-                  },
-                );
+                MessageBox.error(this.i18n('productCountError'), {
+                  details: error,
+                });
               },
             });
           });

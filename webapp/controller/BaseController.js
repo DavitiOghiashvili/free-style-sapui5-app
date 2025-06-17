@@ -2,46 +2,68 @@ sap.ui.define(['sap/ui/core/mvc/Controller'], function (Controller) {
   'use strict';
 
   return Controller.extend('freestylesapui5app.controller.BaseController', {
+    /**
+     * Returns a route by name.
+     * @param {string} sName - Route name.
+     * @returns {sap.ui.core.routing.Route} The route instance.
+     * @public
+     */
     getRoute(sName) {
       return this.getOwnerComponent().getRouter().getRoute(sName);
     },
 
+    /**
+     * Returns the default model from the owner component.
+     * @returns {sap.ui.model.Model} The default model.
+     * @public
+     */
     getMainModel() {
       return this.getOwnerComponent().getModel();
     },
 
-    getModel() {
-      return this.getView().getModel();
-    },
-
-    getNamedModel(sName) {
+    /**
+     * Returns a model by name from the view.
+     * @param {string} [sName] - Optional model name.
+     * @returns {sap.ui.model.Model} The requested model.
+     * @public
+     */
+    getModel(sName) {
       return this.getView().getModel(sName);
     },
 
-    setNamedModel(oModel, sName) {
+    /**
+     * Sets a model on the view.
+     * @param {sap.ui.model.Model} oModel - The model instance.
+     * @param {string} sName - Model name.
+     * @returns {sap.ui.core.mvc.View} The view instance.
+     * @public
+     */
+    setModel(oModel, sName) {
       return this.getView().setModel(oModel, sName);
     },
 
-    getResourceBundleText(sText) {
+    /**
+     * Retrieves a localized text from the i18n model.
+     * @param {string} sText - i18n key.
+     * @param {string[]|string|number} [aArgs] - Optional arguments for placeholders.
+     * @returns {string} Localized and formatted text.
+     * @public
+     */
+    i18n(sText, aArgs) {
       return this.getOwnerComponent()
         .getModel('i18n')
         .getResourceBundle()
-        .getText(sText);
+        .getText(sText, aArgs);
     },
 
-    getResourceBundleTextWithParam(sText, Param) {
-      return this.getOwnerComponent()
-        .getModel('i18n')
-        .getResourceBundle()
-        .getText(sText, Param);
-    },
-
-    navTo(sName) {
-      this.getOwnerComponent().getRouter().navTo(sName);
-    },
-
-    navToWithParameters(sName, ID) {
-      this.getOwnerComponent().getRouter().navTo(sName, ID);
+    /**
+     * Navigates to a specific route.
+     * @param {string} sName - Route name.
+     * @param {object} [oID] - Optional parameters (e.g., object ID).
+     * @public
+     */
+    navTo(sName, oID) {
+      this.getOwnerComponent().getRouter().navTo(sName, oID);
     },
   });
 });
