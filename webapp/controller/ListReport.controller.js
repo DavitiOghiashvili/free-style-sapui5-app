@@ -1,500 +1,526 @@
-sap.ui.define([
-  "sap/ui/core/mvc/Controller",
-  "sap/ui/model/json/JSONModel",
-  "sap/ui/model/Filter",
-  "sap/ui/model/FilterOperator",
-  "sap/m/MessageBox",
-  "../utils/Formatter",
-  "../utils/Constants",
-  "sap/ui/core/BusyIndicator",
-  "sap/m/MessageToast",
-  "sap/ui/core/Messaging",
-], (
-  Controller,
-  JSONModel,
-  Filter,
-  FilterOperator,
-  MessageBox,
-  Formatter,
-  Constants,
-  BusyIndicator,
-  MessageToast,
-  Messaging
-) => {
-  "use strict";
-  return Controller.extend("freestylesapui5app.controller.ListReport", {
-    formatter: Formatter,
-    _selectedStoreId: null,
+sap.ui.define(
+  [
+    'freestylesapui5app/controller/BaseController',
+    'sap/ui/model/json/JSONModel',
+    'sap/ui/model/Filter',
+    'sap/ui/model/FilterOperator',
+    'sap/m/MessageBox',
+    '../utils/Formatter',
+    '../utils/Constants',
+    'sap/ui/core/BusyIndicator',
+    'sap/m/MessageToast',
+    'sap/ui/core/Messaging',
+  ],
+  (
+    BaseController,
+    JSONModel,
+    Filter,
+    FilterOperator,
+    MessageBox,
+    Formatter,
+    Constants,
+    BusyIndicator,
+    MessageToast,
+    Messaging,
+  ) => {
+    'use strict';
+    return BaseController.extend('freestylesapui5app.controller.ListReport', {
+      _oDialog: null,
+      _oSelectStoreDialog: null,
+      formatter: Formatter,
+      _selectedStoreId: null,
 
-    onInit() {
-      this.getView().setModel(Messaging.getMessageModel(), "message");
-      Messaging.registerObject(this.getView(), true)
+      onInit() {
+        this.setModel(Messaging.getMessageModel(), 'message');
+        Messaging.registerObject(this.getView(), true);
 
-      this._oResourceBundle = this.getOwnerComponent()
-        .getModel("i18n")
-        .getResourceBundle();
+        this.setModel(
+          new JSONModel({
+            currencies: [
+              {
+                key: Constants.PRICE_CURRENCIES.USD,
+                text: this.i18n('USD'),
+              },
+              {
+                key: Constants.PRICE_CURRENCIES.EUR,
+                text: this.i18n('EUR'),
+              },
+            ],
+            statuses: [
+              {
+                key: Constants.PRODUCT_STATUS.OK,
+                text: this.i18n('OK'),
+              },
+              {
+                key: Constants.PRODUCT_STATUS.STORAGE,
+                text: this.i18n('STORAGE'),
+              },
+              {
+                key: Constants.PRODUCT_STATUS.OUT_OF_STOCK,
+                text: this.i18n('OUT_OF_STOCK'),
+              },
+            ],
+            ratings: [
+              { key: Constants.RATING_LENGTH[1], text: '1' },
+              { key: Constants.RATING_LENGTH[2], text: '2' },
+              { key: Constants.RATING_LENGTH[3], text: '3' },
+              { key: Constants.RATING_LENGTH[4], text: '4' },
+              { key: Constants.RATING_LENGTH[5], text: '5' },
+            ],
+            productsCount: 0,
+            searchQuery: '',
+          }),
+          'uiModel',
+        );
 
-      this.getView().setModel(
-        new JSONModel({
-          currencies: [
-            { key: Constants.PRICE_CURRENCIES.USD, text: this._oResourceBundle.getText("USD") },
-            { key: Constants.PRICE_CURRENCIES.EUR, text: this._oResourceBundle.getText("EUR") }
-          ],
-          statuses: [
-            { key: Constants.PRODUCT_STATUS.OK, text: this._oResourceBundle.getText("OK") },
-            { key: Constants.PRODUCT_STATUS.STORAGE, text: this._oResourceBundle.getText("STORAGE") },
-            { key: Constants.PRODUCT_STATUS.OUT_OF_STOCK, text: this._oResourceBundle.getText("OUT_OF_STOCK") }
-          ],
-          ratings: [
-            { key: Constants.RATING_LENGTH[1], text: '1' },
-            { key: Constants.RATING_LENGTH[2], text: '2' },
-            { key: Constants.RATING_LENGTH[3], text: '3' },
-            { key: Constants.RATING_LENGTH[4], text: '4' },
-            { key: Constants.RATING_LENGTH[5], text: '5' },
-          ],
-          productsCount: 0,
-          searchQuery: '',
-        }),
-        "uiModel"
-      );
+        // Fetch initial product count
+        this._updateFilteredCount([]);
 
-      // Fetch initial product count
-      this._updateFilteredCount([]);
+        // Initialize view references
+        this._oExpandedLabel = this.getView().byId(
+          'idNoFiltersActiveExpandedLabel',
+        );
+        this._oSnappedLabel = this.getView().byId(
+          'idNoFiltersActiveSnappedLabel',
+        );
+        this._oFilterBar = this.getView().byId('idFilterBar');
+        this._oTable = this.getView().byId('idProductsTable');
+        this._oProductDeleteButton = this.getView().byId(
+          'idProductDeleteButton',
+        );
 
-      // Initialize view references
-      this._oExpandedLabel = this.getView().byId("idNoFiltersActiveExpandedLabel");
-      this._oSnappedLabel = this.getView().byId("idNoFiltersActiveSnappedLabel");
-      this._oFilterBar = this.getView().byId("idFilterBar");
-      this._oTable = this.getView().byId("idProductsTable");
-      this._oProductDeleteButton = this.getView().byId("idProductDeleteButton")
+        this._oFilterBar.registerGetFiltersWithValues(
+          this._getFiltersWithValues.bind(this),
+        );
+      },
 
-      this._oFilterBar.registerGetFiltersWithValues(this._getFiltersWithValues.bind(this));
-    },
-
-    /**
-     * Fetches filtered count of products from OData service
-     * @param {sap.ui.model.Filter[]} aFilters - Array of filters to apply
-     * @private
-     */
-    _updateFilteredCount(aFilters) {
-      const oModel = this.getOwnerComponent().getModel();
-      const oUiModel = this.getView().getModel("uiModel");
-
-      oModel.read("/Products/$count", {
-        filters: aFilters,
-        success: (count) => {
-          oUiModel.setProperty("/productsCount", count);
-        },
-        error: (oError) => {
-          MessageBox.error(this._oResourceBundle.getText("productCountError"), { details: oError });
-        }
-      });
-    },
-
-    /**
-   * Retrieve filter group items that have selected values.
-   * @returns {Array<FilterGroupItem>} Array of FilterGroupItem objects whose controls have one or more selected keys
-   * @private
-   */
-    _getFiltersWithValues() {
-      const aFiltersWithValue = this._oFilterBar.getFilterGroupItems().reduce((aResult, oFilterGroupItem) => {
-        const oControl = oFilterGroupItem.getControl();
-        if (oControl.getSelectedKeys().length) {
-          aResult.push(oFilterGroupItem);
-        }
-        return aResult;
-      }, []);
-
-      return aFiltersWithValue;
-    },
-
-    /**
-     * Handle MultiComboBox selection changes and trigger variant modification.
-     * @public
-     */
-    onMultiComboBoxSelectionChange() {
-      this._updateLabelsAndTable();
-    },
-
-    /**
-     * Apply filters from FilterBar and update product counts.
-     * @public
-     */
-    onFilterBarSearch() {
-      const oBinding = this._oTable.getBinding("items");
-      const aFilters = [];
-
-      const sQuery = this.getView().getModel("uiModel").getProperty("/searchQuery")
-      const textFields = Constants.SEARCH_FILTERS.byText
-
-      if (sQuery) {
-        const aTextFieldFilters = textFields.map((field) => {
-          return new Filter({
-            path: field,
-            operator: FilterOperator.Contains,
-            caseSensitive: false,
-            value1: sQuery
+      /**
+       * Fetches filtered count of products from OData service
+       * @param {sap.ui.model.Filter[]} aFilters - Array of filters to apply
+       * @private
+       */
+      _updateFilteredCount(aFilters) {
+        this.getOwnerComponent()
+          .getModel()
+          .read('/Products/$count', {
+            filters: aFilters,
+            success: (count) => {
+              this.getModel('uiModel').setProperty('/productsCount', count);
+            },
+            error: (oError) => {
+              MessageBox.error(this.i18n('productCountError'), {
+                details: oError,
+              });
+            },
           });
-        });
+      },
 
-        if (!isNaN(sQuery)) {
-          const nQuery = Number(sQuery);
-          const maxLength = Constants.MAX_PRICE_QUERY_LENGTH;
-          const numDigitsInQuery = sQuery.length;
-          const multiplier = Math.pow(10, maxLength - numDigitsInQuery);
+      /**
+       * Retrieve filter group items that have selected values.
+       * @returns {Array<FilterGroupItem>} Array of FilterGroupItem objects whose controls have one or more selected keys
+       * @private
+       */
+      _getFiltersWithValues() {
+        const aFiltersWithValue = this._oFilterBar
+          .getFilterGroupItems()
+          .reduce((aResult, oFilterGroupItem) => {
+            const oControl = oFilterGroupItem.getControl();
+            if (oControl.getSelectedKeys().length) {
+              aResult.push(oFilterGroupItem);
+            }
+            return aResult;
+          }, []);
 
-          const value1 = nQuery * multiplier;
-          const value2 = (nQuery + 1) * multiplier - 1;
+        return aFiltersWithValue;
+      },
 
-          aFilters.push(
-            new Filter({
-              path: "Price_amount",
-              operator: FilterOperator.BT,
-              value1: value1,
-              value2: value2
-            })
-          );
-        }
+      /**
+       * Handle MultiComboBox selection changes and trigger variant modification.
+       * @public
+       */
+      onMultiComboBoxSelectionChange() {
+        this._updateLabelsAndTable();
+      },
 
-        if (!isNaN(sQuery)) {
-          aFilters.push(
-            new Filter({
-              path: "Rating",
-              operator: FilterOperator.EQ,
-              value1: Number(sQuery)
-            })
-          );
-        }
+      /**
+       * Apply filters from FilterBar and update product counts.
+       * @public
+       */
+      onFilterBarSearch() {
+        const oBinding = this._oTable.getBinding('items');
+        const aFilters = [];
 
-        aFilters.push(new Filter({
-          filters: aTextFieldFilters,
-          and: false
-        }));
-      }
+        const sQuery = this.getModel('uiModel').getProperty('/searchQuery');
+        const textFields = Constants.SEARCH_FILTERS.byText;
 
-      this._oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
-        const sFieldName = oFilterGroupItem.getName();
-        if (sFieldName === 'Search Field') return;
-
-        const oControl = oFilterGroupItem.getControl();
-        const aSelectedKeys = oControl.getSelectedKeys();
-
-        if (aSelectedKeys.length) {
-          const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
+        if (sQuery) {
+          const aTextFieldFilters = textFields.map((field) => {
             return new Filter({
-              path: sFieldName,
-              operator: sFieldName === "Rating" ? FilterOperator.EQ : FilterOperator.Contains,
-              value1: sSelectedKey
+              path: field,
+              operator: FilterOperator.Contains,
+              caseSensitive: false,
+              value1: sQuery,
             });
           });
 
-          aFilters.push(new Filter({
-            filters: aFieldFilters,
-            and: false
-          }));
+          if (!isNaN(sQuery)) {
+            const nQuery = Number(sQuery);
+            const maxLength = Constants.MAX_PRICE_QUERY_LENGTH;
+            const numDigitsInQuery = sQuery.length;
+            const multiplier = Math.pow(10, maxLength - numDigitsInQuery);
+
+            const value1 = nQuery * multiplier;
+            const value2 = (nQuery + 1) * multiplier - 1;
+
+            aFilters.push(
+              new Filter({
+                path: 'Price_amount',
+                operator: FilterOperator.BT,
+                value1: value1,
+                value2: value2,
+              }),
+            );
+          }
+
+          if (!isNaN(sQuery)) {
+            aFilters.push(
+              new Filter({
+                path: 'Rating',
+                operator: FilterOperator.EQ,
+                value1: Number(sQuery),
+              }),
+            );
+          }
+
+          aFilters.push(
+            new Filter({
+              filters: aTextFieldFilters,
+              and: false,
+            }),
+          );
         }
-      });
 
-      oBinding.filter(aFilters);
-      this._updateFilteredCount(aFilters);
-    },
+        this._oFilterBar.getFilterGroupItems().forEach((oFilterGroupItem) => {
+          const sFieldName = oFilterGroupItem.getName();
+          if (sFieldName === 'Search Field') return;
 
-    /**
-     * Handle filter changes and update labels and table.
-     * @public
-     */
-    onFilterBarFilterChange() {
-      this._updateLabelsAndTable();
-    },
+          const oControl = oFilterGroupItem.getControl();
+          const aSelectedKeys = oControl.getSelectedKeys();
 
-    /**
-     * Handle variant load and update labels and table.
-     * @public
-     */
-    onFilterBarAfterVariantLoad() {
-      this._updateLabelsAndTable();
-    },
+          if (aSelectedKeys.length) {
+            const aFieldFilters = aSelectedKeys.map((sSelectedKey) => {
+              return new Filter({
+                path: sFieldName,
+                operator:
+                  sFieldName === 'Rating'
+                    ? FilterOperator.EQ
+                    : FilterOperator.Contains,
+                value1: sSelectedKey,
+              });
+            });
 
-    /**
-     * Update filter labels and table based on current filter state.
-     * @private
-     */
-    _updateLabelsAndTable() {
-      this._oExpandedLabel.setText(Formatter.getFormattedSummaryTextExpanded(this._oFilterBar));
-      this._oSnappedLabel.setText(Formatter.getFormattedSummaryText(this._oFilterBar));
-    },
-
-    /**
-   * Navigate to item on press.
-   * @param {sap.ui.base.Event} oEvent The press event from the list item.
-   * @public
-   */
-    onColumnListItemPress(oEvent) {
-      const oContext = oEvent.getSource().getBindingContext();
-      const sProductId = oContext.getProperty("ID");
-
-      this.getOwnerComponent().getRouter().navTo("ObjectPage", {
-        Product_ID: sProductId,
-      });
-    },
-
-    /**
-     * Handle products table selection change and enable delete button.
-     * @param {sap.ui.base.Event} oEvent The press event from the products table.
-     * @public
-     */
-    onProductsTableSelectionChange(oEvent) {
-      const oTable = oEvent.getSource();
-      const aSelectedContexts = oTable.getSelectedContexts();
-
-      this._oProductDeleteButton.setEnabled(aSelectedContexts.length > 0);
-    },
-
-    /**
-     * Product delete button handler.
-     * @public
-     */
-    onDeleteButtonPress() {
-      const oModel = this.getView().getModel();
-      const aSelectedContexts = this._oTable.getSelectedContexts();
-      const iSelectedCount = aSelectedContexts.length;
-      const oBinding = this._oTable.getBinding('items')
-
-      const handleDeleteSuccess = () => {
-        BusyIndicator.hide();
-        const sSuccessMsg = iSelectedCount === 1
-          ? this._oResourceBundle.getText("productDeleteSuccessSingular")
-          : this._oResourceBundle.getText("productDeleteSuccessPlural", [iSelectedCount]);
-        MessageToast.show(sSuccessMsg);
-        this._oProductDeleteButton.setEnabled(false)
-      };
-
-      const handleDeleteError = (oError) => {
-        BusyIndicator.hide();
-        MessageBox.error(this._oResourceBundle.getText("productDeleteError"), {
-          details: oError,
+            aFilters.push(
+              new Filter({
+                filters: aFieldFilters,
+                and: false,
+              }),
+            );
+          }
         });
-      };
 
-      const deleteSelectedContexts = () => {
-        BusyIndicator.show();
-        aSelectedContexts.forEach((oContext) => {
-          const sPath = oContext.getPath();
-          oModel.remove(sPath, {
-            success: handleDeleteSuccess,
-            error: handleDeleteError,
+        oBinding.filter(aFilters);
+        this._updateFilteredCount(aFilters);
+      },
+
+      /**
+       * Handle filter changes and update labels and table.
+       * @public
+       */
+      onFilterBarFilterChange() {
+        this._updateLabelsAndTable();
+      },
+
+      /**
+       * Handle variant load and update labels and table.
+       * @public
+       */
+      onFilterBarAfterVariantLoad() {
+        this._updateLabelsAndTable();
+      },
+
+      /**
+       * Update filter labels and table based on current filter state.
+       * @private
+       */
+      _updateLabelsAndTable() {
+        this._oExpandedLabel.setText(
+          Formatter.getFormattedSummaryTextExpanded(this._oFilterBar),
+        );
+        this._oSnappedLabel.setText(
+          Formatter.getFormattedSummaryText(this._oFilterBar),
+        );
+      },
+
+      /**
+       * Navigate to item on press.
+       * @param {sap.ui.base.Event} oEvent The press event from the list item.
+       * @public
+       */
+      onColumnListItemPress(oEvent) {
+        const oContext = oEvent.getSource().getBindingContext();
+        const sProductId = oContext.getProperty('ID');
+
+        this.navTo('ObjectPage', {
+          Product_ID: sProductId,
+        });
+      },
+
+      /**
+       * Handle products table selection change and enable delete button.
+       * @param {sap.ui.base.Event} oEvent The press event from the products table.
+       * @public
+       */
+      onProductsTableSelectionChange(oEvent) {
+        const oTable = oEvent.getSource();
+        const aSelectedContexts = oTable.getSelectedContexts();
+
+        this._oProductDeleteButton.setEnabled(aSelectedContexts.length > 0);
+      },
+
+      /**
+       * Product delete button handler.
+       * @public
+       */
+      onDeleteButtonPress() {
+        const aSelectedContexts = this._oTable.getSelectedContexts();
+        const iSelectedCount = aSelectedContexts.length;
+        const oBinding = this._oTable.getBinding('items');
+
+        const handleDeleteSuccess = () => {
+          BusyIndicator.hide();
+          const sSuccessMsg =
+            iSelectedCount === 1
+              ? this.i18n('productDeleteSuccessSingular')
+              : this.i18n('productDeleteSuccessPlural', iSelectedCount);
+          MessageToast.show(sSuccessMsg);
+          this._oProductDeleteButton.setEnabled(false);
+        };
+
+        const handleDeleteError = (oError) => {
+          BusyIndicator.hide();
+          MessageBox.error(this.i18n('productDeleteError'), {
+            details: oError,
           });
+        };
 
-          if (!oBinding.length) {
-            oBinding.filter()
-          }
-          this._updateFilteredCount([])
-        });
-      };
+        const deleteSelectedContexts = () => {
+          BusyIndicator.show();
+          aSelectedContexts.forEach((oContext) => {
+            const sPath = oContext.getPath();
+            this.getModel().remove(sPath, {
+              success: handleDeleteSuccess,
+              error: handleDeleteError,
+            });
 
-      const handleConfirmClose = (sAction) => {
-        if (sAction === MessageBox.Action.OK) {
-          deleteSelectedContexts();
-        }
-      };
-
-      const sConfirmMsg = iSelectedCount === 1
-        ? this._oResourceBundle.getText("confirmDeleteProductSingular")
-        : this._oResourceBundle.getText("confirmDeleteProductPlural", [iSelectedCount]);
-
-      MessageBox.confirm(sConfirmMsg, {
-        onClose: handleConfirmClose,
-      });
-    },
-
-    /**
-     * Handles pressing the "Create Product" button.
-     * Initializes product context and opens the dialog.
-     * @public
-     */
-    async onCreateProductDialogPress() {
-      const oView = this.getView();
-      const oMainModel = oView.getModel();
-
-      const oEntryCtx = oMainModel.createEntry("/Products", {
-        properties: {
-          ID: "",
-          Name: "",
-          Price_amount: "",
-          Specs: "",
-          Rating: "0",
-          SupplierInfo: "",
-          MadeIn: "",
-          ProductionCompanyName: "",
-          Status: Constants.PRODUCT_STATUS.OK,
-          Store_ID: "",
-        },
-      });
-
-      const oDialog = await this._loadCreateProductDialog();
-      oDialog.setModel(oMainModel);
-      oDialog.setBindingContext(oEntryCtx);
-      oDialog.open();
-    },
-
-    /**
-     * Loads the create product dialog fragment if not already loaded.
-     * @private
-     * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
-     * @type {sap.m.Dialog}
-     */
-    _oDialog: null,
-    async _loadCreateProductDialog() {
-      this._oDialog ??= await this.loadFragment({
-        name: "freestylesapui5app.view.fragments.CreateProduct",
-      });
-      return this._oDialog;
-    },
-
-    /**
-    * Handles press on the "Select Store" button.
-    * Opens the SelectStore dialog fragment.
-    * @public
-    */
-    async onSelectStoreButtonPress() {
-      const oDialog = await this._loadSelectStoreDialog();
-      oDialog.open();
-    },
-
-    /**
-     * Loads the SelectStore dialog fragment if not already loaded.
-     * @private
-     * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
-     * @type {sap.m.Dialog}
-     */
-    _oSelectStoreDialog: null,
-    async _loadSelectStoreDialog() {
-      if (!this._oSelectStoreDialog) {
-        const oView = this.getView();
-        this._oSelectStoreDialog = await this.loadFragment({
-          id: oView.getId(),
-          name: "freestylesapui5app.view.fragments.SelectStore",
-          controller: this,
-        });
-        this._oSelectStoreDialog.setModel(oView.getModel());
-      }
-
-      return this._oSelectStoreDialog;
-    },
-
-    /**
-     * Handles the search logic for the stores SelectDialog in the create product dialog.
-     * @param {sap.ui.base.Event} oEvent The search event from the SelectDialog.
-     * @public
-     */
-    onStoresSelectDialogSearch(oEvent) {
-      const sValue = oEvent.getParameter("value");
-      const oFilter = new Filter({
-        path: "Name",
-        operator: FilterOperator.Contains,
-        caseSensitive: false,
-        value1: sValue
-      });
-
-      const oBinding = oEvent.getParameter("itemsBinding");
-      oBinding.filter([oFilter]);
-    },
-
-    /**
-     * Handles the close event of the "Select Store" dialog in the product creation dialog.
-     * @param {sap.ui.base.Event} oEvent The close event containing the selected store contexts.
-     * @public
-     */
-    onStoresDialogClose(oEvent) {
-      const aContexts = oEvent.getParameter("selectedContexts");
-      if (aContexts.length) {
-        this._selectedStoreId = aContexts[0].getObject().ID;
-        MessageToast.show(this._oResourceBundle.getText("chosenStore") + aContexts[0].getObject().Name);
-      }
-
-      oEvent.getSource().getBinding("items").filter([]);
-
-      const oContext = this._oDialog.getBindingContext();
-      const sPath = oContext.getPath();
-      const oModel = this.getView().getModel();
-      oModel.setProperty(sPath + "/Store_ID", this._selectedStoreId);
-    },
-
-    /**
-     * "Cancel" button press event handler (in the product creation dialog).
-     *  @public
-     */
-    onCancelButtonPress() {
-      const oContext = this._oDialog.getBindingContext();
-      const mData = oContext.getObject();
-      const oMainModel = this.getView().getModel();
-
-      const resetAndRefresh = () => {
-        oMainModel.resetChanges();
-        this._oDialog.close();
-      };
-
-      if (
-        mData.Name ||
-        mData.Price_amount ||
-        mData.Specs ||
-        mData.SupplierInfo ||
-        mData.MadeIn ||
-        mData.ProductionCompanyName
-      ) {
-        MessageBox.confirm(this._oResourceBundle.getText('inputDataLoss'), {
-          onClose: (oAction) => {
-            if (oAction === MessageBox.Action.OK) {
-              resetAndRefresh();
+            if (!oBinding.length) {
+              oBinding.filter();
             }
-          }
-        });
-      } else {
-        resetAndRefresh();
-      }
-    },
+            this._updateFilteredCount([]);
+          });
+        };
 
-    /**
+        const handleConfirmClose = (sAction) => {
+          if (sAction === MessageBox.Action.OK) {
+            deleteSelectedContexts();
+          }
+        };
+
+        const sConfirmMsg =
+          iSelectedCount === 1
+            ? this.i18n('confirmDeleteProductSingular')
+            : this.i18n('confirmDeleteProductPlural', iSelectedCount);
+
+        MessageBox.confirm(sConfirmMsg, {
+          onClose: handleConfirmClose,
+        });
+      },
+
+      /**
+       * Handles pressing the "Create Product" button.
+       * Initializes product context and opens the dialog.
+       * @public
+       */
+      async onCreateProductDialogPress() {
+        const oEntryCtx = this.getModel().createEntry('/Products', {
+          properties: {
+            ID: '',
+            Name: '',
+            Price_amount: '',
+            Specs: '',
+            Rating: '0',
+            SupplierInfo: '',
+            MadeIn: '',
+            ProductionCompanyName: '',
+            Status: Constants.PRODUCT_STATUS.OK,
+            Store_ID: '',
+          },
+        });
+
+        const oDialog = await this._loadCreateProductDialog();
+        oDialog.setModel(this.getModel());
+        oDialog.setBindingContext(oEntryCtx);
+        oDialog.open();
+      },
+
+      /**
+       * Loads the create product dialog fragment if not already loaded.
+       * @private
+       * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
+       * @type {sap.m.Dialog}
+       */
+      async _loadCreateProductDialog() {
+        this._oDialog ??= await this.loadFragment({
+          name: 'freestylesapui5app.view.fragments.CreateProduct',
+        });
+        return this._oDialog;
+      },
+
+      /**
+       * Handles press on the "Select Store" button.
+       * Opens the SelectStore dialog fragment.
+       * @public
+       */
+      async onSelectStoreButtonPress() {
+        const oDialog = await this._loadSelectStoreDialog();
+        oDialog.open();
+      },
+
+      /**
+       * Loads the SelectStore dialog fragment if not already loaded.
+       * @private
+       * @returns {Promise<sap.m.Dialog>} The loaded dialog instance
+       * @type {sap.m.Dialog}
+       */
+      async _loadSelectStoreDialog() {
+        this._oSelectStoreDialog ??= await this.loadFragment({
+          name: 'freestylesapui5app.view.fragments.SelectStore',
+        });
+        return this._oSelectStoreDialog;
+      },
+
+      /**
+       * Handles the search logic for the stores SelectDialog in the create product dialog.
+       * @param {sap.ui.base.Event} oEvent The search event from the SelectDialog.
+       * @public
+       */
+      onStoresSelectDialogSearch(oEvent) {
+        const sValue = oEvent.getParameter('value');
+        const oFilter = new Filter({
+          path: 'Name',
+          operator: FilterOperator.Contains,
+          caseSensitive: false,
+          value1: sValue,
+        });
+
+        const oBinding = oEvent.getParameter('itemsBinding');
+        oBinding.filter([oFilter]);
+      },
+
+      /**
+       * Handles the close event of the "Select Store" dialog in the product creation dialog.
+       * @param {sap.ui.base.Event} oEvent The close event containing the selected store contexts.
+       * @public
+       */
+      onStoresDialogClose(oEvent) {
+        const aContexts = oEvent.getParameter('selectedContexts');
+        if (aContexts.length) {
+          this._selectedStoreId = aContexts[0].getObject().ID;
+          MessageToast.show(
+            this.i18n('chosenStore') + aContexts[0].getObject().Name,
+          );
+        }
+
+        oEvent.getSource().getBinding('items').filter([]);
+
+        const oContext = this._oDialog.getBindingContext();
+        const sPath = oContext.getPath();
+        this.getModel().setProperty(sPath + '/Store_ID', this._selectedStoreId);
+      },
+
+      /**
+       * "Cancel" button press event handler (in the product creation dialog).
+       *  @public
+       */
+      onCancelButtonPress() {
+        const oContext = this._oDialog.getBindingContext();
+        const mData = oContext.getObject();
+
+        const resetAndRefresh = () => {
+          this.getModel().resetChanges();
+          this._selectedStoreId = null;
+          this._oDialog.close();
+        };
+
+        if (
+          mData.Name ||
+          mData.Price_amount ||
+          mData.Specs ||
+          mData.SupplierInfo ||
+          mData.MadeIn ||
+          mData.ProductionCompanyName
+        ) {
+          MessageBox.confirm(this.i18n('inputDataLoss'), {
+            onClose: (oAction) => {
+              if (oAction === MessageBox.Action.OK) {
+                resetAndRefresh();
+              }
+            },
+          });
+        } else {
+          resetAndRefresh();
+        }
+      },
+
+      /**
        * Handles product creation and it's validation
        * @public
        */
-    onCreateButtonPress() {
-      const oView = this.getView();
-      const oMainModel = oView.getModel();
-      const oContext = this._oDialog.getBindingContext();
-      const mData = oContext.getObject();
-      const rb = this._oResourceBundle;
-      const oTable = this.byId("idProductsTable");
-      const oBinding = oTable.getBinding("items");
+      onCreateButtonPress() {
+        const oContext = this._oDialog.getBindingContext();
+        const mData = oContext.getObject();
+        const oBinding = this._oTable.getBinding('items');
 
-      Messaging.removeAllMessages();
+        Messaging.removeAllMessages();
 
-      if (!mData.Name || !mData.Price_amount || !mData.Specs) {
-        oMainModel.setRefreshAfterChange(false);
-        oMainModel.submitChanges({});
-      } else if (!this._selectedStoreId) {
-        MessageToast.show(this._oResourceBundle.getText("storeSelectError"));
-      } else {
-        mData.Store_ID = this._selectedStoreId
-        oMainModel.setRefreshAfterChange(true);
-        oMainModel.submitChanges({
-          success: () => {
-            MessageToast.show(rb.getText("productCreateSuccess"));
-            Messaging.removeAllMessages();
-            this._selectedStoreId = null;
-            this._oDialog.close();
-            this._updateFilteredCount([]);
-            if (oBinding) {
-              oBinding.refresh(true);
-            }
-          },
-          error: (oError) => {
-            MessageBox.error(rb.getText("productCreateError"), {
-              details: oError,
-            });
-          },
-        });
-      }
-    },
-  });
-});
+        if (!mData.Name || !mData.Price_amount || !mData.Specs) {
+          this.getModel().setRefreshAfterChange(false);
+          this.getModel().submitChanges({});
+        } else if (!this._selectedStoreId) {
+          this.getModel().setRefreshAfterChange(false);
+          this.getModel().submitChanges({});
+          MessageToast.show(this.i18n('storeSelectError'));
+          return;
+        } else {
+          this.getModel().setRefreshAfterChange(true);
+          this.getModel().submitChanges({
+            success: () => {
+              MessageToast.show(this.i18n('productCreateSuccess'));
+              this._oDialog.close();
+              this._updateFilteredCount([]);
+              if (oBinding) {
+                oBinding.refresh(true);
+              }
+              Messaging.removeAllMessages();
+              this._selectedStoreId = null;
+            },
+            error: (oError) => {
+              MessageBox.error(this.i18n('productCreateError'), {
+                details: oError,
+              });
+            },
+          });
+        }
+      },
+    });
+  },
+);

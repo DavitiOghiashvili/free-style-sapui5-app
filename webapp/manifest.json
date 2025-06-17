@@ -90,23 +90,17 @@
         {
           "name": "ListReport",
           "pattern": "",
-          "target": [
-            "ListReport"
-          ]
+          "target": ["ListReport"]
         },
         {
           "name": "ObjectPage",
           "pattern": "ObjectPage/{Product_ID}",
-          "target": [
-            "ObjectPage"
-          ]
+          "target": ["ObjectPage"]
         },
         {
           "name": "ObjectChartPage",
           "pattern": "ObjectChartPage",
-          "target": [
-            "ObjectChartPage"
-          ]
+          "target": ["ObjectChartPage"]
         }
       ],
       "targets": {

@@ -2,9 +2,9 @@
     xmlns:core="sap.ui.core">
     <SelectDialog noDataText="{i18n>noDataFound}"
         title="{i18n>selectStore}"
-        search="onStoresSelectDialogSearch"
-        confirm="onStoresDialogClose"
-        cancel="onStoresDialogClose"
+        search=".onStoresSelectDialogSearch"
+        confirm=".onStoresDialogClose"
+        cancel=".onStoresDialogClose"
         items="{
 			path: '/Stores'
 		}">

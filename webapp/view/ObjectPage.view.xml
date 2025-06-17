@@ -7,13 +7,18 @@
         <m:customHeader>
             <m:Bar>
                 <m:contentRight>
+                    <m:Button type="Emphasized"
+                        text="{i18n>invokeFunction}"
+                        press=".onInvokeFunctionFromMetadataButtonPress" />
                     <m:Button id="idEditButton"
                         type="Emphasized"
                         enabled="{uiModel>/toggleEditButton}"
                         text="{i18n>editBtn}"
-                        press="onEditButtonPress" />
+                        press=".onEditButtonPress" />
                     <m:Button text="{i18n>deleteBtn}"
-                        press="onDeleteButtonPress" />
+                        id="idDeleteButton"
+                        visible="false"
+                        press=".onDeleteButtonPress" />
                 </m:contentRight>
             </m:Bar>
         </m:customHeader>
@@ -24,28 +29,28 @@
                     text="{= ${message>/}.length }"
                     visible="{= ${message>/}.length > 0 }"
                     type="Negative"
-                    press="onMessagePopoverButtonPress" />
+                    press=".onMessagePopoverButtonPress" />
                 <m:ToolbarSpacer />
                 <m:Button id="idSaveButton"
                     text="{i18n>saveBtn}"
                     type="Accept"
                     visible="false"
-                    press="onSaveButtonPress" />
+                    press=".onSaveButtonPress" />
                 <m:Button id="idCancelButton"
                     type="Reject"
                     text="Cancel"
                     visible="false"
-                    press="onCancelButtonPress" />
+                    press=".onCancelButtonPress" />
                 <m:Button text="{i18n>saveComment}"
                     type="Accept"
                     visible="false"
                     id="idSaveNewCommentButton"
-                    press="onSaveNewCommentButtonPress" />
+                    press=".onSaveNewCommentButtonPress" />
                 <m:Button text="{i18n>cancelBtn}"
                     type="Reject"
                     visible="false"
                     id="idCancelNewCommentButton"
-                    press="onCancelNewCommentButtonPress" />
+                    press=".onCancelNewCommentButtonPress" />
             </m:OverflowToolbar>
         </m:footer>
     </m:Page>

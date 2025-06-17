@@ -5,12 +5,12 @@
   <Dialog title="{i18n>createProductFormTitle}">
     <f:SimpleForm>
       <Button text="{i18n>selectStore}"
-        press="onSelectStoreButtonPress" />
+        press=".onSelectStoreButtonPress" />
 
       <Label text="{i18n>labelName}"
         required="true" />
       <Input value="{Name}"
-        placeholder="{parts: ['i18n>enterName'], formatter: 'formatMessage'}"
+        placeholder="{i18n>enterName}"
         id="idNameInput" />
 
       <Label text="{i18n>labelPrice}"
@@ -18,7 +18,7 @@
       <HBox alignItems="Center">
         <Input value="{Price_amount}"
           type="Number"
-          placeholder="{parts: ['i18n>enterPrice'], formatter: 'formatMessage'}"
+          placeholder="{i18n>enterPrice}"
           id="idPriceAmountInput">
           <layoutData>
             <FlexItemData growFactor="1" />
@@ -31,7 +31,7 @@
       <Label text="{i18n>labelSpecs}"
         required="true" />
       <Input value="{Specs}"
-        placeholder="{parts: ['i18n>enterSpecs'], formatter: 'formatMessage'}"
+        placeholder="{i18n>enterSpecs}"
         id="idSpecsInput" />
 
       <Label text="{i18n>labelRating}" />
@@ -42,17 +42,17 @@
 
       <Label text="{i18n>labelSupplierInfo}" />
       <Input value="{SupplierInfo}"
-        placeholder="{parts: ['i18n>enterSupplier'], formatter: 'formatMessage'}"
+        placeholder="{i18n>enterSupplier}"
         id="idSupplierInfoInput" />
 
       <Label text="{i18n>labelMadeIn}" />
       <Input value="{MadeIn}"
-        placeholder="{parts: ['i18n>enterMadeIn'], formatter: 'formatMessage'}"
+        placeholder="{i18n>enterMadeIn}"
         id="idMadeInInput" />
 
       <Label text="{i18n>labelProductionCompanyName}" />
       <Input value="{ProductionCompanyName}"
-        placeholder="{parts: ['i18n>enterCompany'], formatter: 'formatMessage'}"
+        placeholder="{i18n>enterCompany}"
         id="idProductionCompanyNameInput" />
 
       <Label text="{i18n>labelStatus}"
@@ -70,10 +70,10 @@
     <buttons>
       <Button text="{i18n>createBtn}"
         type="Accept"
-        press="onCreateButtonPress" />
+        press=".onCreateButtonPress" />
       <Button text="{i18n>cancelBtn}"
         type="Reject"
-        press="onCancelButtonPress" />
+        press=".onCancelButtonPress" />
     </buttons>
   </Dialog>
 </core:FragmentDefinition>
