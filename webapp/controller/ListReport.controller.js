@@ -10,6 +10,7 @@ sap.ui.define(
     'sap/ui/core/BusyIndicator',
     'sap/m/MessageToast',
     'sap/ui/core/Messaging',
+    "sap/f/library"
   ],
   (
     BaseController,
@@ -22,6 +23,7 @@ sap.ui.define(
     BusyIndicator,
     MessageToast,
     Messaging,
+    fioriLibrary
   ) => {
     'use strict';
     return BaseController.extend('freestylesapui5app.controller.ListReport', {
@@ -266,13 +268,14 @@ sap.ui.define(
        * @param {sap.ui.base.Event} oEvent The press event from the list item.
        * @public
        */
-      onColumnListItemPress(oEvent) {
-        const oContext = oEvent.getSource().getBindingContext();
-        const sProductId = oContext.getProperty('ID');
+        onColumnListItemPress (oEvent) {
+        let productPath = oEvent.getSource().getBindingContext().getPath(),
+          product = productPath.split("/").slice(-1).pop();
+        let oContext = oEvent.getSource().getBindingContext();
+        let sProductId = oContext.getProperty('ID');
+        console.log("productPath", productPath, "product", product,"fioriLibrary.LayoutType", fioriLibrary.LayoutType, "oContext", oContext, "sProductId", sProductId);
 
-        this.navTo('ObjectPage', {
-          Product_ID: sProductId,
-        });
+        this.getOwnerComponent().getRouter().navTo("ObjectPage", { layout: fioriLibrary.LayoutType.TwoColumnsMidExpanded, Product_ID: sProductId, });
       },
 
       /**

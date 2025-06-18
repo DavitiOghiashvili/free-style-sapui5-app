@@ -53,10 +53,9 @@ sap.ui.define(
        * @public
        */
       onInit() {
-        this.getRoute('ObjectPage').attachPatternMatched(
-          this._onRouteMatched,
-          this,
-        );
+        this.getRoute("ListReport").attachPatternMatched(this._onRouteMatched, this);
+        this.getRoute("ObjectPage").attachPatternMatched(this._onRouteMatched, this);
+        this.getRoute("ObjectChartPage").attachPatternMatched(this._onRouteMatched, this);
 
         this._objectPage = this.getView().byId('idObjectPage');
         this._formFragments = {};

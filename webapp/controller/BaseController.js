@@ -2,12 +2,6 @@ sap.ui.define(['sap/ui/core/mvc/Controller'], function (Controller) {
   'use strict';
 
   return Controller.extend('freestylesapui5app.controller.BaseController', {
-    /**
-     * Returns a route by name.
-     * @param {string} sName - Route name.
-     * @returns {sap.ui.core.routing.Route} The route instance.
-     * @public
-     */
     getRoute(sName) {
       return this.getOwnerComponent().getRouter().getRoute(sName);
     },
