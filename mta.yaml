@@ -1,0 +1,31 @@
+_schema-version: "3.1"
+ID: freestylesapui5app
+version: 0.0.1
+modules:
+  - name: freestylesapui5app-ui
+    type: html5
+    path: .
+    build-parameters:
+      builder: custom
+      commands:
+        - npm install
+        - npm run build
+      supported-platforms: []
+      build-result: dist
+  - name: freestylesapui5app-ui-deployer
+    type: com.sap.html5.application-content
+    path: dist
+    requires:
+      - name: freestylesapui5app-html5-repo-host
+    build-parameters:
+      requires:
+        - name: freestylesapui5app-ui
+          artifacts:
+            - "./dist/*"
+          target-path: resources/freestylesapui5app-ui
+resources:
+  - name: freestylesapui5app-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host

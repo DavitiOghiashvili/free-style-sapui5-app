@@ -10,8 +10,8 @@
   "main": "webapp/index.html",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
-    "@sap/ux-ui5-tooling": "1",
-    "@ui5/cli": "^3.0.0",
+    "@sap/ux-ui5-tooling": "^1.18.0",
+    "@ui5/cli": "^3.11.9",
     "@ui5/linter": "^1.13.1",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
