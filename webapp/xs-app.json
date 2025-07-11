@@ -1,0 +1,17 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "none",
+  "routes": [
+    {
+      "source": "^/v2/root/(.*)$",
+      "target": "$1",
+      "destination": "odata-v2-backend",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "localDir": "webapp"
+    }
+  ]
+}
