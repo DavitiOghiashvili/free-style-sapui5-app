@@ -3,10 +3,21 @@
   "authenticationMethod": "none",
   "routes": [
     {
-      "source": "^(.*)$",
-      "target": "$1",
+      "source": "^/v2/root/(.*)$",
+      "target": "/$1",
+      "authenticationType": "xsuaa",
+      "destination": "odata-v2-backend",
+      "scope": [
+        "$XSAPPNAME.accessDataService"
+      ]
+    },
+    {
+      "source": "(.*)",
+      "target": "/ui5app/$1",
       "service": "html5-apps-repo-rt",
-      "authenticationType": "none"
+      "scope": [
+        "$XSAPPNAME.accessApp"
+      ]
     }
   ]
 }

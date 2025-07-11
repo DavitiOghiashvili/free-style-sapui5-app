@@ -1,6 +1,6 @@
-specVersion: "3.2"
+specVersion: "3.1"
 metadata:
-  name: free-style-sapui5-app
+  name: freestylesapui5app
 type: application
 
 server:
