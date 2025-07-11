@@ -4,13 +4,14 @@
   "routes": [
     {
       "source": "^/v2/root/(.*)$",
-      "target": "/$1",
-      "destination": "odata-v2-backend"
+      "target": "$1",
+      "destination": "odata-v2-backend",
+      "authenticationType": "none"
     },
     {
-      "source": "(.*)",
-      "target": "/$1",
-      "service": "html5-apps-repo-rt"
+      "source": "^(.*)$",
+      "target": "$1",
+      "localDir": "webapp"
     }
   ]
 }

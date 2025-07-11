@@ -3,6 +3,37 @@ ID: freestylesapui5app
 version: 0.0.1
 
 modules:
+  - name: freestylesapui5app
+    type: html5
+    path: .
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build
+      supported-platforms: []
+      customTasks:
+        - name: ui5-task-zipper
+          afterTask: generateCachebusterInfo
+          configuration:
+            archiveName: freestylesapui5app
+
+  - name: freestylesapui5app-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: freestylesapui5app-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - name: freestylesapui5app
+          artifacts:
+            - freestylesapui5app.zip
+          target-path: resources/
+
   - name: freestylesapui5app-destination-content
     type: com.sap.application.content
     requires:
@@ -25,45 +56,14 @@ modules:
               ServiceInstanceName: freestylesapui5app-html5-srv
               ServiceKeyName: freestylesapui5app-repo-host-key
               sap.cloud.service: freestylesapui5app
-            - Authentication: OAuth2UserTokenExchange
-              Name: freestylesapui5app-uaa
+            - Name: freestylesapui5app-uaa
+              Authentication: OAuth2UserTokenExchange
               ServiceInstanceName: freestylesapui5app-xsuaa-service
               ServiceKeyName: freestylesapui5app-uaa-key
               sap.cloud.service: freestylesapui5app
           existing_destinations_policy: ignore
     build-parameters:
       no-source: true
-
-  - name: freestylesapui5app-app-content
-    type: com.sap.application.content
-    path: .
-    requires:
-      - name: freestylesapui5app-repo-host
-        parameters:
-          content-target: true
-    build-parameters:
-      build-result: resources
-      requires:
-        - artifacts:
-            - freestylesapui5app.zip
-          name: freestylesapui5app
-          target-path: resources/
-
-  - name: freestylesapui5app
-    type: html5
-    path: .
-    build-parameters:
-      build-result: dist
-      builder: custom
-      commands:
-        - npm install
-        - npm run build
-      supported-platforms: []
-      customTasks:
-          - name: ui5-task-zipper
-            afterTask: generateCachebusterInfo
-      configuration:
-        archiveName: freestylesapui5app
 
 resources:
   - name: freestylesapui5app-destination-service
@@ -74,8 +74,8 @@ resources:
         init_data:
           instance:
             destinations:
-              - Authentication: NoAuthentication
-                Name: odata-v2-backend
+              - Name: odata-v2-backend
+                Authentication: NoAuthentication
                 ProxyType: Internet
                 Type: HTTP
                 URL: https://011aeafftrial-backend-capserver-srv.cfapps.us10-001.hana.ondemand.com/v2/root/

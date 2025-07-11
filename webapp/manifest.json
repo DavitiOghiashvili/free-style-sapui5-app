@@ -152,5 +152,8 @@
       "id": "App",
       "async": true
     }
+  },
+  "sap.cloud": {
+    "service": "freestylesapui5app"
   }
 }
