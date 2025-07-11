@@ -10,10 +10,7 @@
   "main": "webapp/index.html",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
-<<<<<<< Updated upstream
-=======
     "@sap/cds-dk": "^8",
->>>>>>> Stashed changes
     "@sap/ux-ui5-tooling": "^1.18.0",
     "@ui5/cli": "^3.11.9",
     "@ui5/linter": "^1.13.1",
