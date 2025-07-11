@@ -22,7 +22,7 @@ modules:
         instance:
           destinations:
             - Name: freestylesapui5app_html_repo_host
-              ServiceInstanceName: freestylesapui5app-html5-service
+              ServiceInstanceName: freestylesapui5app-html5-srv
               ServiceKeyName: freestylesapui5app-repo-host-key
               sap.cloud.service: freestylesapui5app
             - Authentication: OAuth2UserTokenExchange
@@ -98,7 +98,7 @@ resources:
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
-      service-name: freestylesapui5app-html5-service
+      service-name: freestylesapui5app-html5-srv
       service-plan: app-host
 
 parameters:

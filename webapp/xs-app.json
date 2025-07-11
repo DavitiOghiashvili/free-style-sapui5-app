@@ -5,19 +5,12 @@
     {
       "source": "^/v2/root/(.*)$",
       "target": "/$1",
-      "authenticationType": "xsuaa",
-      "destination": "odata-v2-backend",
-      "scope": [
-        "$XSAPPNAME.accessDataService"
-      ]
+      "destination": "odata-v2-backend"
     },
     {
       "source": "(.*)",
-      "target": "/ui5app/$1",
-      "service": "html5-apps-repo-rt",
-      "scope": [
-        "$XSAPPNAME.accessApp"
-      ]
+      "target": "/$1",
+      "service": "html5-apps-repo-rt"
     }
   ]
 }
