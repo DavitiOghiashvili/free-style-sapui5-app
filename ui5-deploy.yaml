@@ -1,0 +1,18 @@
+specVersion: "3.2"
+metadata:
+  name: free-style-sapui5-app-build
+type: application
+
+builder:
+  resources:
+      excludes:
+        - "/test/**"
+        - "/localService/**"
+  customTasks:
+    - name: ui5-task-zipper
+      afterTask: generateCachebusterInfo
+      configuration:
+        archiveName: freestylesapui5app
+        outputPath: "dist"
+        additionalFiles:
+          - xs-app.json

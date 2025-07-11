@@ -1,28 +1,38 @@
-# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
-
-specVersion: '3.1'
+specVersion: "3.2"
 metadata:
-  name: freestylesapui5app
+  name: free-style-sapui5-app
 type: application
+
 server:
   customMiddleware:
-    - name: fiori-tools-proxy
-      afterMiddleware: compression
-      configuration:
-        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
-        ui5:
-          path:
-            - /resources
-            - /test-resources
-          url: https://ui5.sap.com
-    - name: fiori-tools-appreload
-      afterMiddleware: compression
-      configuration:
-        port: 35729
-        path: webapp
-        delay: 300
-    - name: fiori-tools-preview
-      afterMiddleware: fiori-tools-appreload
-      configuration:
-        flp:
-          theme: sap_horizon
+  - name: fiori-tools-proxy
+    afterMiddleware: compression
+    configuration:
+      ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+      backend:
+      - path: /odata-v2-backend/
+        pathPrefix: /
+        url: https://011aeafftrial-backend-capserver-srv.cfapps.us10-001.hana.ondemand.com/v2/root/
+      #  destination: your_global_destination #uses global destination from the btp account of used BAS instance
+      ui5:
+        path: 
+        - /resources
+        - /test-resources
+        url: https://ui5.sap.com
+        version: # The UI5 version, for instance, 1.78.1. Empty means latest version
+  - name: fiori-tools-appreload
+    afterMiddleware: compression
+    configuration:
+     port: 35729
+     path: webapp
+
+builder:
+  resources:
+    excludes:
+      - "test/**"
+  customTasks:
+          - name: ui5-task-zipper
+            afterTask: generateCachebusterInfo
+            configuration:
+              archiveName: freestylesapui5app
+              outputPath: "dist"

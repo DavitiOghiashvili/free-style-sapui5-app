@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
 
-specVersion: '3.1'
+specVersion: '3.2'
 metadata:
   name: freestylesapui5app
 type: application
 framework:
   name: SAPUI5
-  version: 1.135.0
+  version: 1.65.0
   libraries:
     - name: sap.m
     - name: sap.ui.core

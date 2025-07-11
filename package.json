@@ -10,6 +10,10 @@
   "main": "webapp/index.html",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+<<<<<<< Updated upstream
+=======
+    "@sap/cds-dk": "^8",
+>>>>>>> Stashed changes
     "@sap/ux-ui5-tooling": "^1.18.0",
     "@ui5/cli": "^3.11.9",
     "@ui5/linter": "^1.13.1",
@@ -17,7 +21,8 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
     "globals": "^16.1.0",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "ui5-task-zipper": "^3.4.2"
   },
   "scripts": {
     "lint": "eslint .",
@@ -45,5 +50,8 @@
   "bugs": {
     "url": "https://github.com/DavitiOghiashvili/free-style-sapui5-app/issues"
   },
-  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme"
+  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme",
+  "dependencies": {
+    "@sap-ux/ui5-config": "^0.29.0"
+  }
 }

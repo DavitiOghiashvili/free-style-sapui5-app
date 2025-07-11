@@ -6,7 +6,7 @@
     "i18n": "i18n/i18n.properties",
     "dataSources": {
       "mainService": {
-        "uri": "http://localhost:4004/v2/root/",
+        "uri": "/v2/root/",
         "type": "OData",
         "settings": {
           "odataVersion": "2.0"
@@ -23,6 +23,25 @@
       "id": "@sap/generator-fiori:basic",
       "version": "1.17.5",
       "toolsId": "fe9e3d3d-1f42-46af-a784-571bd2d7abba"
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "freestylesapui5app-display": {
+          "semanticObject": "freestylesapui5app",
+          "action": "display",
+          "title": "{{FreestyleApp-display.flpTitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      },
+      "outbounds": {
+        "ExternalNavigation": {
+          "semanticObject": "fiorielementsapp",
+          "action": "display"
+        }
+      }
     }
   },
   "sap.ui": {
@@ -42,6 +61,7 @@
     }
   },
   "sap.ui5": {
+    "async": true,
     "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.136.1",
@@ -90,17 +110,23 @@
         {
           "name": "ListReport",
           "pattern": "",
-          "target": ["ListReport"]
+          "target": [
+            "ListReport"
+          ]
         },
         {
           "name": "ObjectPage",
           "pattern": "ObjectPage/{Product_ID}",
-          "target": ["ObjectPage"]
+          "target": [
+            "ObjectPage"
+          ]
         },
         {
           "name": "ObjectChartPage",
           "pattern": "ObjectChartPage",
-          "target": ["ObjectChartPage"]
+          "target": [
+            "ObjectChartPage"
+          ]
         }
       ],
       "targets": {
@@ -127,5 +153,9 @@
       "id": "App",
       "async": true
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "freestylesapui5app"
   }
 }

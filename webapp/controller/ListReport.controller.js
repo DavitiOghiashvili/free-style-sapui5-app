@@ -94,6 +94,17 @@ sap.ui.define(
         );
       },
 
+      // Get the CrossApplicationNavigation service and navigate to Manage Products app
+      onNavigateToProducts: function () {
+        sap.ushell.Container.getServiceAsync("CrossApplicationNavigation").then(function (navService) {
+          navService.toExternal({
+            target: {
+              shellHash: "fiorielementsapp-display"
+            }
+          });
+        });
+      },
+
       /**
        * Fetches filtered count of products from OData service
        * @param {sap.ui.model.Filter[]} aFilters - Array of filters to apply
