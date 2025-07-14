@@ -10,4 +10,4 @@ builder:
       configuration:
         archiveName: freestylesapui5app
         additionalFiles:
-          - webapp/xs-app.json
+          - xs-app.json
