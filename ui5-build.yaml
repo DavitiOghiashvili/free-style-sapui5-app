@@ -13,3 +13,5 @@ builder:
         afterTask: generateCachebusterInfo
         configuration:
           archiveName: freestylesapui5app
+          additionalFiles:
+          - xs-app.json
