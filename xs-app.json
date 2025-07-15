@@ -3,9 +3,9 @@
   "authenticationMethod": "none",
   "routes": [
     {
-      "source": "^/root/(.*)$",
+      "source": "^/v2/root/(.*)$",
       "target": "$1",
-      "destination": "fiorielementsapp-destination-service",
+      "destination": "freestylesapui5app-destination-service",
       "authenticationType": "none"
     }
   ]

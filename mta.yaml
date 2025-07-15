@@ -1,9 +1,9 @@
 _schema-version: "3.1"
-ID: fiorielementsapp
+ID: freestylesapui5app
 version: 0.0.1
 
 modules:
-  - name: fiorielementsapp
+  - name: freestylesapui5app
     type: html5
     path: .
     build-parameters:
@@ -14,54 +14,54 @@ modules:
         - npm run build
       supported-platforms: []
 
-  - name: fiorielementsapp-app-content
+  - name: freestylesapui5app-app-content
     type: com.sap.application.content
     path: .
     requires:
-      - name: fiorielementsapp-repo-host
+      - name: freestylesapui5app-repo-host
         parameters:
           content-target: true
     build-parameters:
       build-result: resources
       requires:
-        - name: fiorielementsapp
+        - name: freestylesapui5app
           artifacts:
-            - fiorielementsapp.zip
+            - freestylesapui5app.zip
           target-path: resources/
 
-  - name: fiorielementsapp-destination-content
+  - name: freestylesapui5app-destination-content
     type: com.sap.application.content
     requires:
-      - name: fiorielementsapp-destination-service
+      - name: freestylesapui5app-destination-service
         parameters:
           content-target: true
-      - name: fiorielementsapp-repo-host
+      - name: freestylesapui5app-repo-host
         parameters:
           service-key:
-            name: fiorielementsapp-repo-host-key
-      - name: fiorielementsapp-uaa
+            name: freestylesapui5app-repo-host-key
+      - name: freestylesapui5app-uaa
         parameters:
           service-key:
-            name: fiorielementsapp-uaa-key
+            name: freestylesapui5app-uaa-key
     parameters:
       content:
         instance:
           destinations:
-            - Name: fiorielementsapp_html_repo_host
-              ServiceInstanceName: fiorielementsapp-html5-srv
-              ServiceKeyName: fiorielementsapp-repo-host-key
-              sap.cloud.service: fiorielementsapp
-            - Name: fiorielementsapp-uaa
+            - Name: freestylesapui5app_html_repo_host
+              ServiceInstanceName: freestylesapui5app-html5-srv
+              ServiceKeyName: freestylesapui5app-repo-host-key
+              sap.cloud.service: freestylesapui5app
+            - Name: freestylesapui5app-uaa
               Authentication: OAuth2UserTokenExchange
-              ServiceInstanceName: fiorielementsapp-xsuaa-service
-              ServiceKeyName: fiorielementsapp-uaa-key
-              sap.cloud.service: fiorielementsapp
+              ServiceInstanceName: freestylesapui5app-xsuaa-service
+              ServiceKeyName: freestylesapui5app-uaa-key
+              sap.cloud.service: freestylesapui5app
           existing_destinations_policy: ignore
     build-parameters:
       no-source: true
 
 resources:
-  - name: fiorielementsapp-destination-service
+  - name: freestylesapui5app-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
       config:
@@ -78,22 +78,22 @@ resources:
             existing_destinations_policy: update
         version: 1.0.0
       service: destination
-      service-name: fiorielementsapp-destination-service
+      service-name: freestylesapui5app-destination-service
       service-plan: lite
 
-  - name: fiorielementsapp-uaa
+  - name: freestylesapui5app-uaa
     type: org.cloudfoundry.managed-service
     parameters:
       path: ./xs-security.json
       service: xsuaa
-      service-name: fiorielementsapp-xsuaa-service
+      service-name: freestylesapui5app-xsuaa-service
       service-plan: application
 
-  - name: fiorielementsapp-repo-host
+  - name: freestylesapui5app-repo-host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
-      service-name: fiorielementsapp-html5-srv
+      service-name: freestylesapui5app-html5-srv
       service-plan: app-host
 
 parameters:
