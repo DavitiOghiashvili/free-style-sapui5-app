@@ -10,16 +10,14 @@
   "main": "webapp/index.html",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
-    "@sap/cds-dk": "^8",
-    "@sap/ux-ui5-tooling": "^1.18.0",
-    "@ui5/cli": "^3.11.9",
+    "@sap/ux-ui5-tooling": "1",
+    "@ui5/cli": "^3.0.0",
     "@ui5/linter": "^1.13.1",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.0",
     "globals": "^16.1.0",
-    "prettier": "^3.5.3",
-    "ui5-task-zipper": "^3.4.2"
+    "prettier": "^3.5.3"
   },
   "scripts": {
     "lint": "eslint .",
@@ -29,7 +27,7 @@
     "lint:ui5:fix": "ui5lint --fix",
     "start": "fiori run --open \"test/flp.html#app-preview\"",
     "start-local": "fiori run --config ./ui5-local.yaml --open \"test/flp.html#app-preview\"",
-    "build": "ui5 build --config=ui5-build.yaml --clean-dest --dest dist",
+    "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
     "deploy": "fiori verify",
     "deploy-config": "fiori add deploy-config",
     "start-noflp": "fiori run --open \"index.html?sap-ui-xx-viewCache=false\"",
@@ -47,8 +45,5 @@
   "bugs": {
     "url": "https://github.com/DavitiOghiashvili/free-style-sapui5-app/issues"
   },
-  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme",
-  "dependencies": {
-    "@sap-ux/ui5-config": "^0.29.0"
-  }
+  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme"
 }

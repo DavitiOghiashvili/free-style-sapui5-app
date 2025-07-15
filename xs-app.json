@@ -3,23 +3,10 @@
   "authenticationMethod": "none",
   "routes": [
     {
-      "source": "^/v2/root/(.*)$",
+      "source": "^/root/(.*)$",
       "target": "$1",
-      "destination": "freestylesapui5app_html_repo_host",
+      "destination": "fiorielementsapp-destination-service",
       "authenticationType": "none"
-    },
-    {
-      "source": "^/test-resources/(.*)$",
-      "target": "/test-resources/$1",
-      "authenticationType": "none",
-      "destination": "ui5"
-    },
-    {
-      "source": "^(.*)$",
-      "target": "$1",
-      "service": "html5-apps-repo",
-      "authenticationType": "xsuaa",
-      "cacheControl": "no-cache"
     }
   ]
 }
