@@ -5,8 +5,21 @@
     {
       "source": "^/v2/root/(.*)$",
       "target": "$1",
-      "destination": "freestylesapui5app-destination-service",
+      "destination": "freestylesapui5app-repo-host",
       "authenticationType": "none"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "none",
+      "destination": "ui5"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache"
     }
   ]
 }
