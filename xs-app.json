@@ -5,7 +5,7 @@
     {
       "source": "^/v2/root/(.*)$",
       "target": "$1",
-      "destination": "freestylesapui5app-repo-host",
+      "destination": "odata-v2-backend",
       "authenticationType": "none"
     },
     {
@@ -17,7 +17,7 @@
     {
       "source": "^(.*)$",
       "target": "$1",
-      "service": "html5-apps-repo",
+      "service": "html5-apps-repo-rt",
       "authenticationType": "xsuaa",
       "cacheControl": "no-cache"
     }
