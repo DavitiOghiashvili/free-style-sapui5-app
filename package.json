@@ -45,5 +45,8 @@
   "bugs": {
     "url": "https://github.com/DavitiOghiashvili/free-style-sapui5-app/issues"
   },
-  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme"
+  "homepage": "https://github.com/DavitiOghiashvili/free-style-sapui5-app#readme",
+  "dependencies": {
+    "ui5-task-zipper": "^3.4.2"
+  }
 }
