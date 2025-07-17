@@ -6,7 +6,7 @@
     "i18n": "i18n/i18n.properties",
     "dataSources": {
       "mainService": {
-        "uri": "/v2/root/",
+        "uri": "v2/root/",
         "type": "OData",
         "settings": {
           "odataVersion": "2.0"
