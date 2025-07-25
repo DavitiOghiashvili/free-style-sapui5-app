@@ -11,8 +11,7 @@ sap.ui.define(
     'use strict';
     const { ValueState } = coreLibrary;
 
-    QUnit.module("Status State and color", () => {
-
+    QUnit.module("Product status state and color", () => {
       const statusStateTestCase = (oOptions) => {
         const sState = Formatter.productStatusState(oOptions.statusValue)
 
@@ -50,7 +49,30 @@ sap.ui.define(
           expected: ValueState.None
         })
       })
-
-
     });
+
+    QUnit.module('Product creation/modification date formatter', () => {
+      const formatDateTestCase = (oOptions) => {
+        const formatDate = Formatter.formatDate(oOptions.dateValue)
+
+
+        oOptions.assert.strictEqual(formatDate, oOptions.expected, 'Product date has been formatted accordingly')
+      }
+
+      QUnit.test('Should format product date correctly', (assert) => {
+        formatDateTestCase.call(this, {
+          assert: assert,
+          dateValue: new Date(1753430309333),
+          expected: '2025-07-25'
+        })
+      })
+
+      QUnit.test('Should handle product date absence', (assert) => {
+        formatDateTestCase.call(this, {
+          assert: assert,
+          dateValue: '',
+          expected: ''
+        })
+      })
+    })
   });
