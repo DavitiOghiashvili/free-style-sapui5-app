@@ -1,9 +1,11 @@
 sap.ui.define(
-  ['freestylesapui5app/utils/Formatter',
+  ['freestylesapui5app/controller/ListReport.controller',
+    'freestylesapui5app/utils/Formatter',
     'freestylesapui5app/utils/Constants',
     'sap/ui/core/library',
   ],
   function (
+    Controller,
     Formatter,
     Constants,
     coreLibrary
@@ -11,7 +13,7 @@ sap.ui.define(
     'use strict';
     const { ValueState } = coreLibrary;
 
-    QUnit.module("Product status state and color", () => {
+    QUnit.module("Product status state and color, FORMATTER", () => {
       const statusStateTestCase = (oOptions) => {
         const sState = Formatter.productStatusState(oOptions.statusValue)
 
@@ -51,10 +53,9 @@ sap.ui.define(
       })
     });
 
-    QUnit.module('Product creation/modification date formatter', () => {
+    QUnit.module('Product creation/modification date formatter, FORMATTER', () => {
       const formatDateTestCase = (oOptions) => {
         const formatDate = Formatter.formatDate(oOptions.dateValue)
-
 
         oOptions.assert.strictEqual(formatDate, oOptions.expected, 'Product date has been formatted accordingly')
       }
@@ -75,4 +76,39 @@ sap.ui.define(
         })
       })
     })
+
+
+    QUnit.module("ListReport Controller - _getFiltersWithValues", (hooks) => {
+      hooks.beforeEach(function () {
+        this.oController = new Controller();
+
+        const oControlWithKeys = {
+          getSelectedKeys: () => ["A", "B"]
+        };
+
+        const oControlNoKeys = {
+          getSelectedKeys: () => []
+        };
+
+        this.oFilterGroupItem1 = {
+          getControl: () => oControlWithKeys
+        };
+
+        this.oFilterGroupItem2 = {
+          getControl: () => oControlNoKeys
+        };
+
+        this.oController._oFilterBar = {
+          getFilterGroupItems: () => [this.oFilterGroupItem1, this.oFilterGroupItem2]
+        };
+      });
+
+      QUnit.test("Should return only filter group items with selected keys", function (assert) {
+        const result = this.oController._getFiltersWithValues();
+
+        assert.strictEqual(result.length, 1, "Only one filter item returned");
+        assert.strictEqual(result[0], this.oFilterGroupItem1, "Correct filter item returned");
+      });
+    });
+
   });
