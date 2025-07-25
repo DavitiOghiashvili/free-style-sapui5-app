@@ -8,10 +8,11 @@ sap.ui.define(
     Controller,
     Formatter,
     Constants,
-    coreLibrary
+    coreLibrary,
   ) {
     'use strict';
     const { ValueState } = coreLibrary;
+
 
     QUnit.module("Product status state and color, FORMATTER", () => {
       const statusStateTestCase = (oOptions) => {
@@ -53,6 +54,7 @@ sap.ui.define(
       })
     });
 
+
     QUnit.module('Product creation/modification date formatter, FORMATTER', () => {
       const formatDateTestCase = (oOptions) => {
         const formatDate = Formatter.formatDate(oOptions.dateValue)
@@ -73,6 +75,114 @@ sap.ui.define(
           assert: assert,
           dateValue: '',
           expected: ''
+        })
+      })
+    })
+
+
+    QUnit.module('Display proper product status text from i18n, FORMATTER', () => {
+      const productStatusTestCase = (oOptions) => {
+        const productStatusText = Formatter.productStatusText(oOptions.sStatusValue);
+
+        oOptions.assert.strictEqual(productStatusText, oOptions.expected, 'Product status text displayed correctly')
+      }
+
+      QUnit.test('Should get proper i18n text from resource bundle for status', (assert) => {
+        productStatusTestCase.call(this, {
+          assert: assert,
+          sStatusValue: 'OUT_OF_STOCK',
+          expected: 'Out of stock'
+        })
+      })
+    })
+
+
+    QUnit.module('Display correct title according to product count, FORMATTER', () => {
+      const formatProductCountTitleTestCase = (oOptions) => {
+        const formatProductCountTitle = Formatter.formatProductCountTitle(oOptions.iCount)
+
+        oOptions.assert.strictEqual(formatProductCountTitle, oOptions.expected, 'Displayed correct title')
+      }
+
+      QUnit.test('Should show correct title for multiple products', (assert) => {
+        formatProductCountTitleTestCase.call(this, {
+          assert: assert,
+          iCount: 2,
+          expected: 'Products: 2'
+        })
+      })
+
+      QUnit.test('Should show correct title for single product', (assert) => {
+        formatProductCountTitleTestCase.call(this, {
+          assert: assert,
+          iCount: 1,
+          expected: 'Products: 1'
+        })
+      })
+
+      QUnit.test('Should show correct title for no product', (assert) => {
+        formatProductCountTitleTestCase.call(this, {
+          assert: assert,
+          iCount: 0,
+          expected: 'Product: 0'
+        })
+      })
+    })
+
+
+    QUnit.module('Display selected filter formatted text, FORMATTER', () => {
+      const getFormattedSummaryTextTestCase = (oOptions) => {
+        const getFormattedSummaryText = Formatter.getFormattedSummaryText(oOptions.oFilterBar)
+
+        oOptions.assert.strictEqual(getFormattedSummaryText, oOptions.expected, 'Displays selected filter text')
+      }
+
+      QUnit.test('Should display no filter active text', (assert) => {
+        getFormattedSummaryTextTestCase.call(this, {
+          assert: assert,
+          oFilterBar: {
+            retrieveFiltersWithValues: () => []
+          },
+          expected: 'No filters active'
+        })
+      })
+
+      QUnit.test('Should display selected singular filter text', (assert) => {
+        getFormattedSummaryTextTestCase.call(this, {
+          assert: assert,
+          oFilterBar: {
+            retrieveFiltersWithValues: () => ['First']
+          },
+          expected: '1 filter active: First'
+        })
+      })
+
+      QUnit.test('Should display selected filters text', (assert) => {
+        getFormattedSummaryTextTestCase.call(this, {
+          assert: assert,
+          oFilterBar: {
+            retrieveFiltersWithValues: () => ['First', 'Second']
+          },
+          expected: '2 filters active: First, Second'
+        })
+      })
+    })
+
+    QUnit.module('Display EXPANDED selected filter formatted text, FORMATTER', () => {
+      const getFormattedSummaryTextExpandedTestCase = (oOptions) => {
+        const getFormattedSummaryTextExpanded = Formatter.getFormattedSummaryTextExpanded(oOptions.oFilterBar)
+
+        oOptions.assert.strictEqual(getFormattedSummaryTextExpanded, oOptions.expected, 'Displays correct text of selected filters when expanded')
+      }
+
+      QUnit.test('Should display no active filters text when expanded', (assert) => {
+        getFormattedSummaryTextExpandedTestCase.call(this, {
+          assert: assert,
+          oFilterBar: {
+            retrieveFiltersWithValues: () => [],
+            retrieveNonVisibleFiltersWithValues: () => []
+          },
+          expected: 'No filters active'
         })
       })
     })
