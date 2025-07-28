@@ -1,6 +1,6 @@
 sap.ui.define(
   ['freestylesapui5app/controller/ListReport.controller',
-      "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator"
   ],
   function (
     Controller,
@@ -113,5 +113,39 @@ sap.ui.define(
       assert.ok(stub.calledOnce, "setEnabled was called once");
       assert.strictEqual(stub.firstCall.args[0], true, "Delete button is enabled");
     });
+
+    QUnit.module("ListReport Controller - onStoresSelectDialogSearch", {
+      beforeEach: function () {
+        this.oController = new Controller();
+      },
+
+      afterEach: function () {
+        sinon.restore();
+      }
+    });
+
+    QUnit.test('Should filter items depending on name search value', function (assert) {
+      const sSearchValue = 'Store';
+
+      const oBindingMock = {
+        filter: sinon.stub()
+      };
+
+      const oFakeEvent = {
+        getParameter: sinon.stub()
+      };
+
+      oFakeEvent.getParameter.withArgs("value").returns(sSearchValue);
+      oFakeEvent.getParameter.withArgs("itemsBinding").returns(oBindingMock);
+
+      this.oController.onStoresSelectDialogSearch(oFakeEvent);
+
+      assert.ok(oBindingMock.filter.calledOnce, "Binding filter was called once");
+      const aFilters = oBindingMock.filter.firstCall.args[0];
+      assert.strictEqual(aFilters.length, 1, "One filter passed");
+      assert.strictEqual(aFilters[0].sPath, "Name", "Filter path is correct");
+      assert.strictEqual(aFilters[0].sOperator, FilterOperator.Contains, "Operator is Contains");
+      assert.strictEqual(aFilters[0].oValue1, sSearchValue, "Search value is correct");
+    })
 
   });
