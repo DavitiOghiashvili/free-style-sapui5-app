@@ -7,6 +7,7 @@ sap.ui.define([
 ) {
     "use strict";
 
+
     QUnit.module("ObjectPage Controller - _onRouteMatched", {
         beforeEach: function () {
             this.oController = new Controller();
@@ -56,6 +57,29 @@ sap.ui.define([
 
         assert.ok(this.messagingStub.calledOnce, "Messaging.removeAllMessages was called");
         assert.ok(this.oViewMock.addEventDelegate.calledOnce, "addEventDelegate was called");
+    });
+
+
+    QUnit.module("onInvokeFunctionFromMetadataButtonPress", {
+        beforeEach: function () {
+            this.oController = new Controller();
+
+            this.oCallFunctionStub = sinon.stub();
+            this.oModelStub = {
+                callFunction: this.oCallFunctionStub,
+            };
+            sinon.stub(this.oController, "getModel").returns(this.oModelStub);
+        },
+
+        afterEach: function () {
+            sinon.restore();
+        }
+    });
+
+    QUnit.test("should call /mutate and show result", function (assert) {
+        this.oController.onInvokeFunctionFromMetadataButtonPress();
+
+        assert.ok(this.oCallFunctionStub.calledOnce, "callFunction was called once");
     });
 
 });
