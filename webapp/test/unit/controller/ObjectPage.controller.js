@@ -60,7 +60,7 @@ sap.ui.define([
     });
 
 
-    QUnit.module("onInvokeFunctionFromMetadataButtonPress", {
+    QUnit.module("ObjectPage Controller - onInvokeFunctionFromMetadataButtonPress", {
         beforeEach: function () {
             this.oController = new Controller();
 
@@ -80,6 +80,28 @@ sap.ui.define([
         this.oController.onInvokeFunctionFromMetadataButtonPress();
 
         assert.ok(this.oCallFunctionStub.calledOnce, "callFunction was called once");
+    });
+
+
+    QUnit.module("ObjectPage Controller onColumnListItemPress", {
+        beforeEach: function () {
+            this.oController = new Controller();
+
+            this.navToStub = sinon.stub();
+            this.oController.navTo = this.navToStub;
+        },
+
+        afterEach: function () {
+            sinon.restore();
+        }
+    });
+
+    QUnit.test("Should navigate to ObjectChartPage", function (assert) {
+        this.oController.onColumnListItemPress();
+
+        assert.ok(this.navToStub.calledOnce, "navTo was called once");
+        assert.strictEqual(this.navToStub.firstCall.args[0], "ObjectChartPage",
+            "Navigated to 'ObjectChartPage'");
     });
 
 });
