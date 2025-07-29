@@ -18,7 +18,7 @@ sap.ui.define(
         Then.onTheViewPage.iShouldSeeThePageView();
 
         //Cleanup
-        Then.iTeardownMyApp();
+        // Then.iTeardownMyApp();
       },
     );
   },
