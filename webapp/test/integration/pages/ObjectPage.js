@@ -1,9 +1,9 @@
 sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
   'use strict';
-  const sViewName = 'ListReport';
+  const sViewName = 'ObjectPage';
 
   Opa5.createPageObjects({
-    onTheListReportPage: {
+    onTheObjectPage: {
       actions: {
         iClickOnTheFirstItem: function () {
           return this.waitFor({
@@ -17,9 +17,9 @@ sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
       },
 
       assertions: {
-        iShouldSeeThePageListReport: function () {
+        iShouldSeeThePageObjectPage: function () {
           return this.waitFor({
-            id: 'idListReportPage',
+            id: 'idObjectPage',
             viewName: sViewName,
             success: function () {
               Opa5.assert.ok(true, 'The ' + sViewName + ' view is displayed');
