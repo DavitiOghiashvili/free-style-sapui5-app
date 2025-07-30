@@ -1,4 +1,4 @@
-sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
+sap.ui.define(['sap/ui/test/Opa5', 'sap/ui/test/actions/Press'], function (Opa5, Press) {
   'use strict';
   const sViewName = 'ListReport';
 
@@ -13,7 +13,25 @@ sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
             },
             errorMessage: "Could not find any list items"
           });
-        }
+        },
+
+        iClickOnTheCreateButton: function () {
+          return this.waitFor({
+            id: "idCreateProductButton",
+            viewName: sViewName,
+            actions: new Press(),
+            errorMessage: "Could not find the Create button"
+          });
+        },
+
+        iClickOnTheCancelProductCreateDialogButton: function () {
+          return this.waitFor({
+            id: "idCancelProductCreateDialogButton",
+            viewName: sViewName,
+            actions: new Press(),
+            errorMessage: "Could not find the Cancel button"
+          });
+        },
       },
 
       assertions: {
@@ -39,17 +57,6 @@ sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
           });
         },
 
-        iShouldSeeTheFilterBar: function () {
-          return this.waitFor({
-            id: 'idFilterBar',
-            viewName: sViewName,
-            success: function () {
-              Opa5.assert.ok(true, 'Filter bar is visible');
-            },
-            errorMessage: 'Filter bar not found',
-          });
-        },
-        
         iShouldSeeTheFilterBar: function () {
           return this.waitFor({
             id: 'idFilterBar',

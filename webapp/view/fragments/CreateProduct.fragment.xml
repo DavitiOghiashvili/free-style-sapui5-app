@@ -73,6 +73,7 @@
         press=".onCreateButtonPress" />
       <Button text="{i18n>cancelBtn}"
         type="Reject"
+        id="idCancelProductCreateDialogButton"
         press=".onCancelButtonPress" />
     </buttons>
   </Dialog>

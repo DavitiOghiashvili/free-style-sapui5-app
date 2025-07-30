@@ -96,6 +96,7 @@
                             }" />
                         <ToolbarSpacer />
                         <Button text="{i18n>createBtn}"
+                            id="idCreateProductButton"
                             press=".onCreateProductDialogPress" />
                         <Button text="{i18n>deleteBtn}"
                             id="idProductDeleteButton"
