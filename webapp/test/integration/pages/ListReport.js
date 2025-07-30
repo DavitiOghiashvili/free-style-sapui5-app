@@ -24,6 +24,25 @@ sap.ui.define(['sap/ui/test/Opa5', 'sap/ui/test/actions/Press'], function (Opa5,
           });
         },
 
+        iClickOnTheSelectStoreButton: function () {
+          return this.waitFor({
+            id: "idSelectStoreButton",
+            viewName: sViewName,
+            actions: new Press(),
+            errorMessage: "Could not find the Select store button"
+          });
+        },
+
+        iClickOnTheSelectStoreFirstItem: function () {
+          return this.waitFor({
+            controlType: "sap.m.StandardListItem",
+            success: function (aItems) {
+              aItems[0].$().trigger("tap");
+            },
+            errorMessage: "Could not find any list items"
+          });
+        },
+
         iClickOnTheCancelProductCreateDialogButton: function () {
           return this.waitFor({
             id: "idCancelProductCreateDialogButton",

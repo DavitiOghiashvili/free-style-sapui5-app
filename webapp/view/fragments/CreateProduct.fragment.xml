@@ -5,6 +5,7 @@
   <Dialog title="{i18n>createProductFormTitle}">
     <f:SimpleForm>
       <Button text="{i18n>selectStore}"
+        id="idSelectStoreButton"
         press=".onSelectStoreButtonPress" />
 
       <Label text="{i18n>labelName}"

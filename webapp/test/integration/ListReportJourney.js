@@ -21,6 +21,8 @@ sap.ui.define([
         Then.onTheListReportPage.iShouldSeeTheProductsTable();
 
         When.onTheListReportPage.iClickOnTheCreateButton()
+        When.onTheListReportPage.iClickOnTheSelectStoreButton()
+        When.onTheListReportPage.iClickOnTheSelectStoreFirstItem()
         When.onTheListReportPage.iClickOnTheCancelProductCreateDialogButton()
 
         Then.iTeardownMyApp()
