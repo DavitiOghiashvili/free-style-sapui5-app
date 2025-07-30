@@ -7,7 +7,7 @@
     xmlns:plugins="sap.m.plugins">
     <f:DynamicPage id="idListReportPage">
         <f:title>
-            <f:DynamicPageTitle>
+            <f:DynamicPageTitle id="idTitle">
                 <f:heading>
                     <Title text="{i18n>appTitle}" />
                 </f:heading>

@@ -27,6 +27,50 @@ sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
             errorMessage: 'Did not find the ' + sViewName + ' view',
           });
         },
+
+        iShouldSeeTheTitle: function () {
+          return this.waitFor({
+            id: 'idTitle',
+            viewName: sViewName,
+            success: function () {
+              Opa5.assert.ok(true, 'Title is visible');
+            },
+            errorMessage: 'Title not found',
+          });
+        },
+
+        iShouldSeeTheFilterBar: function () {
+          return this.waitFor({
+            id: 'idFilterBar',
+            viewName: sViewName,
+            success: function () {
+              Opa5.assert.ok(true, 'Filter bar is visible');
+            },
+            errorMessage: 'Filter bar not found',
+          });
+        },
+        
+        iShouldSeeTheFilterBar: function () {
+          return this.waitFor({
+            id: 'idFilterBar',
+            viewName: sViewName,
+            success: function () {
+              Opa5.assert.ok(true, 'Filter bar is visible');
+            },
+            errorMessage: 'Filter bar not found',
+          });
+        },
+
+        iShouldSeeTheProductsTable: function () {
+          return this.waitFor({
+            id: 'idProductsTable',
+            viewName: sViewName,
+            success: function () {
+              Opa5.assert.ok(true, 'Products Table is visible');
+            },
+            errorMessage: 'Products Table not found',
+          });
+        },
       },
     },
   });
