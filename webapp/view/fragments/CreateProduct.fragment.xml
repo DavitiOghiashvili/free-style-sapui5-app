@@ -2,7 +2,7 @@
   xmlns:f="sap.ui.layout.form"
   xmlns:core="sap.ui.core"
   core:require="{ formatMessage: 'sap/base/strings/formatMessage' }">
-  <Dialog title="{i18n>createProductFormTitle}">
+  <Dialog title="{i18n>createProductFormTitle}" id="idCreateProductDialog">
     <f:SimpleForm>
       <Button text="{i18n>selectStore}"
         id="idSelectStoreButton"
@@ -58,7 +58,7 @@
 
       <Label text="{i18n>labelStatus}"
         required="true" />
-      <Select selectedKey="{Status}">
+      <Select selectedKey="{Status}" id="idSelectStatus">
         <core:Item key="OK"
           text="{i18n>OK}" />
         <core:Item key="STORAGE"
@@ -71,7 +71,8 @@
     <buttons>
       <Button text="{i18n>createBtn}"
         type="Accept"
-        press=".onCreateButtonPress" />
+        press=".onCreateButtonPress"
+        id="idConfirmProductCreateButton" />
       <Button text="{i18n>cancelBtn}"
         type="Reject"
         id="idCancelProductCreateDialogButton"
