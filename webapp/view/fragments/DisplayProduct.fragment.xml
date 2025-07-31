@@ -5,7 +5,7 @@
     xmlns:plugins="sap.m.plugins">
     <ObjectPageLayout>
         <headerTitle>
-            <ObjectPageDynamicHeaderTitle>
+            <ObjectPageDynamicHeaderTitle id="idObjectPageDynamicHeaderTitle">
                 <expandedHeading>
                     <m:Title text="{Name}" />
                 </expandedHeading>
@@ -25,7 +25,8 @@
 
         <headerContent>
             <m:FlexBox wrap="Wrap"
-                fitContainer="true">
+                fitContainer="true"
+                id="idHeaderInfoFlexBox">
                 <m:Avatar src="{Photo}"
                     class="sapUiMediumMarginEnd"
                     displayShape="Square"
@@ -74,7 +75,7 @@
         </headerContent>
 
         <sections>
-            <ObjectPageSection title="{i18n>generalInformationTitle}">
+            <ObjectPageSection title="{i18n>generalInformationTitle}" id="idObjectPageSectionGeneralInfo">
                 <subSections>
                     <ObjectPageSubSection title="{i18n>generalInformationTitle}">
                         <forms:SimpleForm class="sapUxAPObjectPageSubSectionAlignContent"
@@ -109,7 +110,7 @@
                 </subSections>
             </ObjectPageSection>
 
-            <ObjectPageSection title="{i18n>commentsTitle}">
+            <ObjectPageSection title="{i18n>commentsTitle}" id="idObjectPageSectionComments">
                 <subSections>
                     <ObjectPageSubSection title="{i18n>commentsTitle}">
                         <m:VBox>
@@ -125,12 +126,15 @@
                                 justifyContent="Center"
                                 class="sapUiSmallMargin">
                                 <m:Input placeholder="{i18n>commentAuthor}"
+                                    id="idAuthorInput"
                                     value="{Author}"
                                     required="true" />
                                 <m:Input placeholder="{i18n>commentMessage}"
+                                    id="idMessageInput"
                                     value="{Message}"
                                     required="true" />
                                 <m:Input placeholder="{i18n>commentRating}"
+                                    id="idRatingInput"
                                     value="{Rating}" />
                             </m:HBox>
                             <m:Table id="idCommentTable"
