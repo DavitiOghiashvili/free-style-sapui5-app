@@ -1,0 +1,424 @@
+{
+    "d": {
+        "results": [
+            {
+                "ID": "0b99cf7c-7075-42a1-b01b-a2972209e64d",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Lemke - Schamberger",
+                "Email": "Meghan_Rippin@gmail.com",
+                "PhoneNumber": "1-890-737-7090",
+                "Address": "AZ, West, 28954 Bednar Ramp",
+                "Established": "/Date(1633781828000+0000)/",
+                "FloorArea": 8959,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'0b99cf7c-7075-42a1-b01b-a2972209e64d')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'0b99cf7c-7075-42a1-b01b-a2972209e64d')"
+                }
+            },
+            {
+                "ID": "18da6328-d816-4e95-a736-70b67953c59c",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Gulgowski LLC",
+                "Email": "Diego.Barrows42@yahoo.com",
+                "PhoneNumber": "(054) 024-4046",
+                "Address": "CO, Port, 1356 Donald Pass",
+                "Established": "/Date(1616083647000+0000)/",
+                "FloorArea": 5804,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'18da6328-d816-4e95-a736-70b67953c59c')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'18da6328-d816-4e95-a736-70b67953c59c')"
+                }
+            },
+            {
+                "ID": "1fd20164-0406-47f4-b6a9-a9894ba7fe04",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Ryan LLC",
+                "Email": "Yoshiko.Wunsch17@hotmail.com",
+                "PhoneNumber": "1-424-176-7282 x7173",
+                "Address": "ME, West, 1455 Braun Orchard",
+                "Established": "/Date(1613769837000+0000)/",
+                "FloorArea": 7073,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'1fd20164-0406-47f4-b6a9-a9894ba7fe04')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'1fd20164-0406-47f4-b6a9-a9894ba7fe04')"
+                }
+            },
+            {
+                "ID": "230bba72-4b6b-4974-9b2b-3494ab57a3e6",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Braun, McCullough and Kessler",
+                "Email": "Brionna.Auer61@gmail.com",
+                "PhoneNumber": "494-449-5421",
+                "Address": "FL, West, 516 Cordie Run",
+                "Established": "/Date(1620179989000+0000)/",
+                "FloorArea": 4015,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'230bba72-4b6b-4974-9b2b-3494ab57a3e6')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'230bba72-4b6b-4974-9b2b-3494ab57a3e6')"
+                }
+            },
+            {
+                "ID": "480c81bb-b525-40a3-aa03-c49148386515",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Lang and Sons",
+                "Email": "Orlando.MacGyver7@gmail.com",
+                "PhoneNumber": "743-373-2535 x500",
+                "Address": "VT, East, 643 Clement Gateway",
+                "Established": "/Date(1614811457000+0000)/",
+                "FloorArea": 2905,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'480c81bb-b525-40a3-aa03-c49148386515')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'480c81bb-b525-40a3-aa03-c49148386515')"
+                }
+            },
+            {
+                "ID": "bccfacab-5d42-4e15-b0d9-4b8c8241780c",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Armstrong and Sons",
+                "Email": "Linwood5@yahoo.com",
+                "PhoneNumber": "(060) 305-4682 x839",
+                "Address": "NH, South, 043 Summer Flat",
+                "Established": "/Date(1605332077000+0000)/",
+                "FloorArea": 6797,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'bccfacab-5d42-4e15-b0d9-4b8c8241780c')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'bccfacab-5d42-4e15-b0d9-4b8c8241780c')"
+                }
+            },
+            {
+                "ID": "cd8a4354-9915-4802-a83f-ad8ffb5d0e87",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Kassulke Group",
+                "Email": "Rudy_Hauck@hotmail.com",
+                "PhoneNumber": "222-442-9929 x69578",
+                "Address": "TN, North, 7422 Daugherty Station",
+                "Established": "/Date(1611996187000+0000)/",
+                "FloorArea": 1194,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'cd8a4354-9915-4802-a83f-ad8ffb5d0e87')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'cd8a4354-9915-4802-a83f-ad8ffb5d0e87')"
+                }
+            },
+            {
+                "ID": "d0618af0-00f2-4fa5-9327-9a88a9a1e6fd",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Pagac - Purdy",
+                "Email": "Eloisa_Nicolas87@yahoo.com",
+                "PhoneNumber": "947.206.7352 x624",
+                "Address": "NH, Port, 7504 Sienna Ports",
+                "Established": "/Date(1607587101000+0000)/",
+                "FloorArea": 4259,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'd0618af0-00f2-4fa5-9327-9a88a9a1e6fd')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'd0618af0-00f2-4fa5-9327-9a88a9a1e6fd')"
+                }
+            },
+            {
+                "ID": "d554e720-870a-4088-9bcb-dce8aecaa047",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Koch and Sons",
+                "Email": "Reilly25@gmail.com",
+                "PhoneNumber": "(502) 003-8107",
+                "Address": "DE, South, 8632 Willms Track",
+                "Established": "/Date(1617238620000+0000)/",
+                "FloorArea": 3375,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'd554e720-870a-4088-9bcb-dce8aecaa047')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'd554e720-870a-4088-9bcb-dce8aecaa047')"
+                }
+            },
+            {
+                "ID": "79e89cf8-eeb5-46fd-9988-b3c8fbb2413c",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Harris - Hahn",
+                "Email": "Arnaldo.Oberbrunner33@hotmail.com",
+                "PhoneNumber": "(392) 363-9116",
+                "Address": "NE, Lake, 7681 Ron Mountains",
+                "Established": "/Date(1609399412000+0000)/",
+                "FloorArea": 1979,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'79e89cf8-eeb5-46fd-9988-b3c8fbb2413c')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'79e89cf8-eeb5-46fd-9988-b3c8fbb2413c')"
+                }
+            },
+            {
+                "ID": "4cf5fbab-e6d9-44c1-8f80-eacfc9218b28",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Kirlin - Homenick",
+                "Email": "Sincere16@hotmail.com",
+                "PhoneNumber": "958.924.7578 x44077",
+                "Address": "AR, New, 07140 Casper Forks",
+                "Established": "/Date(1624995265000+0000)/",
+                "FloorArea": 9691,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'4cf5fbab-e6d9-44c1-8f80-eacfc9218b28')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'4cf5fbab-e6d9-44c1-8f80-eacfc9218b28')"
+                }
+            },
+            {
+                "ID": "a3b58c52-196b-4f12-8bdc-23dbb9fb7745",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Littel, O'Keefe and Steuber",
+                "Email": "Jedidiah26@yahoo.com",
+                "PhoneNumber": "(220) 092-6585 x123",
+                "Address": "ID, North, 100 Dulce Courts",
+                "Established": "/Date(1629526692000+0000)/",
+                "FloorArea": 6969,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'a3b58c52-196b-4f12-8bdc-23dbb9fb7745')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'a3b58c52-196b-4f12-8bdc-23dbb9fb7745')"
+                }
+            },
+            {
+                "ID": "bac9b7bc-d43e-4c89-9172-5cf890798e03",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Rath - Waters",
+                "Email": "Reymundo_Gerhold88@yahoo.com",
+                "PhoneNumber": "(803) 270-9473 x49128",
+                "Address": "NV, Lake, 214 Jovanny Rapid",
+                "Established": "/Date(1624600688000+0000)/",
+                "FloorArea": 2062,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'bac9b7bc-d43e-4c89-9172-5cf890798e03')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'bac9b7bc-d43e-4c89-9172-5cf890798e03')"
+                }
+            },
+            {
+                "ID": "1228d78d-05ff-41c6-b1c9-78be881be203",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Walker Group",
+                "Email": "Destany53@yahoo.com",
+                "PhoneNumber": "1-492-063-4381 x33067",
+                "Address": "MA, Lake, 9221 Trantow Harbors",
+                "Established": "/Date(1613237214000+0000)/",
+                "FloorArea": 7296,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'1228d78d-05ff-41c6-b1c9-78be881be203')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'1228d78d-05ff-41c6-b1c9-78be881be203')"
+                }
+            },
+            {
+                "ID": "6eb2935e-cbd1-46be-b1fa-e04ae14a6272",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Auer, Vandervort and Beer",
+                "Email": "Casimir16@gmail.com",
+                "PhoneNumber": "385.039.5751 x17371",
+                "Address": "IA, Port, 698 Fay Lakes",
+                "Established": "/Date(1614289922000+0000)/",
+                "FloorArea": 3776,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'6eb2935e-cbd1-46be-b1fa-e04ae14a6272')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'6eb2935e-cbd1-46be-b1fa-e04ae14a6272')"
+                }
+            },
+            {
+                "ID": "4a5a7a36-9973-4f30-bb64-5e28849dc98e",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Zieme and Sons",
+                "Email": "Rhea28@hotmail.com",
+                "PhoneNumber": "624-816-4877 x762",
+                "Address": "MA, East, 306 Kenny Pass",
+                "Established": "/Date(1626810689000+0000)/",
+                "FloorArea": 1110,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'4a5a7a36-9973-4f30-bb64-5e28849dc98e')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'4a5a7a36-9973-4f30-bb64-5e28849dc98e')"
+                }
+            },
+            {
+                "ID": "fd6600bd-a5e4-4e91-a6b0-292b0a7129d8",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Boyer, Hermann and Upton",
+                "Email": "Nasir.Sipes84@gmail.com",
+                "PhoneNumber": "914-504-4110",
+                "Address": "MT, New, 12082 Laila Lakes",
+                "Established": "/Date(1615170920000+0000)/",
+                "FloorArea": 4451,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'fd6600bd-a5e4-4e91-a6b0-292b0a7129d8')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'fd6600bd-a5e4-4e91-a6b0-292b0a7129d8')"
+                }
+            },
+            {
+                "ID": "f8d44863-a9a6-41c1-a3f4-17f07525563b",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Swaniawski - Paucek",
+                "Email": "Wilhelmine_Hartmann46@yahoo.com",
+                "PhoneNumber": "(117) 321-3895",
+                "Address": "NM, New, 830 Tremblay Inlet",
+                "Established": "/Date(1613104484000+0000)/",
+                "FloorArea": 1547,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'f8d44863-a9a6-41c1-a3f4-17f07525563b')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'f8d44863-a9a6-41c1-a3f4-17f07525563b')"
+                }
+            },
+            {
+                "ID": "0f2a2f80-5b19-450f-9b1a-99cb6fc25ee9",
+                "createdAt": "/Date(1753430309315+0000)/",
+                "createdBy": "anonymous",
+                "modifiedAt": "/Date(1753430309315+0000)/",
+                "modifiedBy": "anonymous",
+                "Name": "Wunsch - Gerhold",
+                "Email": "Nina.Towne@hotmail.com",
+                "PhoneNumber": "1-037-724-6054 x628",
+                "Address": "WI, North, 8823 Stamm Spurs",
+                "Established": "/Date(1627535701000+0000)/",
+                "FloorArea": 5195,
+                "Products": {
+                    "__deferred": {
+                        "uri": "http://localhost:4004/v2/root/Stores(guid'0f2a2f80-5b19-450f-9b1a-99cb6fc25ee9')/Products"
+                    }
+                },
+                "__metadata": {
+                    "type": "StoreService.Stores",
+                    "uri": "http://localhost:4004/v2/root/Stores(guid'0f2a2f80-5b19-450f-9b1a-99cb6fc25ee9')"
+                }
+            }
+        ]
+    }
+}

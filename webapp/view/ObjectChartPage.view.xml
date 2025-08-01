@@ -8,7 +8,8 @@
     <suite:ChartContainer showFullScreen="true"
         autoAdjustHeight="true"
         showSelectionDetails="true"
-        title="{i18n>productDataTitle}">
+        title="{i18n>productDataTitle}"
+        id="idObjectChartPage">
         <suite:ChartContainerContent>
             <suite:content>
                 <viz:VizFrame id="idVizFrame"

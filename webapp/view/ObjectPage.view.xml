@@ -5,11 +5,12 @@
     <m:Page id="idObjectPage"
         showFooter="{uiModel>/toggleFooterVisibility}">
         <m:customHeader>
-            <m:Bar>
+            <m:Bar id="idObjectPageCustomHeaderBar">
                 <m:contentRight>
                     <m:Button type="Emphasized"
                         text="{i18n>invokeFunction}"
-                        press=".onInvokeFunctionFromMetadataButtonPress" />
+                        press=".onInvokeFunctionFromMetadataButtonPress" 
+                        id="idInvokeFunctionFromMetadataButton"/>
                     <m:Button id="idEditButton"
                         type="Emphasized"
                         enabled="{uiModel>/toggleEditButton}"

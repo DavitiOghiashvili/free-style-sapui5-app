@@ -1,15 +1,15 @@
 sap.ui.define(['sap/ui/test/Opa5'], function (Opa5) {
   'use strict';
-  const sViewName = 'App';
+  const sViewName = 'ObjectChartPage';
 
   Opa5.createPageObjects({
-    onTheAppPage: {
+    onTheObjectChartPage: {
       actions: {},
 
       assertions: {
-        iShouldSeeTheApp: function () {
+        iShouldSeeThePageObjectChartPage: function () {
           return this.waitFor({
-            id: 'app',
+            id: 'idObjectChartPage',
             viewName: sViewName,
             success: function () {
               Opa5.assert.ok(true, 'The ' + sViewName + ' view is displayed');

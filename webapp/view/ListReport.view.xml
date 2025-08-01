@@ -5,9 +5,9 @@
     xmlns:f="sap.f"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:plugins="sap.m.plugins">
-    <f:DynamicPage>
+    <f:DynamicPage id="idListReportPage">
         <f:title>
-            <f:DynamicPageTitle>
+            <f:DynamicPageTitle id="idTitle">
                 <f:heading>
                     <Title text="{i18n>appTitle}" />
                 </f:heading>
@@ -96,6 +96,7 @@
                             }" />
                         <ToolbarSpacer />
                         <Button text="{i18n>createBtn}"
+                            id="idCreateProductButton"
                             press=".onCreateProductDialogPress" />
                         <Button text="{i18n>deleteBtn}"
                             id="idProductDeleteButton"

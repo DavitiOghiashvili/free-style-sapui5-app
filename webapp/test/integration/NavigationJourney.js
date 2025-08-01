@@ -1,25 +1,30 @@
 /*global QUnit*/
 
 sap.ui.define(
-  ['sap/ui/test/opaQunit', './pages/App', './pages/ListReport'],
+  ['sap/ui/test/opaQunit', './pages/App', './pages/ListReport', './pages/ObjectPage', './pages/ObjectChartPage'],
   function (opaTest) {
     'use strict';
 
     QUnit.module('Navigation Journey');
 
-    opaTest(
-      'Should see the initial page of the app',
-      function (Given, When, Then) {
-        // Arrangements
-        Given.iStartMyApp();
+    opaTest("Should see the ListReport view", function (Given, When, Then) {
+      Given.iStartMyApp();
 
-        // Assertions
-        Then.onTheAppPage.iShouldSeeTheApp();
-        Then.onTheViewPage.iShouldSeeThePageView();
+      Then.onTheListReportPage.iShouldSeeThePageListReport();
+    });
 
-        //Cleanup
-        Then.iTeardownMyApp();
-      },
-    );
+    opaTest("Should see the ObjectPage view", function (Given, When, Then) {
+      When.onTheListReportPage.iClickOnTheFirstItem();
+
+      Then.onTheObjectPage.iShouldSeeThePageObjectPage();
+    });
+
+    opaTest("Should see the ObjectChartPage view", function (Given, When, Then) {
+      When.onTheObjectPage.iClickOnTheFirstItem();
+
+      Then.onTheObjectChartPage.iShouldSeeThePageObjectChartPage();
+
+      Then.iTeardownMyApp();
+    });
   },
 );

@@ -60,7 +60,8 @@
                             <m:Label text="{i18n>price}"
                                 class="sapUiTinyMarginBottom" />
                             <m:Input value="{Price_amount}"
-                                required="true" />
+                                required="true" 
+                                id="idEditPriceAmountInput"/>
                         </forms:SimpleForm>
                     </ObjectPageSubSection>
                 </subSections>
